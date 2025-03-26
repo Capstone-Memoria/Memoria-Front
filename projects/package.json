@@ -11,8 +11,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.15",
+    "@types/node": "^22.13.13",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.0",
+    "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.15"
   },
   "devDependencies": {
@@ -22,6 +27,8 @@
     "@vitejs/plugin-react-swc": "^3.8.0",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.2.4",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
