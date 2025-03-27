@@ -6,8 +6,8 @@ type Props = {
 
 const LoginPage: React.FC<Props> = ({ className }) => {
   return (
-    <div className={cn('w-full text-center', className)}>
-      <h1>Login</h1>
+    <div className={cn('h-screen w-full text-center', className)}>
+      <h1>메모리아</h1>
     </div>
   );
 };

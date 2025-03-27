@@ -1,10 +1,13 @@
 import './App.css';
-import AppRoutes from './routes/AppRoutes';
+import Layout from '@/layouts/layout';
+import AppRoutes from '@/routes/AppRoutes';
 
 function App() {
   return (
     <>
-      <AppRoutes />
+      <Layout>
+        <AppRoutes />
+      </Layout>
     </>
   );
 }
