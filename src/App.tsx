@@ -1,6 +1,6 @@
-import './App.css';
-import Layout from '@/layouts/layout';
-import AppRoutes from '@/routes/AppRoutes';
+import "./App.css";
+import Layout from "@/layouts/Layout";
+import AppRoutes from "@/routes/AppRoutes";
 
 function App() {
   return (

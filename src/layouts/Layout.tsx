@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils/className';
+import { cn } from "@/lib/utils/className";
 
 type Props = {
   className?: string;
@@ -6,11 +6,7 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = ({ className, children }) => {
-  return (
-    <div className={cn('mx-auto w-[450px] bg-sky-200', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("mx-auto w-[450px]", className)}>{children}</div>;
 };
 
 export default Layout;
