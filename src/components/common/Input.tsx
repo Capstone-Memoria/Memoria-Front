@@ -1,17 +1,27 @@
 import { cn } from "@/lib/utils/className";
+import React from "react";
+import { IoEye } from "react-icons/io5";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  value: string;
+  type: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
   label?: string;
   error?: string;
   icon?: React.ReactNode;
+  disabled?: boolean;
   placeholder?: string;
   className?: string;
 };
 
 const Input: React.FC<InputProps> = ({
+  value,
+  type,
+  onChange,
   label,
   error,
   icon,
+  disabled,
   placeholder,
   className,
 }) => {
@@ -29,10 +39,17 @@ const Input: React.FC<InputProps> = ({
             {label}
           </label>
         )}
-        <input
-          className="w-full outline-none placeholder:text-[#B1B1B1]"
-          placeholder={placeholder}
-        />
+        <div className="flex pr-1">
+          <input
+            className="w-full outline-none placeholder:text-[#B1B1B1]"
+            value={value}
+            type={type}
+            onChange={onChange}
+            placeholder={placeholder}
+            disabled={disabled}
+          />
+          {type === "password" && <IoEye />}
+        </div>
       </div>
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
