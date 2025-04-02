@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # 프론트엔드 develop 브랜치에 푸시될 때 실행
+  workflow_dispatch: # 수동으로 실행할 수 있도록 설정
 
 jobs:
   dispatch:
