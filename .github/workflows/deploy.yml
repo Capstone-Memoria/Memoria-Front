@@ -1,0 +1,17 @@
+name: Trigger Backend Deployment
+
+on:
+  push:
+    branches:
+      - main # 프론트엔드 develop 브랜치에 푸시될 때 실행
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3 # 외부 Action 사용
+        with:
+          token: ${{ secrets.BACKEND_TRIGGER_PAT }} # 1단계에서 프론트엔드 레포에 저장한 PAT
+          repository: Capstone-Memoria/Memoria-Back # <<<--- 백엔드 레포지토리 경로 입력!
+          event-type: frontend-update # <<<--- 백엔드 워크플로우 on.repository_dispatch.types 와 일치시켜야 함
