@@ -1,5 +1,5 @@
 import LoginPage from "@/features/login/pages/LoginPage";
-import MainPage from "@/features/login/pages/MainPage";
+import MainPage from "@/features/main/pages/MainPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import { RouteObject } from "react-router-dom";
 
