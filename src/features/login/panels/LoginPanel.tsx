@@ -53,7 +53,7 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
       <div>
         <img
           src={MemoriaLogo}
-          alt="Memoria Logo"
+          alt={"Memoria Logo"}
           className={"mx-auto h-7 mt-8"}
         />
         <div className={"text-xs flex justify-center mt-2"}>

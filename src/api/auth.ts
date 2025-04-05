@@ -16,3 +16,20 @@ export const login = async (email: string, password: string) => {
 
   return response.data;
 };
+
+type RegisterResponse = User;
+
+interface RegisterRequest {
+  email: string;
+  password: string;
+  nickName: string;
+}
+
+export const register = async (request: RegisterRequest) => {
+  const response = await server.post<RegisterResponse>(
+    "/api/auth/register",
+    request
+  );
+
+  return response.data;
+};
