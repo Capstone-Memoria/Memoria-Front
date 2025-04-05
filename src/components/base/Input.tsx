@@ -6,6 +6,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
   helperText?: string;
   helperTextClassName?: string;
+  isError?: boolean;
 }
 
 export default function Input({
@@ -55,7 +56,15 @@ export default function Input({
         </div>
       </div>
       {helperText && (
-        <p className={cn("mt-1 text-xs text-gray-400", helperTextClassName)}>
+        <p
+          className={cn(
+            "mt-1 text-xs text-gray-400",
+            {
+              "text-red-500": props.isError,
+            },
+            helperTextClassName
+          )}
+        >
           {helperText}
         </p>
       )}
