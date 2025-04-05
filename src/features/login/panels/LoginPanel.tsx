@@ -1,9 +1,13 @@
+import api from "@/api";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import { cn } from "@/lib/utils/className";
-import { HTMLAttributes } from "react";
+import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useMutation } from "@tanstack/react-query";
+import { HTMLAttributes, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 interface LoginPanelProps extends HTMLAttributes<HTMLDivElement> {
   onNext?: () => void;
@@ -15,6 +19,31 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
   onPrev,
   ...props
 }: LoginPanelProps) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
+
+  const {
+    mutate: tryLogin,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: () => api.auth.login(email, password),
+    onSuccess: (data) => {
+      authStore.login({
+        accessToken: data.accessToken,
+        accessTokenExpiresAt: data.accessTokenExpiresAt,
+        user: data.user,
+      });
+      navigate("/main");
+    },
+  });
+
+  const handleLogin = () => {
+    tryLogin();
+  };
+
   return (
     <div
       {...props}
@@ -36,16 +65,24 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
           className={"w-full"}
           label={"이메일"}
           placeholder={"user@example.com"}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <Input
           className={"w-full"}
           label={"비밀번호"}
           type={"password"}
           placeholder={"비밀번호를 입력하세요"}
+          value={password}
+          helperText={error?.message}
+          isError={!!error}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
       <div className={"flex-1 min-h-24"} />
-      <Button size={"xl"}>로그인</Button>
+      <Button size={"xl"} onClick={handleLogin}>
+        로그인
+      </Button>
     </div>
   );
 };

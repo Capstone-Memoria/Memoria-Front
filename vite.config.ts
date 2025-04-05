@@ -14,5 +14,11 @@ export default defineConfig({
   server: {
     allowedHosts: true,
     host: true,
+    proxy: {
+      "/api": {
+        target: "https://memoria.myunghyun.me",
+        changeOrigin: true,
+      },
+    },
   },
 });

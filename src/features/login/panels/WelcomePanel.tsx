@@ -23,7 +23,7 @@ const WelcomePanel: React.FC<WelcomePanelProps> = ({ onNext, ...props }) => {
         <div>메모리아에서 함께 이야기해요.</div>
       </div>
       <div className={"mx-8 flex-1 flex items-center justify-center"}>
-        <img src={onboardingImage} alt="Onboarding" />
+        <img src={onboardingImage} alt="Onboarding" className={"max-w-72"} />
       </div>
       <div className={"flex items-center justify-center mb-4"} onClick={onNext}>
         이미 함께하고 계신가요?{" "}

@@ -1,11 +1,20 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useLocation, useRoutes } from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import "./App.css";
 import { routes } from "./routes/routes";
+import { useAuthStore } from "./stores/AuthenticationStore";
 
 function App() {
-  const renderedRoute = useRoutes(routes);
+  const authStore = useAuthStore();
+
+  const isLogined = useMemo(() => authStore.isAuthenticated(), [authStore]);
+  const currentRouting = useMemo(() => {
+    return isLogined ? "logined" : "unlogined";
+  }, [isLogined]);
+
+  const renderedRoute = useRoutes(routes[currentRouting]);
+
   const location = useLocation();
   const nodeRef = useRef(null);
 
