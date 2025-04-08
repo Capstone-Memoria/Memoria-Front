@@ -4,22 +4,17 @@ import Header from "@/components/base/Header";
 import Input from "@/components/base/Input";
 import PageContainer from "@/components/page/PageContainer";
 import { useAuthStore } from "@/stores/AuthenticationStore";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { IoMdCheckmark } from "react-icons/io";
 
 const ProfilePage = () => {
   const authStore = useAuthStore();
-  const userEmail = authStore.context?.user?.email ?? "";
-  const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({
-    queryKey: ["user", userEmail],
-    queryFn: () => api.user.getUser(userEmail),
-    enabled: !!userEmail,
-  });
 
   // 닉네임 변경 상태
-  const [nickName, setNickName] = useState(user?.nickName || "");
+  const [nickName, setNickName] = useState(
+    authStore.context?.user?.nickName || ""
+  );
   const [isEditingNickname, setIsEditingNickname] = useState(false);
 
   // 비밀번호 변경 상태
@@ -31,35 +26,37 @@ const ProfilePage = () => {
 
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [isPasswordChanged, setIsPasswordChanged] = useState(false);
 
   const { mutate: tryUpdateUser } = useMutation({
     mutationFn: (data: {
-      userEmail: string;
+      email: string;
       nickName?: string;
       password?: string;
     }) =>
-      api.user.updateUser(
-        data.userEmail,
-        data.nickName ?? "",
-        data.password ?? ""
-      ),
-    onSuccess: (_, variables) => {
-      // 사용자 정보 다시 불러오기
-      queryClient.invalidateQueries({
-        queryKey: ["user", variables.userEmail],
+      api.user.updateUser(data.email, {
+        nickName: data.nickName,
+        password: data.password,
+      }),
+    onSuccess: (res, vars) => {
+      authStore.updateContext({
+        user: {
+          ...res,
+        },
       });
+
+      if (vars.password) {
+        setIsPasswordChanged(true);
+      }
     },
   });
 
   // 닉네임 변경 핸들러
   const handleNicknameChange = () => {
-    if (!userEmail) return;
-
     tryUpdateUser({
-      userEmail,
-      nickName,
+      email: authStore.context!.user!.email,
+      nickName: nickName,
     });
-    alert("닉네임이 변경되었습니다.");
     setIsEditingNickname(false);
   };
 
@@ -75,19 +72,15 @@ const ProfilePage = () => {
 
   // 비밀번호 변경 관련 핸들러
   const handlePasswordSubmit = () => {
-    if (!userEmail) return;
-
     if (passwords.newPassword !== passwords.confirmPassword) {
       setPasswordError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
 
     tryUpdateUser({
-      userEmail: userEmail,
+      email: authStore.context!.user!.email,
       password: passwords.newPassword,
     });
-
-    alert("비밀번호가 변경되었습니다.");
     setIsChangingPassword(false);
     setPasswords({
       currentPassword: "",
@@ -98,7 +91,8 @@ const ProfilePage = () => {
   };
 
   // 카드 스타일 공통 클래스
-  const cardClass = "bg-white rounded-xl p-5 shadow-sm mb-4";
+  const cardClass =
+    "bg-white rounded-xl p-5 shadow-sm mb-4 border-1 border-gray-300";
 
   return (
     <PageContainer>
@@ -110,11 +104,11 @@ const ProfilePage = () => {
           <div className={"flex flex-col gap-2"}>
             <div className={"flex justify-between items-center"}>
               <span className={"text-gray-500"}>닉네임</span>
-              <span>{user?.nickName}</span>
+              <span>{authStore.context?.user?.nickName}</span>
             </div>
             <div className={"flex justify-between items-center"}>
               <span className={"text-gray-500"}>이메일</span>
-              <span>{userEmail}</span>
+              <span>{authStore.context!.user!.email}</span>
             </div>
           </div>
         </div>
@@ -210,9 +204,21 @@ const ProfilePage = () => {
               </div>
             </div>
           ) : (
-            <Button onClick={() => setIsChangingPassword(true)}>
+            <Button
+              onClick={() => {
+                setIsChangingPassword(true);
+                setIsPasswordChanged(false);
+              }}
+            >
               비밀번호 변경하기
             </Button>
+          )}
+
+          {isPasswordChanged && (
+            <div className={"text-green-600 mt-4 flex items-center gap-2"}>
+              <IoMdCheckmark />
+              비밀번호가 성공적으로 변경되었습니다.
+            </div>
           )}
         </div>
       </div>

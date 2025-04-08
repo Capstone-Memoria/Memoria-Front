@@ -1,30 +1,24 @@
-import { DateTime } from "luxon";
+import { User } from "@/models/User";
 import server from "./axios";
-
-interface User {
-  userEmail: string;
-  nickName: string;
-  createdAt: DateTime;
-  lastModifiedAt: DateTime;
-}
 
 export const getUser = async (userEmail: string) => {
   const response = await server.get<User>(`/api/user/${userEmail}`);
   return response.data;
 };
 
-export const updateUser = async (
-  userEmail: string,
-  nickName: string,
-  password: string
-) => {
-  const updateData: Record<string, string> = {};
-  if (nickName) updateData.nickName = nickName;
-  if (password) updateData.password = password;
 
+interface UpdateUserRequest {
+  nickName?: string;
+  password?: string;
+}
+
+export const updateUser = async (
+  email: string,
+  request: UpdateUserRequest
+) => {
   const response = await server.patch<User>(
-    `/api/user/${userEmail}`,
-    updateData
+    `/api/user/${email}`,
+    request
   );
   return response.data;
 };

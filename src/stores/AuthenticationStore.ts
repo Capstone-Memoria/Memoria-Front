@@ -15,6 +15,7 @@ type AuthenticationState = {
   isAuthenticated: () => boolean;
   login: (context: AuthenticationContext) => void;
   logout: () => void;
+  updateContext: (context: Partial<AuthenticationContext>) => void;
 };
 
 /**
@@ -45,6 +46,14 @@ export const AuthenticationStore = createStore<AuthenticationState>(
       logout: () => {
         set({ context: undefined });
       },
+      updateContext: (context: Partial<AuthenticationContext>) => {
+        set((state) => ({
+          context: {
+            ...state.context,
+            ...context,
+          },
+        }));
+      },
     };
   }
 );
@@ -52,7 +61,6 @@ export const AuthenticationStore = createStore<AuthenticationState>(
 export const useAuthStore = () => {
   return useStore(AuthenticationStore);
 };
-
 
 /**
  * localStorage에 인증 정보를 저장합니다.
