@@ -1,19 +1,9 @@
+import ErrorPage from "@/features/error/pages/ErrorPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import MainPage from "@/features/main/pages/MainPage";
 import ProfilePage from "@/features/profile/pages/ProfilePage";
 import { Navigate, RouteObject } from "react-router-dom";
-
-// export const routes: RouteObject[] = [
-//   {
-//     path: "/",
-//     element: <LoginPage />,
-//   },
-//   {
-//     path: "/register",
-//     element: <RegisterPage />,
-//   },
-// ];
 
 type RoutingContext = "logined" | "unlogined";
 type ContextRoutes = Record<RoutingContext, RouteObject[]>;
@@ -36,6 +26,18 @@ export const routes: ContextRoutes = {
       path: "/login",
       element: <LoginPage />,
     },
+    {
+      path: "/error",
+      element: <ErrorPage />,
+    },
+    {
+      path: "/error/:errorCode",
+      element: <ErrorPage />,
+    },
+    {
+      path: "/*",
+      element: <ErrorPage defaultErrorCode={"404"} />,
+    },
   ],
   unlogined: [
     {
@@ -49,6 +51,18 @@ export const routes: ContextRoutes = {
     {
       path: "/register",
       element: <RegisterPage />,
+    },
+    {
+      path: "/error",
+      element: <ErrorPage />,
+    },
+    {
+      path: "/error/:errorCode",
+      element: <ErrorPage />,
+    },
+    {
+      path: "/*",
+      element: <ErrorPage defaultErrorCode={"404"} />,
     },
   ],
 };
