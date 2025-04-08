@@ -1,13 +1,22 @@
+import api from "@/api";
 import Button from "@/components/base/Button";
 import Header from "@/components/base/Header";
 import Input from "@/components/base/Input";
 import PageContainer from "@/components/page/PageContainer";
 import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 const ProfilePage = () => {
   const authStore = useAuthStore();
-  const user = authStore.context?.user;
+  const userEmail = authStore.context?.user?.email ?? "";
+  const queryClient = useQueryClient();
+
+  const { data: user } = useQuery({
+    queryKey: ["user", userEmail],
+    queryFn: () => api.user.getUser(userEmail),
+    enabled: !!userEmail,
+  });
 
   // 닉네임 변경 상태
   const [nickName, setNickName] = useState(user?.nickName || "");
@@ -19,19 +28,41 @@ const ProfilePage = () => {
     newPassword: "",
     confirmPassword: "",
   });
+
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
 
+  const { mutate: tryUpdateUser } = useMutation({
+    mutationFn: (data: {
+      userEmail: string;
+      nickName?: string;
+      password?: string;
+    }) =>
+      api.user.updateUser(
+        data.userEmail,
+        data.nickName ?? "",
+        data.password ?? ""
+      ),
+    onSuccess: (_, variables) => {
+      // 사용자 정보 다시 불러오기
+      queryClient.invalidateQueries({
+        queryKey: ["user", variables.userEmail],
+      });
+    },
+  });
+
   // 닉네임 변경 핸들러
   const handleNicknameChange = () => {
-    // API 연결은 아직 하지 않음
-    console.log("닉네임 변경:", nickName);
-    setIsEditingNickname(false);
-    // 성공 메시지 표시
+    if (!userEmail) return;
+
+    tryUpdateUser({
+      userEmail,
+      nickName,
+    });
     alert("닉네임이 변경되었습니다.");
+    setIsEditingNickname(false);
   };
 
-  // 비밀번호 변경 관련 핸들러
   const handlePasswordChange = (
     field: keyof typeof passwords,
     value: string
@@ -42,21 +73,21 @@ const ProfilePage = () => {
     }));
   };
 
-  // 비밀번호 변경 제출 핸들러
+  // 비밀번호 변경 관련 핸들러
   const handlePasswordSubmit = () => {
-    // 비밀번호 유효성 검사
+    if (!userEmail) return;
+
     if (passwords.newPassword !== passwords.confirmPassword) {
       setPasswordError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
 
-    if (passwords.newPassword.length < 6) {
-      setPasswordError("비밀번호는 최소 6자 이상이어야 합니다.");
-      return;
-    }
+    tryUpdateUser({
+      userEmail: userEmail,
+      password: passwords.newPassword,
+    });
 
-    // API 연결은 아직 하지 않음
-    console.log("비밀번호 변경:", passwords);
+    alert("비밀번호가 변경되었습니다.");
     setIsChangingPassword(false);
     setPasswords({
       currentPassword: "",
@@ -64,8 +95,6 @@ const ProfilePage = () => {
       confirmPassword: "",
     });
     setPasswordError("");
-    // 성공 메시지 표시
-    alert("비밀번호가 변경되었습니다.");
   };
 
   // 카드 스타일 공통 클래스
@@ -85,7 +114,7 @@ const ProfilePage = () => {
             </div>
             <div className={"flex justify-between items-center"}>
               <span className={"text-gray-500"}>이메일</span>
-              <span>{user?.email}</span>
+              <span>{userEmail}</span>
             </div>
           </div>
         </div>

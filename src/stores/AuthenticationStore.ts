@@ -53,6 +53,7 @@ export const useAuthStore = () => {
   return useStore(AuthenticationStore);
 };
 
+
 /**
  * localStorage에 인증 정보를 저장합니다.
  * @param mapper 인증 정보를 변환하는 함수
