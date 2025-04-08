@@ -1,7 +1,7 @@
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import MainPage from "@/features/main/pages/MainPage";
-import ProfilePage from "@/features/Profile/pages/ProfilePage";
+import ProfilePage from "@/features/profile/pages/ProfilePage";
 import { Navigate, RouteObject } from "react-router-dom";
 
 // export const routes: RouteObject[] = [
