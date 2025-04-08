@@ -91,8 +91,7 @@ const ProfilePage = () => {
   };
 
   // 카드 스타일 공통 클래스
-  const cardClass =
-    "bg-white rounded-xl p-5 shadow-sm mb-4 border-1 border-gray-300";
+  const cardClass = "bg-white rounded-xl p-5 mb-4";
 
   return (
     <PageContainer>
