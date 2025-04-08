@@ -15,6 +15,7 @@ type AuthenticationState = {
   isAuthenticated: () => boolean;
   login: (context: AuthenticationContext) => void;
   logout: () => void;
+  updateContext: (context: Partial<AuthenticationContext>) => void;
 };
 
 /**
@@ -44,6 +45,14 @@ export const AuthenticationStore = createStore<AuthenticationState>(
       },
       logout: () => {
         set({ context: undefined });
+      },
+      updateContext: (context: Partial<AuthenticationContext>) => {
+        set((state) => ({
+          context: {
+            ...state.context,
+            ...context,
+          },
+        }));
       },
     };
   }

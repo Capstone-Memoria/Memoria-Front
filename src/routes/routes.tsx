@@ -1,6 +1,7 @@
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import MainPage from "@/features/main/pages/MainPage";
+import ProfilePage from "@/features/Profile/pages/ProfilePage";
 import { Navigate, RouteObject } from "react-router-dom";
 
 // export const routes: RouteObject[] = [
@@ -26,6 +27,10 @@ export const routes: ContextRoutes = {
     {
       path: "/main",
       element: <MainPage />,
+    },
+    {
+      path: "/profile",
+      element: <ProfilePage />,
     },
     {
       path: "/login",
