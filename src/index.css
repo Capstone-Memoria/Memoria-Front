@@ -27,4 +27,5 @@ body {
 
 @theme {
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --color-gray-1: #6b6b6b;
 }
