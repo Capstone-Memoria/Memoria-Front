@@ -1,3 +1,4 @@
+import Button from "@/components/base/Button";
 import Header from "@/components/base/Header";
 import Diary from "@/components/diary/Diary";
 import PageContainer from "@/components/page/PageContainer";
@@ -60,13 +61,18 @@ const MainPage = () => {
   return (
     <PageContainer>
       <Header />
-      <div className={"my-6"}>
-        <p className={"font-semibold text-lg"}>
-          {authStore.context?.user?.nickName} 님의 책장,
-        </p>
-        <p className={"font-regular text-gray-1 text-xs"}>
-          {diaryDummyData.length}권의 일기장
-        </p>
+      <div className={"my-6 flex items-center justify-between"}>
+        <div>
+          <p className={"font-semibold text-lg"}>
+            {authStore.context?.user?.nickName} 님의 책장,
+          </p>
+          <p className={"font-regular text-gray-1 text-xs"}>
+            {diaryDummyData.length}권의 일기장
+          </p>
+        </div>
+        <Button size={"xs"} variant={"secondary"} onClick>
+          새 일기장
+        </Button>
       </div>
       <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
         {diaryDummyData.map((diary) => (

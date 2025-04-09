@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/className";
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useState } from "react";
 import { TbPinned, TbPinnedFilled } from "react-icons/tb";
 
 interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
@@ -7,12 +7,16 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   notificationCount: number;
 }
 
-const DiaryCover: React.FC<DiaryCoverProps> = ({ pinned, ...props }) => {
+const DiaryCover: React.FC<DiaryCoverProps> = ({
+  pinned: initialPinned,
+  ...props
+}) => {
+  const [pinned, setPinned] = useState(initialPinned);
+
   const handlePinClick = () => {
     // 핀 클릭 시 처리할 로직을 여기에 작성합니다.
     // 예를 들어, 핀 상태를 변경하는 API 호출 등을 수행할 수 있습니다.
-    pinned = !pinned;
-    alert("클릭됨");
+    setPinned(!pinned);
   };
 
   return (

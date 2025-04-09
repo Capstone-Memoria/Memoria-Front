@@ -2,10 +2,12 @@ import { cn } from "@/lib/utils/className";
 import { ButtonHTMLAttributes, useMemo } from "react";
 
 const ButtonVariants = {
-  primary: "bg-black text-white",
+  primary: "bg-black text-white rounded-xl",
+  secondary: "bg-gray-300 text-black rounded-md",
 };
 
 const ButtonSizes = {
+  xs: "px-2 py-1 text-[11px]",
   sm: "px-2 py-1 text-sm",
   md: "px-4 py-2 text-base",
   lg: "px-6 py-3 text-base",
@@ -13,7 +15,8 @@ const ButtonSizes = {
 };
 
 const DisabledVariants = {
-  primary: "bg-gray-300 text-gray-500",
+  primary: "bg-gray-300 text-gray-500 rounded-xl",
+  secondary: "bg-gray-200 text-gray-400 rounded-md",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -41,7 +44,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       {...props}
       className={cn(
-        "rounded-xl focus:outline-none cursor-pointer transition-all active:scale-95",
+        "focus:outline-none cursor-pointer transition-all active:scale-95",
         variantClasses,
         sizeClasses,
         className
