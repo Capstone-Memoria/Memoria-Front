@@ -1,5 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
+import Card from "@/components/base/Card";
 import Header from "@/components/base/Header";
 import Input from "@/components/base/Input";
 import PageContainer from "@/components/page/PageContainer";
@@ -7,9 +8,16 @@ import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const authStore = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authStore.logout();
+    navigate("/login");
+  };
 
   // 닉네임 변경 상태
   const [nickName, setNickName] = useState(
@@ -91,14 +99,13 @@ const ProfilePage = () => {
   };
 
   // 카드 스타일 공통 클래스
-  const cardClass = "bg-white rounded-xl p-5 mb-4";
 
   return (
     <PageContainer>
       <Header logoType={"back"} />
       <div className={"mt-5 flex flex-col gap-5"}>
         {/* 사용자 정보 카드 */}
-        <div className={cardClass}>
+        <Card>
           <h2 className={"text-lg font-medium mb-4"}>사용자 정보</h2>
           <div className={"flex flex-col gap-2"}>
             <div className={"flex justify-between items-center"}>
@@ -110,10 +117,15 @@ const ProfilePage = () => {
               <span>{authStore.context!.user!.email}</span>
             </div>
           </div>
-        </div>
+          <div className={"mt-4"}>
+            <Button className={"w-full"} onClick={handleLogout}>
+              로그아웃
+            </Button>
+          </div>
+        </Card>
 
         {/* 닉네임 변경 카드 */}
-        <div className={cardClass}>
+        <Card>
           <h2 className={"text-lg font-medium mb-4"}>닉네임 변경</h2>
           {isEditingNickname ? (
             <div className={"flex flex-col gap-4"}>
@@ -142,10 +154,10 @@ const ProfilePage = () => {
               닉네임 변경하기
             </Button>
           )}
-        </div>
+        </Card>
 
         {/* 비밀번호 변경 카드 */}
-        <div className={cardClass}>
+        <Card>
           <h2 className={"text-lg font-medium mb-4"}>비밀번호 변경</h2>
           {isChangingPassword ? (
             <div className={"flex flex-col gap-4"}>
@@ -219,7 +231,7 @@ const ProfilePage = () => {
               비밀번호가 성공적으로 변경되었습니다.
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </PageContainer>
   );
