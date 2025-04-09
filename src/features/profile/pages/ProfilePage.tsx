@@ -95,7 +95,7 @@ const ProfilePage = () => {
 
   return (
     <PageContainer>
-      <Header />
+      <Header logoType={"back"} />
       <div className={"mt-5 flex flex-col gap-5"}>
         {/* 사용자 정보 카드 */}
         <div className={cardClass}>
