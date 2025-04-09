@@ -1,3 +1,4 @@
+import CreateDiaryPage from "@/features/diary/pages/CreateDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
@@ -17,6 +18,10 @@ export const routes: ContextRoutes = {
     {
       path: "/main",
       element: <MainPage />,
+    },
+    {
+      path: "/create-diary",
+      element: <CreateDiaryPage />,
     },
     {
       path: "/profile",

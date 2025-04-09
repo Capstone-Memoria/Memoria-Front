@@ -3,6 +3,7 @@ import Header from "@/components/base/Header";
 import Diary from "@/components/diary/Diary";
 import PageContainer from "@/components/page/PageContainer";
 import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useNavigate } from "react-router-dom";
 
 const diaryDummyData = [
   {
@@ -57,6 +58,7 @@ const diaryDummyData = [
 
 const MainPage = () => {
   const authStore = useAuthStore();
+  const navigate = useNavigate();
 
   return (
     <PageContainer>
@@ -70,7 +72,11 @@ const MainPage = () => {
             {diaryDummyData.length}권의 일기장
           </p>
         </div>
-        <Button size={"xs"} variant={"secondary"} onClick>
+        <Button
+          size={"xs"}
+          variant={"secondary"}
+          onClick={() => navigate("/create-diary")}
+        >
           새 일기장
         </Button>
       </div>
