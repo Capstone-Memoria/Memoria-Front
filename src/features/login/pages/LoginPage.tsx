@@ -23,7 +23,7 @@ const LoginPage = () => {
           transform: `translateX(-${step * 100}vw)`,
         }}
       >
-        <WelcomePanel className={"w-screen"} onNext={handleNext} />
+        <WelcomePanel className={"w-screen h-full"} onNext={handleNext} />
         <LoginPanel
           className={"w-screen"}
           onNext={handleNext}
