@@ -5,6 +5,7 @@ const DiaryMemberPage = () => {
   return (
     <Page.Container>
       <DefaultHeader logoType={"back"} />
+      <Page.Content>일기장 멤버 관리 페이지</Page.Content>
     </Page.Container>
   );
 };

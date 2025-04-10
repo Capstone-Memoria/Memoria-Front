@@ -5,7 +5,7 @@ const Card: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
   return (
     <div
       {...props}
-      className={cn("bg-white rounded-xl p-5 mb-4", props.className)}
+      className={cn("bg-white rounded-xl p-4", props.className)}
     />
   );
 };
