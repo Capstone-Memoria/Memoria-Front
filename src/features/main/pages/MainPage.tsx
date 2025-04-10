@@ -84,6 +84,7 @@ const MainPage = () => {
         <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
           {diaryDummyData.map((diary) => (
             <Diary
+              onClick={() => navigate(`/diary/${diary.id}`)}
               key={diary.id}
               title={diary.title}
               memberCount={diary.memberCount}
