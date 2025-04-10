@@ -33,12 +33,7 @@ const Content: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
 };
 
 const Footer: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
-  return (
-    <div
-      {...props}
-      className={cn("flex justify-end items-center", props.className)}
-    />
-  );
+  return <div {...props} className={cn("py-4 px-4", props.className)} />;
 };
 
 export default {
