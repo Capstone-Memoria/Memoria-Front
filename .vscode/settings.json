@@ -1,0 +1,14 @@
+// .vscode/settings.json
+{
+  // 다른 프로젝트 공통 설정도 여기에 추가 가능
+  "editor.formatOnSave": true, // 예시: 저장 시 자동 포맷팅
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.addMissingImports.ts": "explicit",
+    "source.organizeImports": "explicit",
+    "source.removeUnusedImports": "explicit",
+    "source.sortImports": "explicit"
+  }
+  
+}
