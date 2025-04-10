@@ -1,7 +1,7 @@
+import Button from "@/components/base/Button";
+import Page from "@/components/page/Page";
 import { HTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
-import Page from "@/components/page/Page";
-import Button from "@/components/base/Button";
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
   logoType?: "default" | "back";
@@ -24,7 +24,7 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
       <div className={"text-sm font-normal"} onClick={handleBack}>
         취소
       </div>
-      <div className={"text-base font-medium"}>새 일기장</div>
+      <div className={"text-base font-normal"}>새 일기장</div>
       <Button
         variant={"text"}
         disabled={!success}

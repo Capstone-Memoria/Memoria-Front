@@ -3,12 +3,14 @@ import { HTMLAttributes, useState } from "react";
 import { TbPinned, TbPinnedFilled } from "react-icons/tb";
 
 interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
-  pinned: boolean;
-  notificationCount: number;
+  pinned?: boolean;
+  showPin?: boolean;
+  notificationCount?: number;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
-  pinned: initialPinned,
+  pinned: initialPinned = false,
+  showPin = true,
   ...props
 }) => {
   const [pinned, setPinned] = useState(initialPinned);
@@ -29,13 +31,16 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
     >
       {/* 표지 꾸미기에서 바뀌는 부분 */}
       <div className={"w-1.5 h-full rounded-l-xs bg-green-500"}></div>
-      <div
-        className={"absolute top-2 right-2 bg-transparent"}
-        onClick={handlePinClick}
-      >
-        {pinned ? <TbPinnedFilled /> : <TbPinned />}
-      </div>
-      {props.notificationCount > 0 && (
+      {showPin && (
+        <div
+          className={"absolute top-2 right-2 bg-transparent"}
+          onClick={handlePinClick}
+        >
+          {pinned ? <TbPinnedFilled /> : <TbPinned />}
+        </div>
+      )}
+
+      {props.notificationCount && props.notificationCount > 0 && (
         <div
           className={
             "absolute top-0 right-0 min-w-4.5 h-4.5 translate-x-[calc(50%-3px)] -translate-y-[calc(50%-4px)] flex items-center justify-center bg-red-500 text-white font-normal text-[8px] p-1 rounded-full"
