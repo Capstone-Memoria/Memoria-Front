@@ -21,6 +21,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
 
   return (
     <div
+      {...props}
       className={cn(
         "w-22 h-32 flex relative rounded-r-md bg-gray-300 shadow-md",
         props.className

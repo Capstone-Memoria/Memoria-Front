@@ -18,6 +18,7 @@ const Diary: React.FC<DiaryProps> = ({
 }) => {
   return (
     <div
+      {...props}
       className={cn(
         "flex flex-col w-full justify-center items-center",
         props.className
