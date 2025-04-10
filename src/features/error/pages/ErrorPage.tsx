@@ -1,5 +1,5 @@
 import Button from "@/components/base/Button";
-import PageContainer from "@/components/page/PageContainer";
+import Page from "@/components/page/Page";
 import { ReactNode } from "react";
 import {
   FaBug,
@@ -42,7 +42,7 @@ const ErrorPage = ({ defaultErrorCode = "500" }: ErrorPageProps) => {
   };
 
   return (
-    <PageContainer>
+    <Page.Container>
       <div className={"flex flex-col items-center justify-center mt-32"}>
         <div className={"text-6xl"}>
           {errorIcons[code] || <FaExclamationTriangle className={" mb-4"} />}
@@ -60,7 +60,7 @@ const ErrorPage = ({ defaultErrorCode = "500" }: ErrorPageProps) => {
           </Button>
         </div>
       </div>
-    </PageContainer>
+    </Page.Container>
   );
 };
 

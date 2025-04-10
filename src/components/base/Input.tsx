@@ -30,7 +30,9 @@ export default function Input({
       <div className={cn("relative w-full")}>
         <input
           {...props}
-          className={cn("w-full bg-transparent py-2 focus:outline-none")}
+          className={cn(
+            "w-full bg-transparent placeholder:text-gray-2 py-2 focus:outline-none"
+          )}
           onFocus={(e) => {
             setFocused(true);
             props.onFocus?.(e);

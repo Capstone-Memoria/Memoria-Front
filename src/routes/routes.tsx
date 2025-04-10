@@ -1,3 +1,7 @@
+import CreateDiaryPage from "@/features/diary/pages/CreateDiaryPage";
+import DiaryMemberPage from "@/features/diary/pages/DiaryMemberPage";
+import EditDiaryPage from "@/features/diary/pages/EditDiaryPage";
+import ViewDiaryPage from "@/features/diary/pages/ViewDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
@@ -19,6 +23,10 @@ export const routes: ContextRoutes = {
       element: <MainPage />,
     },
     {
+      path: "/create-diary",
+      element: <CreateDiaryPage />,
+    },
+    {
       path: "/profile",
       element: <ProfilePage />,
     },
@@ -33,6 +41,18 @@ export const routes: ContextRoutes = {
     {
       path: "/error/:errorCode",
       element: <ErrorPage />,
+    },
+    {
+      path: "/diary/:diaryId",
+      element: <ViewDiaryPage />,
+    },
+    {
+      path: "/diary/:diaryId/edit",
+      element: <EditDiaryPage />,
+    },
+    {
+      path: "/diary/:diaryId/members",
+      element: <DiaryMemberPage />,
     },
     {
       path: "/*",

@@ -21,7 +21,7 @@ function App() {
   return (
     <SwitchTransition mode={"out-in"}>
       <CSSTransition
-        key={location.pathname}
+        key={`${location.pathname}-${currentRouting}`}
         classNames={"scale"}
         timeout={300}
         unmountOnExit
