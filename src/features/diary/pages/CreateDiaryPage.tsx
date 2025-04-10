@@ -21,7 +21,7 @@ const CreateDiaryPage = () => {
   return (
     <Page.Container>
       <DiaryCreateHeader success={success} />
-      <Page.Content>
+      <Page.Content className={"overflow-x-hidden"}>
         <div className={"mt-4"}>
           <p className={"text-sm font-normal"}>
             새 일기장의 제목을 입력해주세요.
@@ -38,7 +38,7 @@ const CreateDiaryPage = () => {
             일기장 커버 스타일을 선택해주세요.
           </p>
           <DiaryCoverCarousel
-            className={"w-full py-4"}
+            className={"w-fit py-8"}
             onSelect={handlePresetSelect}
           />
         </div>
