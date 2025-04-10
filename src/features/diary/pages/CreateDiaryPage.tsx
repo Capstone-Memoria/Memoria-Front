@@ -1,20 +1,22 @@
+import Input from "@/components/base/Input";
+import DefaultHeader from "@/components/layout/DefaultHeader";
+import Page from "@/components/page/Page";
+
 export default function CreateDiaryPage() {
-  // const [title, setTitle] = useState("");
-  // const [coverColor, setCoverColor] = useState("#A3C4F3");
-  // const navigate = useNavigate();
-
-  // const handleCreate = () => {
-  //   if (!title.trim()) {
-  //     alert("일기장 이름을 입력해주세요.");
-  //     return;
-  //   }
-
-  //   // TODO: 백엔드 연동 or 상태 저장
-  //   console.log("일기장 생성:", { title, coverColor });
-
-  //   // 생성 후 메인 페이지로 이동
-  //   navigate("/main");
-  // };
-
-  return <div></div>;
+  return (
+    <Page.Container>
+      <DefaultHeader />
+      <Page.Content>
+        <div className={"mt-8"}>
+          <p className={"text-sm font-medium"}>
+            새 일기장의 제목을 입력해주세요.
+          </p>
+          <Input
+            className={"w-full placeholder:text-gray-400"}
+            placeholder={"ex) 메모리아 일기장"}
+          />
+        </div>
+      </Page.Content>
+    </Page.Container>
+  );
 }
