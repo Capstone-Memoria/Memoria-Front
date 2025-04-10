@@ -1,7 +1,7 @@
 import Button from "@/components/base/Button";
-import Header from "@/components/base/Header";
 import Diary from "@/components/diary/Diary";
-import PageContainer from "@/components/page/PageContainer";
+import DefaultHeader from "@/components/layout/DefaultHeader";
+import Page from "@/components/page/Page";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useNavigate } from "react-router-dom";
 
@@ -61,37 +61,39 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer>
-      <Header />
-      <div className={"my-6 flex items-center justify-between"}>
-        <div>
-          <p className={"font-semibold text-lg"}>
-            {authStore.context?.user?.nickName} 님의 책장,
-          </p>
-          <p className={"font-regular text-gray-1 text-xs"}>
-            {diaryDummyData.length}권의 일기장
-          </p>
+    <Page.Container>
+      <DefaultHeader />
+      <Page.Content>
+        <div className={"my-6 flex items-center justify-between"}>
+          <div>
+            <p className={"font-semibold text-lg"}>
+              {authStore.context?.user?.nickName} 님의 책장,
+            </p>
+            <p className={"font-regular text-gray-1 text-xs"}>
+              {diaryDummyData.length}권의 일기장
+            </p>
+          </div>
+          <Button
+            size={"xs"}
+            variant={"secondary"}
+            onClick={() => navigate("/create-diary")}
+          >
+            새 일기장
+          </Button>
         </div>
-        <Button
-          size={"xs"}
-          variant={"secondary"}
-          onClick={() => navigate("/create-diary")}
-        >
-          새 일기장
-        </Button>
-      </div>
-      <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
-        {diaryDummyData.map((diary) => (
-          <Diary
-            key={diary.id}
-            title={diary.title}
-            memberCount={diary.memberCount}
-            pinned={diary.pinned}
-            notificationCount={diary.notificationCount}
-          />
-        ))}
-      </div>
-    </PageContainer>
+        <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
+          {diaryDummyData.map((diary) => (
+            <Diary
+              key={diary.id}
+              title={diary.title}
+              memberCount={diary.memberCount}
+              pinned={diary.pinned}
+              notificationCount={diary.notificationCount}
+            />
+          ))}
+        </div>
+      </Page.Content>
+    </Page.Container>
   );
 };
 
