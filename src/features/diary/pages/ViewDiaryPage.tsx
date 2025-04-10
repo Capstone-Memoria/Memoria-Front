@@ -4,14 +4,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt, FaRegCalendar } from "react-icons/fa";
 
-import {
-  IoMdArrowBack,
-  IoMdCalendar,
-  IoMdMore,
-  IoMdPeople,
-} from "react-icons/io";
+import { IoMdArrowBack, IoMdMore, IoMdPeople } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
 const ViewDiaryPage = () => {
@@ -25,13 +20,13 @@ const ViewDiaryPage = () => {
           <IoMdArrowBack onClick={() => navigate(-1)} />
         </div>
         <div>일기장 제목</div>
-        <div className={"flex text-2xl"}>
-          <div className={"p-2"}>
-            <IoMdCalendar />
+        <div className={"flex"}>
+          <div className={"p-2 flex items-center justify-center"}>
+            <FaRegCalendar />
           </div>
           <div className={"p-2"}>
             <Popover>
-              <PopoverTrigger>
+              <PopoverTrigger asChild>
                 <IoMdMore />
               </PopoverTrigger>
               <PopoverContent className={"p-0 overflow-hidden"}>
