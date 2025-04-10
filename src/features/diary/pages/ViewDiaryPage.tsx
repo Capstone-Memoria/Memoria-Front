@@ -31,9 +31,12 @@ const ViewDiaryPage = () => {
           <div className={"p-2"}>
             <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
-                <IoMdMore />
+                <IoMdMore className={"text-xl"} />
               </PopoverTrigger>
-              <PopoverContent className={"p-0 overflow-hidden"}>
+              <PopoverContent
+                className={"py-0 !pl-0 !pr-4 overflow-hidden"}
+                sideOffset={12}
+              >
                 {[
                   {
                     label: "일기장 정보 수정",

@@ -12,7 +12,7 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
     <div
       {...props}
       className={cn(
-        "flex justify-between items-center min-h-12 pt-4 px-4",
+        "flex justify-between items-center h-12 pt-4 px-4",
         props.className
       )}
     >
