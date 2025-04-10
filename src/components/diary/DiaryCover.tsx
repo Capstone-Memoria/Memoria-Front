@@ -32,7 +32,12 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
       )}
     >
       {/* 표지 꾸미기에서 바뀌는 부분 */}
-      <div className={cn("w-1.5 h-full rounded-l-xs", coverColor)}></div>
+      <div
+        className={cn(
+          "w-[4%] min-w-[6px] max-w-[12px] h-full rounded-l-xs",
+          coverColor
+        )}
+      ></div>
       {showPin && (
         <div
           className={"absolute top-2 right-2 bg-transparent"}
