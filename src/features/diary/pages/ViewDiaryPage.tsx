@@ -1,5 +1,17 @@
 import Page from "@/components/page/Page";
-import { IoMdArrowBack, IoMdCalendar, IoMdMore } from "react-icons/io";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { FaPencilAlt } from "react-icons/fa";
+
+import {
+  IoMdArrowBack,
+  IoMdCalendar,
+  IoMdMore,
+  IoMdPeople,
+} from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
 const ViewDiaryPage = () => {
@@ -18,7 +30,33 @@ const ViewDiaryPage = () => {
             <IoMdCalendar />
           </div>
           <div className={"p-2"}>
-            <IoMdMore />
+            <Popover>
+              <PopoverTrigger>
+                <IoMdMore />
+              </PopoverTrigger>
+              <PopoverContent className={"p-0 overflow-hidden"}>
+                {[
+                  {
+                    label: "일기장 정보 수정",
+                    icon: <FaPencilAlt />,
+                  },
+                  {
+                    label: "멤버 관리",
+                    icon: <IoMdPeople />,
+                  },
+                ].map((it) => (
+                  <div
+                    key={it.label}
+                    className={
+                      "flex items-center gap-4 hover:bg-gray-50 p-4 transition-colors select-none"
+                    }
+                  >
+                    <div className={"text-sm"}>{it.icon}</div>
+                    <div>{it.label}</div>
+                  </div>
+                ))}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </Page.Header>
