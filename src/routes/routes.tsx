@@ -1,4 +1,6 @@
 import CreateDiaryPage from "@/features/diary/pages/CreateDiaryPage";
+import DiaryMemberPage from "@/features/diary/pages/DiaryMemberPage";
+import EditDiaryPage from "@/features/diary/pages/EditDiaryPage";
 import ViewDiaryPage from "@/features/diary/pages/ViewDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
 import LoginPage from "@/features/login/pages/LoginPage";
@@ -43,6 +45,14 @@ export const routes: ContextRoutes = {
     {
       path: "/diary/:diaryId",
       element: <ViewDiaryPage />,
+    },
+    {
+      path: "/diary/:diaryId/edit",
+      element: <EditDiaryPage />,
+    },
+    {
+      path: "/diary/:diaryId/members",
+      element: <DiaryMemberPage />,
     },
     {
       path: "/*",

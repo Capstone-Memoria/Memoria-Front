@@ -1,12 +1,12 @@
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 
-const ManageDiaryPage = () => {
+const EditDiaryPage = () => {
   return (
     <Page.Container>
-      <DefaultHeader />
+      <DefaultHeader logoType={"back"} />
     </Page.Container>
   );
 };
 
-export default ManageDiaryPage;
+export default EditDiaryPage;

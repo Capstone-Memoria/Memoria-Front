@@ -4,6 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useState } from "react";
 import { FaPencilAlt, FaRegCalendar } from "react-icons/fa";
 
 import { IoMdArrowBack, IoMdMore, IoMdPeople } from "react-icons/io";
@@ -12,6 +13,9 @@ import { useNavigate } from "react-router-dom";
 const ViewDiaryPage = () => {
   /* Properties */
   const navigate = useNavigate();
+
+  /* States */
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <Page.Container>
@@ -25,7 +29,7 @@ const ViewDiaryPage = () => {
             <FaRegCalendar />
           </div>
           <div className={"p-2"}>
-            <Popover>
+            <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
                 <IoMdMore />
               </PopoverTrigger>
@@ -34,10 +38,12 @@ const ViewDiaryPage = () => {
                   {
                     label: "일기장 정보 수정",
                     icon: <FaPencilAlt />,
+                    onClick: () => navigate("/diary/1/edit"), //TODO: 일기장 id 적용
                   },
                   {
                     label: "멤버 관리",
                     icon: <IoMdPeople />,
+                    onClick: () => navigate("/diary/1/members"), //TODO: 일기장 id 적용
                   },
                 ].map((it) => (
                   <div
@@ -45,6 +51,10 @@ const ViewDiaryPage = () => {
                     className={
                       "flex items-center gap-4 hover:bg-gray-50 p-4 transition-colors select-none"
                     }
+                    onClick={() => {
+                      it.onClick();
+                      setIsMenuOpen(false);
+                    }}
                   >
                     <div className={"text-sm"}>{it.icon}</div>
                     <div>{it.label}</div>
