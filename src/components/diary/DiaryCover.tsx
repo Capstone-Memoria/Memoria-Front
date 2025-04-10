@@ -6,11 +6,13 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   pinned?: boolean;
   showPin?: boolean;
   notificationCount?: number;
+  coverColor?: string;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
   pinned: initialPinned = false,
   showPin = true,
+  coverColor = "bg-green-500",
   ...props
 }) => {
   const [pinned, setPinned] = useState(initialPinned);
@@ -30,7 +32,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
       )}
     >
       {/* 표지 꾸미기에서 바뀌는 부분 */}
-      <div className={"w-1.5 h-full rounded-l-xs bg-green-500"}></div>
+      <div className={cn("w-1.5 h-full rounded-l-xs", coverColor)}></div>
       {showPin && (
         <div
           className={"absolute top-2 right-2 bg-transparent"}

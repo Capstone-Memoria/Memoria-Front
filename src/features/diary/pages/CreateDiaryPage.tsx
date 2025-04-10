@@ -1,6 +1,6 @@
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
-import DiaryCover from "@/components/diary/DiaryCover";
+import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import Page from "@/components/page/Page";
 import DiaryCreateHeader from "@/features/main/components/DiaryCreateHeader";
 import { useEffect, useState } from "react";
@@ -8,10 +8,15 @@ import { useEffect, useState } from "react";
 const CreateDiaryPage = () => {
   const [diaryTitle, setDiaryTitle] = useState("");
   const [success, setSuccess] = useState(false);
+  const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
 
   useEffect(() => {
     setSuccess(diaryTitle.length > 0);
   }, [diaryTitle]);
+
+  const handlePresetSelect = (index: number) => {
+    setSelectedPresetIndex(index);
+  };
 
   return (
     <Page.Container>
@@ -28,8 +33,14 @@ const CreateDiaryPage = () => {
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-        <div className={"pt-10 flex justify-center items-center"}>
-          <DiaryCover showPin={false} className={"w-52 h-83"} />
+        <div className={"mt-8"}>
+          <p className={"text-sm font-normal mb-4"}>
+            일기장 커버 스타일을 선택해주세요.
+          </p>
+          <DiaryCoverCarousel
+            className={"w-full py-4"}
+            onSelect={handlePresetSelect}
+          />
         </div>
         <div className={"flex gap-15 justify-center mt-5"}>
           <Button
