@@ -40,7 +40,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
         </div>
       )}
 
-      {props.notificationCount && props.notificationCount > 0 && (
+      {!!props.notificationCount && props.notificationCount > 0 && (
         <div
           className={
             "absolute top-0 right-0 min-w-4.5 h-4.5 translate-x-[calc(50%-3px)] -translate-y-[calc(50%-4px)] flex items-center justify-center bg-red-500 text-white font-normal text-[8px] p-1 rounded-full"
