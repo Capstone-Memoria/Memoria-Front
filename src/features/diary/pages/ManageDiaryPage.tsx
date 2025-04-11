@@ -6,7 +6,7 @@ import Page from "@/components/page/Page";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const EditDiaryPage = () => {
+const ManageDiaryPage = () => {
   const navigate = useNavigate();
 
   // 더미 데이터 - 실제로는 API에서 가져올 데이터
@@ -64,7 +64,7 @@ const EditDiaryPage = () => {
     <Page.Container>
       <DefaultHeader logoType={"back"} />
       <Page.Content className={"px-6 py-4"}>
-        <h1 className={"text-xl font-medium mb-6"}>일기장 정보 수정</h1>
+        <h1 className={"text-xl font-medium my-3"}>일기장 관리</h1>
 
         {/* 일기장 제목 수정 카드 */}
         <Card className={"mb-6"}>
@@ -117,6 +117,15 @@ const EditDiaryPage = () => {
           </div>
         </Card>
 
+        <Button
+          size={"xl"}
+          className={"w-full bg-green-300 text-black"}
+          onClick={handleSave}
+          disabled={!isFormValid}
+        >
+          일기장 삭제하기
+        </Button>
+
         {/* 저장 버튼 */}
         <Button
           size={"xl"}
@@ -131,4 +140,4 @@ const EditDiaryPage = () => {
   );
 };
 
-export default EditDiaryPage;
+export default ManageDiaryPage;
