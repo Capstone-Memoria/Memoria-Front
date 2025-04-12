@@ -33,3 +33,12 @@ export const register = async (request: RegisterRequest) => {
 
   return response.data;
 };
+
+export const emailCheck = async (email: string) => {
+  const response = await server.post("/api/auth/email-exist", {
+    email: email,
+  });
+
+  return response.data;
+}
+

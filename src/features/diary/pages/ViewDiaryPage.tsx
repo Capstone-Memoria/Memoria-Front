@@ -39,9 +39,9 @@ const ViewDiaryPage = () => {
               >
                 {[
                   {
-                    label: "일기장 정보 수정",
+                    label: "일기장 관리",
                     icon: <FaPencilAlt />,
-                    onClick: () => navigate("/diary/1/edit"), //TODO: 일기장 id 적용
+                    onClick: () => navigate("/diary/1/manage"), //TODO: 일기장 id 적용
                   },
                   {
                     label: "멤버 관리",

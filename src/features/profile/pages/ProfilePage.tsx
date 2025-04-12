@@ -53,6 +53,7 @@ const ProfilePage = () => {
         },
       });
 
+      setNickName(res.nickName);
       if (vars.password) {
         setIsPasswordChanged(true);
       }

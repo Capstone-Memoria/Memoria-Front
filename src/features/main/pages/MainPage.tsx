@@ -44,7 +44,7 @@ const diaryDummyData = [
     memberCount: 3,
     pinned: false,
     diaryCoverImg: "",
-    notificationCount: 10,
+    notificationCount: 120,
   },
   {
     id: 6,

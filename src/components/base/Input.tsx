@@ -15,6 +15,7 @@ export default function Input({
   required,
   helperText,
   helperTextClassName,
+  isError,
   ...props
 }: InputProps) {
   const [focused, setFocused] = useState(false);
@@ -62,7 +63,7 @@ export default function Input({
           className={cn(
             "mt-1 text-xs text-gray-400",
             {
-              "text-red-500": props.isError,
+              "text-red-500": isError,
             },
             helperTextClassName
           )}

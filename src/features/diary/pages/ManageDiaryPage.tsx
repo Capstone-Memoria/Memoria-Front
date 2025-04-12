@@ -49,6 +49,15 @@ const ManageDiaryPage = () => {
     setIsFormValid(diaryData.title.trim().length > 0);
   }, [diaryData.title]);
 
+  // 삭제 핸들러
+  const handleDelete = () => {
+    // API 호출 로직이 여기에 들어갈 예정
+    console.log("일기장 삭제:", diaryData.id);
+
+    // 성공 후 이전 페이지로 이동
+    navigate(-1);
+  };
+
   // 저장 핸들러
   const handleSave = () => {
     if (!isFormValid) return;
@@ -120,7 +129,7 @@ const ManageDiaryPage = () => {
         <Button
           size={"xl"}
           className={"w-full bg-green-300 text-black"}
-          onClick={handleSave}
+          onClick={handleDelete}
           disabled={!isFormValid}
         >
           일기장 삭제하기

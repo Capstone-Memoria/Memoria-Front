@@ -13,6 +13,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
   pinned: initialPinned = false,
   showPin = true,
   coverColor = "bg-green-500",
+  notificationCount,
   ...props
 }) => {
   const [pinned, setPinned] = useState(initialPinned);
@@ -46,14 +47,13 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
           {pinned ? <TbPinnedFilled /> : <TbPinned />}
         </div>
       )}
-
-      {!!props.notificationCount && props.notificationCount > 0 && (
+      {!!notificationCount && notificationCount > 0 && (
         <div
           className={
-            "absolute top-0 right-0 min-w-4.5 h-4.5 translate-x-[calc(50%-3px)] -translate-y-[calc(50%-4px)] flex items-center justify-center bg-red-500 text-white font-normal text-[8px] p-1 rounded-full"
+            "absolute top-0 right-0 min-w-5 h-5 translate-x-[calc(50%-3px)] -translate-y-[calc(50%-4px)] flex items-center justify-center bg-red-500 text-white font-normal text-[8px] p-1 rounded-full"
           }
         >
-          {props.notificationCount}
+          {notificationCount > 99 ? "99+" : notificationCount}
         </div>
       )}
     </div>
