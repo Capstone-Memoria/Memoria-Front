@@ -3,6 +3,7 @@ import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Header from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -143,7 +144,14 @@ const ProfilePage = () => {
               닉네임 변경하기
             </Button>
 
-            {openSection === "nickname" && (
+            <div
+              className={cn(
+                "transition-all duration-300 ease-in-out overflow-hidden",
+                openSection === "nickname"
+                  ? "max-h-[1000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              )}
+            >
               <div className={"mt-5 flex flex-col gap-4"}>
                 <Input
                   className={"w-full"}
@@ -170,7 +178,7 @@ const ProfilePage = () => {
                   </Button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
           <div>
@@ -186,7 +194,14 @@ const ProfilePage = () => {
               비밀번호 변경하기
             </Button>
 
-            {openSection === "password" && (
+            <div
+              className={cn(
+                "transition-all duration-300 ease-in-out overflow-hidden",
+                openSection === "password"
+                  ? "max-h-[1000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              )}
+            >
               <div className={"mt-5 flex flex-col gap-4"}>
                 <Input
                   className={"w-full"}
@@ -248,7 +263,7 @@ const ProfilePage = () => {
                   </Button>
                 </div>
               </div>
-            )}
+            </div>
 
             {isPasswordChanged && (
               <div className={"text-green-600 mt-4 flex items-center gap-2"}>
