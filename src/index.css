@@ -33,6 +33,7 @@ body {
   --color-gray-1: #6b6b6b;
   --color-gray-2: #c5c5c5;
   --color-gray-3: #a5a5a5;
+  --color-gray-4: #202020;
 }
 
 @theme inline {

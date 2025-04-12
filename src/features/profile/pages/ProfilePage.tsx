@@ -1,6 +1,5 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
-import Card from "@/components/base/Card";
 import Input from "@/components/base/Input";
 import Header from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
@@ -103,30 +102,35 @@ const ProfilePage = () => {
     <Page.Container>
       <Header logoType={"back"} />
       <Page.Content>
-        <div className={" flex flex-col gap-5"}>
-          {/* 사용자 정보 카드 */}
-          <Card>
-            <h2 className={"text-lg font-medium mb-4"}>사용자 정보</h2>
-            <div className={"flex flex-col gap-2"}>
+        <div className={" flex flex-col gap-5 px-2"}>
+          {/* 사용자 정보 부분 */}
+          <div className={"pt-7 text-base"}>
+            <h2 className={"text-black text-lg font-medium mb-5"}>
+              사용자 정보
+            </h2>
+            <div className={"flex flex-col gap-5"}>
               <div className={"flex justify-between items-center"}>
-                <span className={"text-gray-500"}>닉네임</span>
-                <span>{authStore.context?.user?.nickName}</span>
+                <span className={"text-gray-900 font-normal"}>닉네임</span>
+                <span className={"text-[#39A580]"}>
+                  {authStore.context?.user?.nickName}
+                </span>
               </div>
               <div className={"flex justify-between items-center"}>
-                <span className={"text-gray-500"}>이메일</span>
-                <span>{authStore.context?.user?.email}</span>
+                <span className={"text-gray-900 font-normal"}>이메일</span>
+                <span className={"text-[#39A580]"}>
+                  {authStore.context?.user?.email}
+                </span>
               </div>
             </div>
-            <div className={"mt-4"}>
-              <Button className={"w-full"} onClick={handleLogout}>
-                로그아웃
-              </Button>
-            </div>
-          </Card>
-
-          {/* 닉네임 변경 카드 */}
-          <Card>
-            <h2 className={"text-lg font-medium mb-4"}>닉네임 변경</h2>
+          </div>
+          {/* 닉네임 변경과 비밀번호 변경 사이의 구분선 */}
+          <div
+            className={
+              "my-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
+            }
+          ></div>
+          {/* 닉네임 변경 부분 */}
+          <div>
             {isEditingNickname ? (
               <div className={"flex flex-col gap-4"}>
                 <Input
@@ -150,15 +154,18 @@ const ProfilePage = () => {
                 </div>
               </div>
             ) : (
-              <Button onClick={() => setIsEditingNickname(true)}>
+              <Button
+                variant={"text"}
+                className={"px-0 py-0 text-base font-normal"}
+                onClick={() => setIsEditingNickname(true)}
+              >
                 닉네임 변경하기
               </Button>
             )}
-          </Card>
+          </div>
 
           {/* 비밀번호 변경 카드 */}
-          <Card>
-            <h2 className={"text-lg font-medium mb-4"}>비밀번호 변경</h2>
+          <div>
             {isChangingPassword ? (
               <div className={"flex flex-col gap-4"}>
                 <Input
@@ -210,12 +217,14 @@ const ProfilePage = () => {
                     취소
                   </Button>
                   <Button onClick={handlePasswordSubmit} size={"sm"}>
-                    변경
+                    저장
                   </Button>
                 </div>
               </div>
             ) : (
               <Button
+                variant={"text"}
+                className={"px-0 py-0 text-base font-normal"}
                 onClick={() => {
                   setIsChangingPassword(true);
                   setIsPasswordChanged(false);
@@ -224,14 +233,28 @@ const ProfilePage = () => {
                 비밀번호 변경하기
               </Button>
             )}
-
             {isPasswordChanged && (
               <div className={"text-green-600 mt-4 flex items-center gap-2"}>
                 <IoMdCheckmark />
                 비밀번호가 성공적으로 변경되었습니다.
               </div>
             )}
-          </Card>
+          </div>
+          <div
+            className={
+              "mt-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
+            }
+          ></div>
+          {/* 로그아웃 버튼 */}
+          <div className={"mt-2"}>
+            <Button
+              variant={"text"}
+              className={"px-0 py-0 text-base font-normal"}
+              onClick={handleLogout}
+            >
+              로그아웃
+            </Button>
+          </div>
         </div>
       </Page.Content>
     </Page.Container>

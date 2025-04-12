@@ -109,7 +109,7 @@ const MainPage = () => {
           즐겨 찾는
         </button>
       </div>
-      <div className={"bg-white h-screen py-8"}>
+      <div className={"bg-white h-full py-8"}>
         <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4 px-4"}>
           {diaryDummyData.map((diary) => (
             <Diary
