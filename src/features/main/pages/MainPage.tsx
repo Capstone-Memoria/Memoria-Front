@@ -2,7 +2,9 @@ import Button from "@/components/base/Button";
 import Diary from "@/components/diary/Diary";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const diaryDummyData = [
@@ -60,6 +62,9 @@ const MainPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
 
+  /* States */
+  const [tab, setTab] = useState<"all" | "pinned">("all");
+
   return (
     <Page.Container>
       <DefaultHeader />
@@ -81,7 +86,31 @@ const MainPage = () => {
             새 일기장
           </Button>
         </div>
-        <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
+      </Page.Content>
+      <div className={"flex pl-6 gap-4"}>
+        <button
+          className={cn(
+            "px-5 py-2 rounded-t-xl text-sm font-normal",
+            tab === "all" ? "bg-white text-black" : "bg-gray-100 text-gray-400"
+          )}
+          onClick={() => setTab("all")}
+        >
+          모든 일기
+        </button>
+        <button
+          className={cn(
+            "px-5 py-2 rounded-t-xl text-sm font-normal",
+            tab === "pinned"
+              ? "bg-white text-black"
+              : "bg-gray-100 text-gray-400"
+          )}
+          onClick={() => setTab("pinned")}
+        >
+          즐겨 찾는
+        </button>
+      </div>
+      <div className={"bg-white h-screen py-8"}>
+        <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4 px-4"}>
           {diaryDummyData.map((diary) => (
             <Diary
               onClick={() => navigate(`/diary/${diary.id}`)}
@@ -93,7 +122,7 @@ const MainPage = () => {
             />
           ))}
         </div>
-      </Page.Content>
+      </div>
     </Page.Container>
   );
 };
