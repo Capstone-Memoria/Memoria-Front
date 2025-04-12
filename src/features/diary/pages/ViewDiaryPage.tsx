@@ -20,7 +20,7 @@ const ViewDiaryPage = () => {
   return (
     <Page.Container>
       <Page.Header>
-        <div className={"text-2xl"}>
+        <div className={"text-2xl pr-8"}>
           <IoMdArrowBack onClick={() => navigate(-1)} />
         </div>
         <div>일기장 제목</div>
@@ -28,7 +28,7 @@ const ViewDiaryPage = () => {
           <div className={"p-2 flex items-center justify-center"}>
             <FaRegCalendar />
           </div>
-          <div className={"p-2"}>
+          <div className={"py-2 pl-2"}>
             <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <PopoverTrigger asChild>
                 <IoMdMore className={"text-xl"} />

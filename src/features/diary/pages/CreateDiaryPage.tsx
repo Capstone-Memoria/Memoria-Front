@@ -23,18 +23,18 @@ const CreateDiaryPage = () => {
       <DiaryCreateHeader success={success} />
       <Page.Content className={"overflow-x-hidden"}>
         <div className={"mt-4"}>
-          <p className={"text-sm font-normal"}>
+          <p className={"text-base font-normal"}>
             새 일기장의 제목을 입력해주세요.
           </p>
           <Input
-            className={"w-full mt-2 text-sm"}
+            className={"w-full mt-2 text-base"}
             placeholder={"ex) 메모리아 일기장"}
             value={diaryTitle}
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
         <div className={"mt-8"}>
-          <p className={"text-sm font-normal mb-4"}>
+          <p className={"text-base font-normal mb-4"}>
             일기장 커버 스타일을 선택해주세요.
           </p>
           <DiaryCoverCarousel
@@ -42,17 +42,17 @@ const CreateDiaryPage = () => {
             onSelect={handlePresetSelect}
           />
         </div>
-        <div className={"flex gap-15 justify-center mt-5"}>
+        <div className={"flex gap-8 justify-center mt-5"}>
           <Button
-            size={"xs"}
-            className={"w-28 rounded-sm bg-gray-200"}
+            size={"sm"}
+            className={"w-36 rounded-sm bg-gray-200"}
             variant={"secondary"}
           >
             AI로 배경사진 만들기
           </Button>
           <Button
-            size={"xs"}
-            className={"w-28 rounded-sm bg-gray-200"}
+            size={"sm"}
+            className={"w-36 rounded-sm bg-gray-200"}
             variant={"secondary"}
           >
             사진 업로드

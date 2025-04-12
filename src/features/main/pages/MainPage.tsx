@@ -66,10 +66,10 @@ const MainPage = () => {
       <Page.Content>
         <div className={"my-6 flex items-center justify-between"}>
           <div>
-            <p className={"font-semibold text-lg"}>
+            <p className={"font-semibold text-xl"}>
               {authStore.context?.user?.nickName} 님의 책장,
             </p>
-            <p className={"font-regular text-gray-1 text-xs"}>
+            <p className={"font-regular text-gray-1 text-sm"}>
               {diaryDummyData.length}권의 일기장
             </p>
           </div>

@@ -21,7 +21,7 @@ const DefaultHeader: React.FC<HeaderProps> = ({ logoType, ...props }) => {
   return (
     <Page.Header {...props}>
       {logoType === "back" ? (
-        <div className={""}>
+        <div className={"pr-6"}>
           <IoMdArrowBack className={"text-2xl"} onClick={handleBack} />
         </div>
       ) : undefined}
