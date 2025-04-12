@@ -102,7 +102,7 @@ const ProfilePage = () => {
     <Page.Container>
       <Header logoType={"back"} />
       <Page.Content>
-        <div className={" flex flex-col gap-5 px-2"}>
+        <div className={"flex flex-col gap-5 px-2"}>
           {/* 사용자 정보 부분 */}
           <div className={"pt-7 text-base"}>
             <h2 className={"text-black text-lg font-medium mb-5"}>
@@ -135,7 +135,7 @@ const ProfilePage = () => {
               <div className={"flex flex-col gap-4"}>
                 <Input
                   className={"w-full"}
-                  label={"새 닉네임"}
+                  label={"새 닉네임을 입력해주세요."}
                   placeholder={"새로운 닉네임을 입력하세요"}
                   value={nickName}
                   onChange={(e) => setNickName(e.target.value)}
@@ -143,12 +143,16 @@ const ProfilePage = () => {
                 <div className={"flex justify-end gap-2"}>
                   <Button
                     onClick={() => setIsEditingNickname(false)}
-                    className={"bg-gray-200 text-black"}
+                    className={"px-3 rounded-lg bg-gray-200 text-black"}
                     size={"sm"}
                   >
                     취소
                   </Button>
-                  <Button onClick={handleNicknameChange} size={"sm"}>
+                  <Button
+                    onClick={handleNicknameChange}
+                    className={"px-3 rounded-lg"}
+                    size={"sm"}
+                  >
                     저장
                   </Button>
                 </div>
@@ -211,12 +215,16 @@ const ProfilePage = () => {
                         confirmPassword: "",
                       });
                     }}
-                    className={"bg-gray-200 text-black"}
+                    className={"px-3 rounded-lg bg-gray-200 text-black"}
                     size={"sm"}
                   >
                     취소
                   </Button>
-                  <Button onClick={handlePasswordSubmit} size={"sm"}>
+                  <Button
+                    onClick={handlePasswordSubmit}
+                    className={"px-3 rounded-lg"}
+                    size={"sm"}
+                  >
                     저장
                   </Button>
                 </div>
@@ -242,19 +250,26 @@ const ProfilePage = () => {
           </div>
           <div
             className={
-              "mt-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
+              "my-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
             }
           ></div>
           {/* 로그아웃 버튼 */}
-          <div className={"mt-2"}>
-            <Button
-              variant={"text"}
-              className={"px-0 py-0 text-base font-normal"}
-              onClick={handleLogout}
-            >
-              로그아웃
-            </Button>
-          </div>
+          <Button
+            variant={"text"}
+            className={"text-left px-0 py-0 text-base font-normal"}
+            onClick={handleLogout}
+          >
+            로그아웃
+          </Button>
+          <Button
+            variant={"text"}
+            className={
+              "text-left w-fit px-0 py-0 text-sm text-[#8F8F8F] border-b border-[#8F8F8F] font-normal"
+            }
+            onClick={handleLogout}
+          >
+            탈퇴하기
+          </Button>
         </div>
       </Page.Content>
     </Page.Container>
