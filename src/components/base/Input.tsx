@@ -3,6 +3,7 @@ import { InputHTMLAttributes, useState } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  labelClassName?: string;
   required?: boolean;
   helperText?: string;
   helperTextClassName?: string;
@@ -12,6 +13,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export default function Input({
   className,
   label,
+  labelClassName,
   required,
   helperText,
   helperTextClassName,
@@ -23,7 +25,7 @@ export default function Input({
   return (
     <div className={cn("w-fit", className)}>
       {(label || required) && (
-        <div className={"text-sm text-gray-500"}>
+        <div className={cn("text-sm text-gray-500", labelClassName)}>
           {required && <span className={"text-red-500"}>*</span>}
           {label}
         </div>
