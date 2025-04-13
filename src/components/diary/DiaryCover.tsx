@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/className";
-import { HTMLAttributes, useState } from "react";
-import { TbPinned, TbPinnedFilled } from "react-icons/tb";
+import { HTMLAttributes } from "react";
+import { FaStar } from "react-icons/fa";
 
 interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   pinned?: boolean;
@@ -10,20 +10,12 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
-  pinned: initialPinned = false,
+  pinned = false,
   showPin = true,
   coverColor = "bg-green-500",
   notificationCount,
   ...props
 }) => {
-  const [pinned, setPinned] = useState(initialPinned);
-
-  const handlePinClick = () => {
-    // 핀 클릭 시 처리할 로직을 여기에 작성합니다.
-    // 예를 들어, 핀 상태를 변경하는 API 호출 등을 수행할 수 있습니다.
-    setPinned(!pinned);
-  };
-
   return (
     <div
       {...props}
@@ -39,13 +31,16 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
           coverColor
         )}
       ></div>
-      {showPin && (
+      {showPin && pinned ? (
         <div
-          className={"absolute top-2 right-2 bg-transparent"}
-          onClick={handlePinClick}
+          className={
+            "absolute top-0 left-[6px] rounded-t-[2px] -translate-y-[14px] px-[4px] pt-[3px] pb-[4px] bg-[#FFE539]"
+          }
         >
-          {pinned ? <TbPinnedFilled /> : <TbPinned />}
+          <FaStar className={"fill-gray-2 text-[7px]"} />
         </div>
+      ) : (
+        <></>
       )}
       {!!notificationCount && notificationCount > 0 && (
         <div
