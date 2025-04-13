@@ -1,6 +1,7 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
+import Modal from "@/components/base/Modal"; // Modal 컴포넌트 (제공한 코드 기반)
 import Header from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
@@ -15,9 +16,13 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    // 로그아웃 처리
     authStore.logout();
     navigate("/login");
   };
+
+  // 로그아웃 모달 상태
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const [nickName, setNickName] = useState(
     authStore.context?.user?.nickName || ""
@@ -31,7 +36,7 @@ const ProfilePage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
 
-  // 변경하기는 하나만 열기.
+  // 편집 섹션은 하나만 열리도록 ("nickname" 또는 "password")
   const [openSection, setOpenSection] = useState<
     "nickname" | "password" | null
   >(null);
@@ -52,7 +57,6 @@ const ProfilePage = () => {
           ...res,
         },
       });
-
       setNickName(res.nickName);
       if (vars.password) {
         setIsPasswordChanged(true);
@@ -83,12 +87,10 @@ const ProfilePage = () => {
       setPasswordError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
-
     tryUpdateUser({
       email: authStore.context!.user!.email,
       password: passwords.newPassword,
     });
-
     setOpenSection(null);
     setPasswords({
       currentPassword: "",
@@ -123,14 +125,13 @@ const ProfilePage = () => {
               </div>
             </div>
           </div>
-
           {/* 구분선 */}
           <div
             className={
               "my-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
             }
           />
-
+          {/* 닉네임 변경 */}
           <div>
             <Button
               variant={"text"}
@@ -143,7 +144,6 @@ const ProfilePage = () => {
             >
               닉네임 변경하기
             </Button>
-
             <div
               className={cn(
                 "transition-all duration-300 ease-in-out overflow-hidden",
@@ -182,6 +182,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
+          {/* 비밀번호 변경 */}
           <div>
             <Button
               variant={"text"}
@@ -194,7 +195,6 @@ const ProfilePage = () => {
             >
               비밀번호 변경하기
             </Button>
-
             <div
               className={cn(
                 "transition-all duration-300 ease-in-out overflow-hidden",
@@ -268,7 +268,6 @@ const ProfilePage = () => {
                 </div>
               </div>
             </div>
-
             {isPasswordChanged && (
               <div className={"text-green-600 mt-4 flex items-center gap-2"}>
                 <IoMdCheckmark />
@@ -283,25 +282,55 @@ const ProfilePage = () => {
               "my-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
             }
           />
-
-          <Button
-            variant={"text"}
-            className={"text-left px-0 py-0 text-base font-normal"}
-            onClick={handleLogout}
-          >
-            로그아웃
-          </Button>
-          <Button
-            variant={"text"}
-            className={
-              "text-left w-fit px-0 py-0 text-sm text-[#8F8F8F] border-b border-[#8F8F8F] font-normal"
-            }
-            onClick={handleLogout}
-          >
-            탈퇴하기
-          </Button>
+          <div className={"flex flex-col gap-3"}>
+            <Button
+              variant={"text"}
+              className={"text-left px-0 py-0 text-base font-normal"}
+              onClick={() => setIsLogoutModalOpen(true)}
+            >
+              로그아웃
+            </Button>
+            <Button
+              variant={"text"}
+              className={
+                "text-left w-fit px-0 py-0 text-sm text-[#8F8F8F] border-b border-[#8F8F8F] font-normal"
+              }
+              onClick={handleLogout}
+            >
+              탈퇴하기
+            </Button>
+          </div>
         </div>
       </Page.Content>
+
+      {/* 로그아웃 모달 */}
+      <Modal
+        open={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        description={"로그아웃 하시겠어요?"}
+      >
+        <div className={"mt-7 flex justify-between font-medium"}>
+          <Button
+            variant={"text"}
+            size={"md"}
+            className={"p-0"}
+            onClick={() => {
+              setIsLogoutModalOpen(false);
+              handleLogout();
+            }}
+          >
+            네
+          </Button>
+          <Button
+            variant={"text"}
+            className={"text-red-500 p-0"}
+            size={"md"}
+            onClick={() => setIsLogoutModalOpen(false)}
+          >
+            아니오
+          </Button>
+        </div>
+      </Modal>
     </Page.Container>
   );
 };
