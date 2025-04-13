@@ -38,8 +38,15 @@ body {
 }
 
 @theme {
-  --slide-up:  
+  --slide-up:        
 ;
+}
+
+@theme {
+  --animate-accordion-down: accordion-down var(--tw-duration, 0.4s)
+    var(--ease-expo-out);
+  --animate-accordion-up: accordion-up var(--tw-duration, 0.4s)
+    var(--ease-expo-out);
 }
 
 @theme inline {
