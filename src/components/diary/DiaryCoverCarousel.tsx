@@ -49,7 +49,7 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
       <div
         ref={containerRef} // 컨테이너 ref 연결
         className={cn(
-          "relative w-full overflow-hidden cursor-grab",
+          "relative w-full overflow-hidden cursor-grab touch-pan-x",
           isDragging ? "cursor-grabbing" : "", // 드래그 중 커서 변경
           className
         )}
