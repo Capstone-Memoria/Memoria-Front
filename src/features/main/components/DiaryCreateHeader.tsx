@@ -25,17 +25,17 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
         variant={"text"}
         size={"sm"}
         onClick={handleBack}
-        className={"text-base font-normal"}
+        className={"text-sm font-normal"}
       >
         취소
       </Button>
-      <div className={"text-lg font-normal"}>새 일기장</div>
+      <div className={"text-base font-normal"}>새 일기장</div>
       <Button
         variant={"text"}
         disabled={!success}
         size={"sm"}
         onClick={handleSuccess}
-        className={"text-base font-normal"}
+        className={"text-sm font-normal"}
       >
         완료
       </Button>

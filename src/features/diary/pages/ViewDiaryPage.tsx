@@ -32,10 +32,9 @@ const ViewDiaryPage = () => {
     {
       label: "다이어리 탈퇴하기",
       onClick: () => {
-        // 다이어리 탈퇴 로직을 여기에 추가합니다.
         console.log("Diary deletion action");
       },
-      small: true, // 글씨 스타일을 작게/회색 처리하기 위한 커스텀 프로퍼티
+      small: true,
     },
   ];
 

@@ -21,7 +21,7 @@ const CreateDiaryPage = () => {
   return (
     <Page.Container>
       <DiaryCreateHeader success={success} />
-      <Page.Content className={"overflow-x-hidden"}>
+      <Page.Content className={"overflow-x-hidden pb-20"}>
         <div className={"mt-4"}>
           <p className={"text-base font-normal"}>
             새 일기장의 제목을 입력해주세요.
