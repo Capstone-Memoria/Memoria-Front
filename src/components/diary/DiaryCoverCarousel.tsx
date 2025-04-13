@@ -98,7 +98,7 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
               >
                 <DiaryCover
                   showPin={false}
-                  className={"w-52 h-83 pointer-events-none"} // 내부 요소 이벤트 방지
+                  className={"w-42 h-60 pointer-events-none"} // 내부 요소 이벤트 방지
                   coverColor={preset.coverColor}
                 />
               </div>
