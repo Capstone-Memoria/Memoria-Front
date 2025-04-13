@@ -2,7 +2,7 @@ import BellIcon from "@/assets/images/BellIcon.svg";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
 import ProflieIcon from "@/assets/images/ProfileIcon.svg";
 import { HTMLAttributes } from "react";
-import { IoMdArrowBack } from "react-icons/io";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Page from "../page/Page";
 
@@ -22,7 +22,10 @@ const DefaultHeader: React.FC<HeaderProps> = ({ logoType, ...props }) => {
     <Page.Header {...props}>
       {logoType === "back" ? (
         <div className={"pr-6"}>
-          <IoMdArrowBack className={"text-2xl"} onClick={handleBack} />
+          <MdOutlineKeyboardBackspace
+            className={"text-2xl"}
+            onClick={handleBack}
+          />
         </div>
       ) : undefined}
       <img

@@ -36,6 +36,10 @@ body {
   --color-gray-4: #202020;
 }
 
+@theme {
+  --slide-up: 
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

@@ -1,9 +1,9 @@
 import Button from "@/components/base/Button";
 import Card from "@/components/base/Card";
 import Input from "@/components/base/Input";
-import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { useEffect, useState } from "react";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const ManageDiaryPage = () => {
@@ -71,7 +71,15 @@ const ManageDiaryPage = () => {
 
   return (
     <Page.Container>
-      <DefaultHeader logoType={"back"} />
+      <Page.Header>
+        <div className={"text-2xl"}>
+          <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
+        </div>
+        <div>일기장 제목</div>
+        <Button variant={"text"} size={"sm"}>
+          완료
+        </Button>
+      </Page.Header>
       <Page.Content className={"px-6 py-4"}>
         <h1 className={"text-xl font-medium my-3"}>일기장 관리</h1>
 
