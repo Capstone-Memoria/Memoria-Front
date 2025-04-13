@@ -2,7 +2,9 @@ import Button from "@/components/base/Button";
 import Diary from "@/components/diary/Diary";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const diaryDummyData = [
@@ -26,7 +28,7 @@ const diaryDummyData = [
     id: 3,
     title: "2025 대학팸",
     memberCount: 9,
-    pinned: false,
+    pinned: true,
     diaryCoverImg: "",
     notificationCount: 0,
   },
@@ -44,7 +46,7 @@ const diaryDummyData = [
     memberCount: 3,
     pinned: false,
     diaryCoverImg: "",
-    notificationCount: 10,
+    notificationCount: 120,
   },
   {
     id: 6,
@@ -60,16 +62,24 @@ const MainPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
 
+  /* States */
+  const [tab, setTab] = useState<"all" | "pinned">("all");
+
+  const filteredDiaries =
+    tab === "all"
+      ? diaryDummyData
+      : diaryDummyData.filter((diary) => diary.pinned);
+
   return (
     <Page.Container>
       <DefaultHeader />
       <Page.Content>
         <div className={"my-6 flex items-center justify-between"}>
           <div>
-            <p className={"font-semibold text-lg"}>
+            <p className={"font-semibold text-xl"}>
               {authStore.context?.user?.nickName} 님의 책장,
             </p>
-            <p className={"font-regular text-gray-1 text-xs"}>
+            <p className={"font-regular text-gray-1 text-sm"}>
               {diaryDummyData.length}권의 일기장
             </p>
           </div>
@@ -81,19 +91,57 @@ const MainPage = () => {
             새 일기장
           </Button>
         </div>
-        <div className={"grid grid-cols-[auto_1fr_auto] gap-y-4"}>
-          {diaryDummyData.map((diary) => (
-            <Diary
-              onClick={() => navigate(`/diary/${diary.id}`)}
-              key={diary.id}
-              title={diary.title}
-              memberCount={diary.memberCount}
-              pinned={diary.pinned}
-              notificationCount={diary.notificationCount}
-            />
-          ))}
-        </div>
       </Page.Content>
+      <div className={"flex pl-6 gap-4"}>
+        <button
+          className={cn(
+            "px-5 py-2 rounded-t-xl text-sm font-normal",
+            tab === "all" ? "bg-white text-black" : "bg-gray-100 text-gray-400"
+          )}
+          onClick={() => setTab("all")}
+        >
+          모든 일기
+        </button>
+        <button
+          className={cn(
+            "px-5 py-2 rounded-t-xl text-sm font-normal",
+            tab === "pinned"
+              ? "bg-white text-black"
+              : "bg-gray-100 text-gray-400"
+          )}
+          onClick={() => setTab("pinned")}
+        >
+          즐겨 찾는
+        </button>
+      </div>
+      <div className={"bg-white h-full min-h-[calc(100vh-160px)] py-8"}>
+        <div className={"px-6"}>
+          <div className={"grid grid-cols-3 gap-6"}>
+            {filteredDiaries.length === 0 && tab === "pinned" ? (
+              <div
+                className={
+                  "col-span-full text-center text-gray-400 text-sm py-20"
+                }
+              >
+                즐겨찾는 일기장이 없습니다.
+                <br />
+                일기장 관리에서 즐겨찾기를 설정할 수 있어요.
+              </div>
+            ) : (
+              filteredDiaries.map((diary) => (
+                <Diary
+                  onClick={() => navigate(`/diary/${diary.id}`)}
+                  key={diary.id}
+                  title={diary.title}
+                  memberCount={diary.memberCount}
+                  pinned={diary.pinned}
+                  notificationCount={diary.notificationCount}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
     </Page.Container>
   );
 };

@@ -21,15 +21,21 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
 
   return (
     <Page.Header {...props}>
-      <div className={"text-sm font-normal"} onClick={handleBack}>
+      <Button
+        variant={"text"}
+        size={"sm"}
+        onClick={handleBack}
+        className={"text-sm font-normal"}
+      >
         취소
-      </div>
+      </Button>
       <div className={"text-base font-normal"}>새 일기장</div>
       <Button
         variant={"text"}
         disabled={!success}
         size={"sm"}
         onClick={handleSuccess}
+        className={"text-sm font-normal"}
       >
         완료
       </Button>

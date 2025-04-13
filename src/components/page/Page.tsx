@@ -12,7 +12,7 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
     <div
       {...props}
       className={cn(
-        "flex justify-between items-center min-h-12 mt-4 px-4",
+        "flex justify-between items-center h-12 pt-4 px-4",
         props.className
       )}
     >
@@ -25,7 +25,7 @@ const Content: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
   return (
     <div
       {...props}
-      className={cn("flex flex-col gap-4 px-4 py-4", props.className)}
+      className={cn("flex flex-col gap-5 px-4 py-4", props.className)}
     >
       {props.children}
     </div>

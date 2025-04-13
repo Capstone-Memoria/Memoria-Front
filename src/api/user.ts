@@ -6,19 +6,12 @@ export const getUser = async (userEmail: string) => {
   return response.data;
 };
 
-
 interface UpdateUserRequest {
   nickName?: string;
   password?: string;
 }
 
-export const updateUser = async (
-  email: string,
-  request: UpdateUserRequest
-) => {
-  const response = await server.patch<User>(
-    `/api/user/${email}`,
-    request
-  );
+export const updateUser = async (email: string, request: UpdateUserRequest) => {
+  const response = await server.patch<User>(`/api/user/${email}`, request);
   return response.data;
 };
