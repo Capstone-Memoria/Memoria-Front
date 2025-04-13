@@ -76,12 +76,12 @@ const ManageDiaryPage = () => {
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
         </div>
         <div>일기장 제목</div>
-        <Button variant={"text"} size={"sm"}>
+        <Button variant={"text"} size={"sm"} onClick={handleSave}>
           완료
         </Button>
       </Page.Header>
       <Page.Content className={"px-6 py-4"}>
-        <h1 className={"text-xl font-medium my-3"}>일기장 관리</h1>
+        <h2 className={"text-xl font-medium my-3"}>일기장 관리</h2>
 
         {/* 일기장 제목 수정 카드 */}
         <Card className={"mb-6"}>
