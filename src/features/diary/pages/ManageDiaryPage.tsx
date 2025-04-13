@@ -1,5 +1,6 @@
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
+import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import Page from "@/components/page/Page";
 import { useEffect, useState } from "react";
 import {
@@ -25,15 +26,7 @@ const ManageDiaryPage = () => {
     null
   );
 
-  // 표지 색상 옵션
-  const coverColors = [
-    { name: "초록색", value: "#4ade80" },
-    { name: "파란색", value: "#3b82f6" },
-    { name: "빨간색", value: "#ef4444" },
-    { name: "보라색", value: "#8b5cf6" },
-    { name: "노란색", value: "#facc15" },
-    { name: "주황색", value: "#fb923c" },
-  ];
+  const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
 
   // 입력값 변경 핸들러 (일기장 제목)
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,14 +35,6 @@ const ManageDiaryPage = () => {
       title: e.target.value,
     });
     // 제목 편집 폼은 이미 열려 있으므로 따로 openSection 처리하지 않아도 됨
-  };
-
-  // 색상 변경 핸들러 (표지 색상)
-  const handleColorChange = (color: string) => {
-    setDiaryData({
-      ...diaryData,
-      coverColor: color,
-    });
   };
 
   // 폼 유효성 검사
@@ -80,6 +65,18 @@ const ManageDiaryPage = () => {
     setOpenSection(null);
   };
 
+  const handlePresetSelect = (index: number) => {
+    setSelectedPresetIndex(index);
+  };
+
+  const handleCoverSubmit = () => {
+    // 표지 색상 저장 로직
+    setDiaryData((prev) => ({
+      ...prev,
+    }));
+    setOpenSection(null);
+  };
+
   return (
     <Page.Container>
       <Page.Header>
@@ -95,10 +92,10 @@ const ManageDiaryPage = () => {
         <h2 className={"text-black text-lg font-semibold pt-5"}>일기장 관리</h2>
 
         {/* 일기장 제목 수정 섹션 */}
-        <div className={""}>
+        <div className={"flex flex-col gap-3"}>
           <div
             className={
-              "flex justify-between items-center border-b border-gray-400 pb-4"
+              "flex justify-between items-center border-b border-gray-400 pb-5"
             }
           >
             <div className={"text-base"}>일기장 제목</div>
@@ -137,7 +134,7 @@ const ManageDiaryPage = () => {
             )}
             {/* 저장 및 취소 버튼 */}
             {/* input에 아무것도 입력 안하면 저장 안되게 */}
-            <div className={"flex justify-end gap-2 mt-3"}>
+            <div className={"flex justify-end gap-2 my-3"}>
               <Button
                 onClick={() => {
                   setOpenSection(null);
@@ -156,13 +153,9 @@ const ManageDiaryPage = () => {
               </Button>
             </div>
           </div>
-        </div>
-
-        {/* 일기장 표지 색상 선택 섹션 */}
-        <div className={"mb-8"}>
           <div
             className={
-              "flex justify-between items-center border-b border-gray-400 pb-4"
+              "flex justify-between items-center border-b border-gray-400 pb-5"
             }
           >
             <div
@@ -175,87 +168,71 @@ const ManageDiaryPage = () => {
             </div>
           </div>
           {/* 편집 중일 때: 색상 선택 그리드 (슬라이드 애니메이션 적용) */}
-          <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              openSection === "cover"
-                ? "max-h-96 opacity-100 mt-4"
-                : "max-h-0 opacity-0"
-            }`}
-          >
-            <div className={"grid grid-cols-3 gap-4"}>
-              {coverColors.map((color) => (
-                <div
-                  key={color.value}
-                  className={"flex flex-col items-center cursor-pointer"}
-                  onClick={() => handleColorChange(color.value)}
-                >
-                  <div
-                    className={
-                      "w-16 h-24 rounded-r-md shadow-md mb-2 flex relative"
-                    }
-                    style={{
-                      borderLeft: `5px solid ${color.value}`,
-                      boxShadow:
-                        diaryData.coverColor === color.value
-                          ? "0 0 0 2px black"
-                          : "none",
-                      backgroundColor: "#f3f4f6",
-                    }}
-                  >
-                    <div
-                      className={"w-1.5 h-full rounded-l-xs"}
-                      style={{ backgroundColor: color.value }}
-                    ></div>
-                  </div>
-                  <span className={"text-xs"}>{color.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* 편집이 아닐 때: 현재 표지 색상 미리보기 */}
-          {openSection !== "cover" && (
-            <div className={"mt-4 flex items-center gap-4"}>
-              <div
-                className={"w-16 h-24 rounded-r-md shadow-md flex relative"}
-                style={{
-                  borderLeft: `5px solid ${diaryData.coverColor}`,
-                  backgroundColor: "#f3f4f6",
-                }}
-              >
-                <div
-                  className={"w-1.5 h-full rounded-l-xs"}
-                  style={{ backgroundColor: diaryData.coverColor }}
-                ></div>
-              </div>
-              <span className={"text-base font-medium"}>
-                {
-                  coverColors.find((c) => c.value === diaryData.coverColor)
-                    ?.name
-                }
-              </span>
-            </div>
-          )}
         </div>
-
-        <Button
-          size={"xl"}
-          className={"w-full bg-green-300 text-black"}
-          onClick={handleDelete}
-          disabled={!isFormValid}
-        >
-          일기장 삭제하기
-        </Button>
-
-        {/* 저장 버튼 */}
-        <Button
-          size={"xl"}
-          className={"w-full mt-4"}
-          onClick={handleSave}
-          disabled={!isFormValid}
-        >
-          변경사항 저장
-        </Button>
       </Page.Content>
+      <div className={"pb-20"}>
+        <div
+          className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            openSection === "cover"
+              ? "max-h-fit opacity-100 mt-4 mb-20"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className={"mt-2 px-6"}>
+            <p className={"text-sm font-normal"}>
+              일기장 커버 스타일을 다시 선택해주세요.
+            </p>
+            <DiaryCoverCarousel
+              className={"w-fit h-full py-8"}
+              onSelect={handlePresetSelect}
+            />
+          </div>
+          <div className={"flex gap-8 justify-center mt-5"}>
+            <Button
+              size={"sm"}
+              className={"w-36 rounded-sm bg-gray-200"}
+              variant={"secondary"}
+            >
+              AI로 배경사진 만들기
+            </Button>
+            <Button
+              size={"sm"}
+              className={"w-36 rounded-sm bg-gray-200"}
+              variant={"secondary"}
+            >
+              사진 업로드
+            </Button>
+          </div>
+          <div className={"flex justify-center gap-2 my-6"}>
+            <Button
+              onClick={() => {
+                setOpenSection(null);
+              }}
+              className={"px-3 rounded-md bg-gray-200 text-black"}
+              size={"sm"}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleCoverSubmit}
+              className={"px-3 rounded-md"}
+              size={"sm"}
+            >
+              저장
+            </Button>
+          </div>
+        </div>
+        <div className={"flex justify-between items-center pt-3 px-6"}>
+          <Button
+            variant={"text"}
+            onClick={handleDelete}
+            disabled={!isFormValid}
+            className={"p-0 text-sm text-gray-400 border-b border-b-gray-400"}
+          >
+            일기장 삭제하기
+          </Button>
+        </div>
+      </div>
     </Page.Container>
   );
 };
