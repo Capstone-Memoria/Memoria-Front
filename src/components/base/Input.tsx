@@ -29,7 +29,7 @@ export default function Input({
   // variant에 따라 다른 스타일을 적용합니다.
   const baseClasses =
     variant === "white"
-      ? "w-full bg-white placeholder:text-gray-300 py-2 px-3 border rounded-sm focus:outline-none"
+      ? "w-full bg-white placeholder:text-gray-300 py-2 px-3 border-none rounded-sm focus:outline-none"
       : "w-full bg-transparent placeholder:text-gray-2 py-2 focus:outline-none";
 
   return (

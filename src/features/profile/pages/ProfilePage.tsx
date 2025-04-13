@@ -154,9 +154,10 @@ const ProfilePage = () => {
             >
               <div className={"mt-5 flex flex-col gap-4"}>
                 <Input
-                  className={"w-full"}
+                  className={"w-full text-sm"}
+                  variant={"white"}
                   label={"새 닉네임을 입력해주세요."}
-                  labelClassName={"text-black"}
+                  labelClassName={"text-black mb-2"}
                   placeholder={"새로운 닉네임을 입력하세요"}
                   value={nickName}
                   onChange={(e) => setNickName(e.target.value)}
@@ -204,9 +205,10 @@ const ProfilePage = () => {
             >
               <div className={"mt-5 flex flex-col gap-4"}>
                 <Input
-                  className={"w-full"}
+                  className={"w-full text-sm"}
+                  variant={"white"}
                   label={"현재 비밀번호"}
-                  labelClassName={"text-black"}
+                  labelClassName={"text-black mb-2"}
                   type={"password"}
                   placeholder={"현재 비밀번호를 입력하세요"}
                   value={passwords.currentPassword}
@@ -215,9 +217,10 @@ const ProfilePage = () => {
                   }
                 />
                 <Input
-                  className={"w-full"}
+                  className={"w-full text-sm"}
+                  variant={"white"}
                   label={"새 비밀번호"}
-                  labelClassName={"text-black"}
+                  labelClassName={"text-black mb-2"}
                   type={"password"}
                   placeholder={"새 비밀번호를 입력하세요"}
                   value={passwords.newPassword}
@@ -226,9 +229,10 @@ const ProfilePage = () => {
                   }
                 />
                 <Input
-                  className={"w-full"}
+                  className={"w-full text-sm"}
+                  variant={"white"}
                   label={"새 비밀번호 확인"}
-                  labelClassName={"text-black"}
+                  labelClassName={"text-black mb-2"}
                   type={"password"}
                   placeholder={"새 비밀번호를 다시 입력하세요"}
                   value={passwords.confirmPassword}
