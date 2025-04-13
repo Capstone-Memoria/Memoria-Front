@@ -34,10 +34,12 @@ body {
   --color-gray-2: #c5c5c5;
   --color-gray-3: #a5a5a5;
   --color-gray-4: #202020;
+  --color-gray-5: #39a580;
 }
 
 @theme {
-  --slide-up: 
+  --slide-up:  
+;
 }
 
 @theme inline {

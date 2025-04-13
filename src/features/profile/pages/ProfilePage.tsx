@@ -111,13 +111,13 @@ const ProfilePage = () => {
             <div className={"flex flex-col gap-5"}>
               <div className={"flex justify-between items-center"}>
                 <span className={"text-gray-900 font-normal"}>닉네임</span>
-                <span className={"text-[#39A580]"}>
+                <span className={"text-gray-5"}>
                   {authStore.context?.user?.nickName}
                 </span>
               </div>
               <div className={"flex justify-between items-center"}>
                 <span className={"text-gray-900 font-normal"}>이메일</span>
-                <span className={"text-[#39A580]"}>
+                <span className={"text-gray-5"}>
                   {authStore.context?.user?.email}
                 </span>
               </div>
