@@ -1,11 +1,9 @@
 import Page from "@/components/page/Page";
-import { cn } from "@/lib/utils";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
-
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import { useNavigate } from "react-router-dom";
 
@@ -14,8 +12,6 @@ const ViewDiaryPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false); // diary의 즐겨찾기 상태
 
-  // 메뉴 항목 정의: '즐겨찾기' 메뉴는 isPinned 상태에 따라 라벨이 바뀌고,
-  // '다이어리 탈퇴하기'는 작고 회색으로 표시될 예정.
   const menuItems = [
     {
       label: "일기장 관리",
@@ -28,13 +24,6 @@ const ViewDiaryPage = () => {
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
       onClick: () => setIsPinned(!isPinned),
-    },
-    {
-      label: "다이어리 탈퇴하기",
-      onClick: () => {
-        console.log("Diary deletion action");
-      },
-      small: true,
     },
   ];
 
@@ -50,58 +39,41 @@ const ViewDiaryPage = () => {
             <IoCalendarOutline className={"text-xl"} />
           </div>
           <div className={"py-2 pl-2"}>
-            <Dialog open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <DialogTrigger asChild>
+            <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <DrawerTrigger asChild>
                 <RiMore2Fill className={"text-xl"} />
-              </DialogTrigger>
-              <DialogContent
-                className={cn(
-                  "fixed bottom-0 w-full max-w-md bg-white shadow-xl rounded-t-xl transition-all duration-300"
-                )}
-                style={{ animation: "slideUp 0.3s ease-out" }}
-              >
-                <div className={"flex flex-col"}>
-                  {menuItems.map((item) => (
-                    <div
-                      key={item.label}
-                      className={
-                        "flex items-center justify-center p-5 select-none last:border-0 border-b-[0.6px] border-[#979797]"
-                      }
+              </DrawerTrigger>
+              <DrawerContent className={"pb-8"}>
+                <div className={"flex flex-col gap-2 p-4"}>
+                  {menuItems.map((item, index) => (
+                    <button
+                      key={index}
                       onClick={() => {
-                        item.onClick?.();
+                        item.onClick();
                         setIsMenuOpen(false);
                       }}
+                      className={
+                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 py-4 border-b border-gray-400"
+                      }
                     >
-                      <div
-                        className={
-                          item.small
-                            ? "text-xs border-b border-gray-400 text-gray-400"
-                            : "text-base w-full text-center"
-                        }
-                      >
-                        {item.label}
-                      </div>
-                    </div>
+                      {item.label}
+                    </button>
                   ))}
                 </div>
-              </DialogContent>
-            </Dialog>
+                <div
+                  className={
+                    "text-sm text-gray-500 px-4 py-2 text-center underline"
+                  }
+                >
+                  다이어리 탈퇴하기
+                </div>
+              </DrawerContent>
+            </Drawer>
           </div>
         </div>
       </Page.Header>
       <Page.Content>PageContent</Page.Content>
       <Page.Footer>Footer</Page.Footer>
-
-      <style>{`
-        @keyframes slideUp {
-          0% {
-            transform: translateY(100%);
-          }
-          100% {
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </Page.Container>
   );
 };

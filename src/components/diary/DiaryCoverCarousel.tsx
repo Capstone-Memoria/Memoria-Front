@@ -24,7 +24,6 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
   onSelect,
 }) => {
   const {
-    currentIndex,
     potentialIndex,
     isDragging,
     isAnimating,
