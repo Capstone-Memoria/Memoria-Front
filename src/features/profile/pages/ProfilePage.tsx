@@ -11,9 +11,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { ImSpinner8 } from "react-icons/im";
 import { IoMdCheckmark } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
@@ -47,7 +49,11 @@ const ProfilePage = () => {
     navigate("/login");
   };
 
-  const { mutate: tryUpdateUser, error } = useMutation({
+  const {
+    mutate: tryUpdateUser,
+    error,
+    isPending,
+  } = useMutation({
     mutationFn: (
       data: UpdateUserVariables // variables 타입 사용
     ) => {
@@ -131,9 +137,14 @@ const ProfilePage = () => {
         <div className={"flex flex-col gap-5 px-2"}>
           {/* 사용자 정보 */}
           <div className={"pt-7 text-base"}>
-            <h2 className={"text-black text-lg font-medium mb-5"}>
-              사용자 정보
-            </h2>
+            <div className={"flex gap-3 items-center mb-5"}>
+              <h2 className={"text-black text-lg font-medium"}>사용자 정보</h2>
+              <ImSpinner8
+                className={cn("animate-spin text-gray-500", {
+                  hidden: !isPending,
+                })}
+              />
+            </div>
             {authStore.context?.user ? ( // 사용자 정보 로딩 확인
               <div className={"flex flex-col gap-5"}>
                 <div className={"flex justify-between items-center"}>
