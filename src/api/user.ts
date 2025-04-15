@@ -8,7 +8,8 @@ export const getUser = async (userEmail: string) => {
 
 interface UpdateUserRequest {
   nickName?: string;
-  password?: string;
+  currentPassword?: string;
+  newPassword?: string;
 }
 
 export const updateUser = async (email: string, request: UpdateUserRequest) => {
