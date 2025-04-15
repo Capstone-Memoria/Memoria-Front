@@ -38,3 +38,9 @@ export const Required: Story = {
     required: true,
   },
 };
+
+export const White: Story = {
+  args: {
+    variant: "white",
+  },
+};

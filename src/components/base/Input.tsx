@@ -3,6 +3,12 @@ import { InputHTMLAttributes, useState } from "react";
 
 export type InputVariant = "default" | "white";
 
+const variantMap = {
+  default: "bg-transparent placeholder:text-gray-300",
+  white:
+    "bg-white px-4 rounded-md placeholder:text-gray-300 mt-1 border border-transparent focus:border-green-500 transition-colors",
+};
+
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   labelClassName?: string;
@@ -10,7 +16,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   helperTextClassName?: string;
   isError?: boolean;
-  variant?: InputVariant; // 추가된 프로퍼티
+  variant?: keyof typeof variantMap;
 }
 
 export default function Input({
@@ -26,12 +32,6 @@ export default function Input({
 }: InputProps) {
   const [focused, setFocused] = useState(false);
 
-  // variant에 따라 다른 스타일을 적용합니다.
-  const baseClasses =
-    variant === "white"
-      ? "w-full bg-white placeholder:text-gray-300 py-2 px-3 border-none rounded-sm focus:outline-none"
-      : "w-full bg-transparent placeholder:text-gray-2 py-2 focus:outline-none";
-
   return (
     <div className={cn("w-fit", className)}>
       {(label || required) && (
@@ -43,7 +43,7 @@ export default function Input({
       <div className={"relative w-full"}>
         <input
           {...props}
-          className={cn(baseClasses)}
+          className={cn("w-full py-2 focus:outline-none", variantMap[variant])}
           onFocus={(e) => {
             setFocused(true);
             props.onFocus?.(e);
@@ -53,23 +53,24 @@ export default function Input({
             props.onBlur?.(e);
           }}
         />
-        {/* 기본 variant일 때만 밑에 애니메이션 바를 노출 */}
-        {variant !== "white" && (
-          <div
-            className={
-              "absolute bottom-0 left-0 h-[2px] w-full overflow-hidden bg-gray-300"
+
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 h-[2px] w-full overflow-hidden bg-gray-300",
+            {
+              hidden: variant !== "default",
             }
-          >
-            <div
-              className={cn(
-                "w-full -translate-x-full bg-black transition-transform duration-700 ease-expo-out",
-                {
-                  "!translate-x-0": focused,
-                }
-              )}
-            />
-          </div>
-        )}
+          )}
+        >
+          <div
+            className={cn(
+              "size-full -translate-x-full bg-black transition-transform duration-700 ease-expo-out",
+              {
+                "!translate-x-0": focused,
+              }
+            )}
+          />
+        </div>
       </div>
       {helperText && (
         <p
