@@ -6,12 +6,14 @@ interface EditDiaryTitlePanelProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   setTitle: (title: string) => void;
   onCancel?: () => void;
+  onSave?: () => void;
 }
 
 const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
   title,
   setTitle,
   onCancel,
+  onSave,
 }) => {
   const [isFormValid, setIsFormValid] = React.useState(true);
 
@@ -44,7 +46,11 @@ const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
         >
           취소
         </Button>
-        <Button className={"px-3 rounded-md"} size={"sm"}>
+        <Button
+          className={"px-3 rounded-md"}
+          size={"sm"}
+          onClick={() => onSave?.()}
+        >
           저장
         </Button>
       </div>

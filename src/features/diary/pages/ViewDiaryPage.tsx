@@ -1,25 +1,37 @@
+import api from "@/api";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
-
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ViewDiaryPage = () => {
+  /* Properties */
   const navigate = useNavigate();
+  const { diaryId } = useParams();
+
+  /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false); // diary의 즐겨찾기 상태
 
+  /* Server Side */
+  const { data, isLoading } = useQuery({
+    queryKey: ["fetchDiaryBookById", diaryId],
+    queryFn: () => api.diary.fetchDiaryBookById(Number(diaryId)),
+  });
+
+  /* UI */
   const menuItems = [
     {
       label: "일기장 관리",
-      onClick: () => navigate("/diary/1/manage"),
+      onClick: () => navigate(`/diary/${diaryId}/manage`),
     },
     {
       label: "일기장 멤버 관리",
-      onClick: () => navigate("/diary/1/members"),
+      onClick: () => navigate(`/diary/${diaryId}/members`),
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
@@ -33,7 +45,13 @@ const ViewDiaryPage = () => {
         <div className={"text-2xl pr-8"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
         </div>
-        <div>일기장 제목</div>
+        <div>
+          {isLoading ? (
+            <div className={"h-5 w-16 bg-gray-200 animate-pulse"} />
+          ) : (
+            <>{data?.title}</>
+          )}
+        </div>
         <div className={"flex"}>
           <div className={"p-2 flex items-center justify-center"}>
             <IoCalendarOutline className={"text-xl"} />
@@ -53,7 +71,7 @@ const ViewDiaryPage = () => {
                         setIsMenuOpen(false);
                       }}
                       className={
-                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 py-4 border-b border-gray-400"
+                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 border-b border-gray-400"
                       }
                     >
                       {item.label}

@@ -1,10 +1,12 @@
+import api from "@/api";
 import Button from "@/components/base/Button";
 import Diary from "@/components/diary/Diary";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const diaryDummyData = [
@@ -62,13 +64,27 @@ const MainPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
 
+  /* Server-State */
+  const { data, isLoading } = useQuery({
+    queryKey: ["fetchMyDiaries"],
+    queryFn: () =>
+      api.diary.fetchMyDiaries({
+        size: 10,
+        page: 1, // TODO: pagination
+      }),
+  });
+
   /* States */
   const [tab, setTab] = useState<"all" | "pinned">("all");
 
-  const filteredDiaries =
-    tab === "all"
-      ? diaryDummyData
-      : diaryDummyData.filter((diary) => diary.pinned);
+  const filteredDiaries = useMemo(() => {
+    if (tab === "all") {
+      return data?.content ?? [];
+    } else if (tab === "pinned") {
+      return data?.content ?? []; // TODO: filter by pinned
+    }
+    return [];
+  }, [tab, data]);
 
   return (
     <Page.Container>
@@ -117,6 +133,14 @@ const MainPage = () => {
       <div className={"bg-white h-full min-h-[calc(100vh-160px)] py-8"}>
         <div className={"px-6"}>
           <div className={"grid grid-cols-3 gap-6"}>
+            {isLoading
+              ? Array.from({ length: 9 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                  />
+                ))
+              : null}
             {filteredDiaries.length === 0 && tab === "pinned" ? (
               <div
                 className={
@@ -133,9 +157,9 @@ const MainPage = () => {
                   onClick={() => navigate(`/diary/${diary.id}`)}
                   key={diary.id}
                   title={diary.title}
-                  memberCount={diary.memberCount}
-                  pinned={diary.pinned}
-                  notificationCount={diary.notificationCount}
+                  memberCount={1}
+                  pinned={false}
+                  notificationCount={1}
                 />
               ))
             )}

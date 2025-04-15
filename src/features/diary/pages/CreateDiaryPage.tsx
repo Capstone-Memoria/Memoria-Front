@@ -1,26 +1,54 @@
+import api from "@/api";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import Page from "@/components/page/Page";
 import DiaryCreateHeader from "@/features/main/components/DiaryCreateHeader";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateDiaryPage = () => {
+  const navigate = useNavigate();
   const [diaryTitle, setDiaryTitle] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [submit, setSubmit] = useState(false);
   const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
 
   useEffect(() => {
-    setSuccess(diaryTitle.length > 0);
+    setSubmit(diaryTitle.length > 0);
   }, [diaryTitle]);
 
   const handlePresetSelect = (index: number) => {
     setSelectedPresetIndex(index);
   };
 
+  /* Server Side */
+  const {
+    mutate: tryCreateDiaryBook,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: () => api.diary.createDiaryBook({ title: diaryTitle }),
+    onSuccess: (data) => {
+      console.log("Diary created successfully", data);
+      navigate("/main");
+    },
+  });
+
+  /* Handlers */
+  const handleSubmit = () => {
+    if (diaryTitle.length > 0) {
+      tryCreateDiaryBook();
+    }
+  };
+
   return (
     <Page.Container>
-      <DiaryCreateHeader success={success} />
+      <DiaryCreateHeader
+        isSubmitable={submit}
+        onSubmit={handleSubmit}
+        isCreating={isPending}
+      />
       <Page.Content className={"overflow-x-hidden pb-20"}>
         <div className={"mt-4"}>
           <p className={"text-base font-normal"}>

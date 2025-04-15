@@ -5,10 +5,17 @@ import { useNavigate } from "react-router-dom";
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
   logoType?: "default" | "back";
-  success: boolean;
+  isSubmitable: boolean;
+  isCreating?: boolean;
+  onSubmit?: () => void;
 }
 
-const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
+const DiaryCreateHeader: React.FC<HeaderProps> = ({
+  isSubmitable,
+  isCreating,
+  onSubmit,
+  ...props
+}) => {
   /* Properties */
   const navigate = useNavigate();
 
@@ -16,8 +23,6 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
   const handleBack = () => {
     navigate(-1);
   };
-
-  const handleSuccess = () => {};
 
   return (
     <Page.Header {...props}>
@@ -32,10 +37,13 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({ success, ...props }) => {
       <div className={"text-base font-normal"}>새 일기장</div>
       <Button
         variant={"text"}
-        disabled={!success}
+        disabled={!isSubmitable}
         size={"sm"}
-        onClick={handleSuccess}
         className={"text-sm font-normal"}
+        onClick={() => {
+          if (isCreating) return;
+          onSubmit?.();
+        }}
       >
         완료
       </Button>
