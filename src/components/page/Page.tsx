@@ -23,10 +23,7 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
 
 const Content: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
   return (
-    <div
-      {...props}
-      className={cn("flex flex-col gap-5 px-4 py-4", props.className)}
-    >
+    <div {...props} className={cn("px-4 py-4", props.className)}>
       {props.children}
     </div>
   );
