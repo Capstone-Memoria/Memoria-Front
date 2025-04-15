@@ -78,7 +78,7 @@ const ManageDiaryPage = () => {
   };
 
   return (
-    <Page.Container>
+    <Page.Container className={"h-full flex flex-col"}>
       <Page.Header className={"grid grid-cols-3 items-center"}>
         <div className={"text-2xl"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
@@ -86,9 +86,8 @@ const ManageDiaryPage = () => {
         <div className={"flex justify-center"}>일기장 관리</div>
         <div />
       </Page.Header>
-      <Page.Content className={"px-6 py-4"}>
+      <Page.Content className={"px-6 py-4 flex-1 flex flex-col"}>
         <h2 className={"text-black text-lg font-semibold pt-5"}>일기장 관리</h2>
-
         <Accordion
           type={"single"}
           collapsible
@@ -134,8 +133,8 @@ const ManageDiaryPage = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
-        <div className={"flex justify-center my-5"}>
+        <div className={"flex-1"} />
+        <div className={"flex justify-center pb-8"}>
           <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DrawerTrigger asChild>
               <Button
