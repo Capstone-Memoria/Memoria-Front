@@ -5,11 +5,13 @@ import React, { HTMLAttributes } from "react";
 interface EditDiaryTitlePanelProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   setTitle: (title: string) => void;
+  onCancel?: () => void;
 }
 
 const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
   title,
   setTitle,
+  onCancel,
 }) => {
   const [isFormValid, setIsFormValid] = React.useState(true);
 
@@ -38,6 +40,7 @@ const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
         <Button
           className={"px-3 rounded-md bg-gray-200 text-black"}
           size={"sm"}
+          onClick={() => onCancel?.()}
         >
           취소
         </Button>

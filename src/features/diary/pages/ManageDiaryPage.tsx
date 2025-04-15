@@ -17,6 +17,7 @@ import EditDiaryTitlePanel from "../components/EditDiaryTitlePanel";
 
 const ManageDiaryPage = () => {
   const navigate = useNavigate();
+  const [openedPanel, setOpenedPanel] = useState<string>("");
 
   // 더미 데이터 - 실제로는 API에서 받아올 데이터
   const [diaryData, setDiaryData] = useState({
@@ -60,7 +61,12 @@ const ManageDiaryPage = () => {
       <Page.Content className={"px-6 py-4"}>
         <h2 className={"text-black text-lg font-semibold pt-5"}>일기장 관리</h2>
 
-        <Accordion type={"single"} collapsible>
+        <Accordion
+          type={"single"}
+          collapsible
+          onValueChange={setOpenedPanel}
+          value={openedPanel}
+        >
           {/* 일기장 제목 */}
           <AccordionItem value={"edit-title"}>
             <AccordionTrigger className={"flex justify-between items-center"}>
@@ -74,6 +80,9 @@ const ManageDiaryPage = () => {
               <EditDiaryTitlePanel
                 title={diaryData.title}
                 setTitle={handleTitleChange}
+                onCancel={() => {
+                  setOpenedPanel("");
+                }}
               />
             </AccordionContent>
           </AccordionItem>
@@ -84,7 +93,11 @@ const ManageDiaryPage = () => {
               <div className={"text-base"}>일기장 표지</div>
             </AccordionTrigger>
             <AccordionContent>
-              <EditDiaryCoverPanel />
+              <EditDiaryCoverPanel
+                onCancel={() => {
+                  setOpenedPanel("");
+                }}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

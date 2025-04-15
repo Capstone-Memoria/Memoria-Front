@@ -3,9 +3,11 @@ import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import { HTMLAttributes } from "react";
 
 interface EditDiaryCoverPanelProps extends HTMLAttributes<HTMLDivElement> {
+  onCancel?: () => void;
 }
 
 const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
+  onCancel,
   ...props
 }) => {
   return (
@@ -36,6 +38,7 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
         <Button
           className={"px-3 rounded-md bg-gray-200 text-black"}
           size={"sm"}
+          onClick={() => onCancel?.()}
         >
           취소
         </Button>
