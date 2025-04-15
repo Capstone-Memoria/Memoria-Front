@@ -2,6 +2,7 @@ import api from "@/api";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Modal from "@/components/base/Modal";
+import SectionMessage from "@/components/base/SectionMessage";
 import Header from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import {
@@ -39,21 +40,24 @@ const ProfilePage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
   const [openedPanel, setOpenedPanel] = useState<string>("");
+  const [disposed, setDisposed] = useState(false);
 
   const handleLogout = () => {
     authStore.logout();
     navigate("/login");
   };
 
-  const { mutate: tryUpdateUser } = useMutation({
+  const { mutate: tryUpdateUser, error } = useMutation({
     mutationFn: (
       data: UpdateUserVariables // variables 타입 사용
-    ) =>
-      api.user.updateUser(data.email, {
+    ) => {
+      setDisposed(false);
+      return api.user.updateUser(data.email, {
         nickName: data.nickName,
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
-      }),
+      });
+    },
     onSuccess: (res, variables) => {
       authStore.updateContext({
         user: {
@@ -112,6 +116,18 @@ const ProfilePage = () => {
     <Page.Container>
       <Header logoType={"back"} />
       <Page.Content>
+        {error && !disposed && (
+          <SectionMessage
+            variant={"error"}
+            title={"오류가 발생했습니다."}
+            disposable
+            onDispose={() => {
+              setDisposed(true);
+            }}
+          >
+            {error?.message}
+          </SectionMessage>
+        )}
         <div className={"flex flex-col gap-5 px-2"}>
           {/* 사용자 정보 */}
           <div className={"pt-7 text-base"}>
