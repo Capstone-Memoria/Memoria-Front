@@ -4,7 +4,12 @@ import Input from "@/components/base/Input";
 import Modal from "@/components/base/Modal";
 import Header from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
-import { cn } from "@/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -33,9 +38,7 @@ const ProfilePage = () => {
   });
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
-  const [openSection, setOpenSection] = useState<
-    "nickname" | "password" | null
-  >(null);
+  const [openedPanel, setOpenedPanel] = useState<string>("");
 
   const handleLogout = () => {
     authStore.logout();
@@ -73,7 +76,7 @@ const ProfilePage = () => {
       email: authStore.context.user.email,
       nickName: nickName,
     });
-    setOpenSection(null);
+    setOpenedPanel("");
   };
 
   const handlePasswordChange = (
@@ -100,7 +103,7 @@ const ProfilePage = () => {
       newPassword: passwords.newPassword,
     });
 
-    setOpenSection(null);
+    setOpenedPanel("");
     setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
     setPasswordError(""); // 이전 에러 메시지 초기화
   };
@@ -141,154 +144,131 @@ const ProfilePage = () => {
             }
           />
           {/* 닉네임 변경 */}
-          <div>
-            <Button
-              variant={"text"}
-              className={"px-0 py-0 text-base font-normal"}
-              onClick={() =>
-                setOpenSection((prev) =>
-                  prev === "nickname" ? null : "nickname"
-                )
-              }
-              disabled={!authStore.context?.user} // 사용자 정보 로드 후 활성화
-            >
-              닉네임 변경하기
-            </Button>
-            <div
-              className={cn(
-                "transition-all duration-300 ease-in-out overflow-hidden",
-                openSection === "nickname"
-                  ? "max-h-[1000px] opacity-100"
-                  : "max-h-0 opacity-0"
-              )}
-            >
-              <div className={"mt-5 flex flex-col gap-4"}>
-                <Input
-                  className={"w-full text-sm"}
-                  variant={"white"}
-                  label={"새 닉네임을 입력해주세요."}
-                  labelClassName={"text-black mb-2"}
-                  placeholder={"새로운 닉네임을 입력하세요"}
-                  value={nickName}
-                  onChange={(e) => setNickName(e.target.value)}
-                />
-                <div className={"flex justify-end gap-2"}>
-                  <Button
-                    onClick={() => setOpenSection(null)}
-                    className={"px-3 rounded-md bg-gray-200 text-black"}
-                    size={"sm"}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    onClick={handleNicknameChange}
-                    className={"px-3 rounded-md"}
-                    size={"sm"}
-                  >
-                    저장
-                  </Button>
+          <Accordion
+            type={"single"}
+            collapsible
+            onValueChange={setOpenedPanel}
+            value={openedPanel}
+            className={"flex flex-col gap-5"}
+          >
+            <AccordionItem value={"nickname"} className={"border-none"}>
+              <AccordionTrigger className={"py-0"}>
+                <div className={"text-base font-normal"}>닉네임 변경하기</div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className={"flex flex-col gap-4"}>
+                  <Input
+                    className={"w-full mt-5 text-sm"}
+                    variant={"white"}
+                    label={"새 닉네임을 입력해주세요."}
+                    labelClassName={"text-black mb-2"}
+                    placeholder={"새로운 닉네임을 입력하세요"}
+                    value={nickName}
+                    onChange={(e) => setNickName(e.target.value)}
+                  />
+                  <div className={"flex justify-end gap-2"}>
+                    <Button
+                      onClick={() => setOpenedPanel("")}
+                      className={"px-3 rounded-md bg-gray-200 text-black"}
+                      size={"sm"}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      onClick={handleNicknameChange}
+                      className={"px-3 rounded-md"}
+                      size={"sm"}
+                    >
+                      저장
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* 비밀번호 변경 */}
-          <div>
-            <Button
-              variant={"text"}
-              className={"px-0 py-0 text-base font-normal"}
-              onClick={() =>
-                setOpenSection((prev) =>
-                  prev === "password" ? null : "password"
-                )
-              }
-              disabled={!authStore.context?.user} // 사용자 정보 로드 후 활성화
-            >
-              비밀번호 변경하기
-            </Button>
-            <div
-              className={cn(
-                "transition-all duration-300 ease-in-out overflow-hidden",
-                openSection === "password"
-                  ? "max-h-[1000px] opacity-100"
-                  : "max-h-0 opacity-0"
-              )}
-            >
-              <div className={"mt-5 flex flex-col gap-4"}>
-                <Input
-                  className={"w-full text-sm"}
-                  variant={"white"}
-                  label={"현재 비밀번호"}
-                  labelClassName={"text-black mb-2"}
-                  type={"password"}
-                  placeholder={"현재 비밀번호를 입력하세요"}
-                  value={passwords.currentPassword}
-                  onChange={(e) =>
-                    handlePasswordChange("currentPassword", e.target.value)
-                  }
-                />
-                <Input
-                  className={"w-full text-sm"}
-                  variant={"white"}
-                  label={"새 비밀번호"}
-                  labelClassName={"text-black mb-2"}
-                  type={"password"}
-                  placeholder={"새 비밀번호를 입력하세요"}
-                  value={passwords.newPassword}
-                  onChange={(e) =>
-                    handlePasswordChange("newPassword", e.target.value)
-                  }
-                />
-                <Input
-                  className={"w-full text-sm"}
-                  variant={"white"}
-                  label={"새 비밀번호 확인"}
-                  labelClassName={"text-black mb-2"}
-                  type={"password"}
-                  placeholder={"새 비밀번호를 다시 입력하세요"}
-                  value={passwords.confirmPassword}
-                  onChange={(e) =>
-                    handlePasswordChange("confirmPassword", e.target.value)
-                  }
-                  helperText={passwordError}
-                  isError={!!passwordError} // passwordError 상태에 따라 에러 표시
-                />
-                <div className={"flex justify-end gap-2"}>
-                  <Button
-                    onClick={() => {
-                      setOpenSection(null);
-                      setPasswordError(""); // 취소 시 에러 초기화
-                      setPasswords({
-                        // 취소 시 입력 필드 초기화
-                        currentPassword: "",
-                        newPassword: "",
-                        confirmPassword: "",
-                      });
-                    }}
-                    className={"px-3 rounded-md bg-gray-200 text-black"}
-                    size={"sm"}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    onClick={handlePasswordSubmit}
-                    className={"px-3 rounded-md"}
-                    size={"sm"}
-                  >
-                    저장
-                  </Button>
+            <AccordionItem value={"password"} className={"border-none"}>
+              <AccordionTrigger className={"py-0"}>
+                <div className={"p-0 text-base font-normal"}>
+                  비밀번호 변경하기
                 </div>
-              </div>
-            </div>
-            {/* 비밀번호 변경 성공 메시지 (onSuccess에서 isPasswordChanged=true 설정) */}
-            {isPasswordChanged && (
-              <div className={"text-green-600 mt-4 flex items-center gap-2"}>
-                <IoMdCheckmark />
-                비밀번호가 성공적으로 변경되었습니다.
-              </div>
-            )}
-          </div>
-
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className={"mt-5 flex flex-col gap-4"}>
+                  <Input
+                    className={"w-full text-sm"}
+                    variant={"white"}
+                    label={"현재 비밀번호"}
+                    labelClassName={"text-black mb-2"}
+                    type={"password"}
+                    placeholder={"현재 비밀번호를 입력하세요"}
+                    value={passwords.currentPassword}
+                    onChange={(e) =>
+                      handlePasswordChange("currentPassword", e.target.value)
+                    }
+                  />
+                  <Input
+                    className={"w-full text-sm"}
+                    variant={"white"}
+                    label={"새 비밀번호"}
+                    labelClassName={"text-black mb-2"}
+                    type={"password"}
+                    placeholder={"새 비밀번호를 입력하세요"}
+                    value={passwords.newPassword}
+                    onChange={(e) =>
+                      handlePasswordChange("newPassword", e.target.value)
+                    }
+                  />
+                  <Input
+                    className={"w-full text-sm"}
+                    variant={"white"}
+                    label={"새 비밀번호 확인"}
+                    labelClassName={"text-black mb-2"}
+                    type={"password"}
+                    placeholder={"새 비밀번호를 다시 입력하세요"}
+                    value={passwords.confirmPassword}
+                    onChange={(e) =>
+                      handlePasswordChange("confirmPassword", e.target.value)
+                    }
+                    helperText={passwordError}
+                    isError={!!passwordError} // passwordError 상태에 따라 에러 표시
+                  />
+                  <div className={"flex justify-end gap-2"}>
+                    <Button
+                      onClick={() => {
+                        setOpenedPanel("");
+                        setPasswordError(""); // 취소 시 에러 초기화
+                        setPasswords({
+                          // 취소 시 입력 필드 초기화
+                          currentPassword: "",
+                          newPassword: "",
+                          confirmPassword: "",
+                        });
+                      }}
+                      className={"px-3 rounded-md bg-gray-200 text-black"}
+                      size={"sm"}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      onClick={handlePasswordSubmit}
+                      className={"px-3 rounded-md"}
+                      size={"sm"}
+                    >
+                      저장
+                    </Button>
+                  </div>
+                  {isPasswordChanged && (
+                    <div
+                      className={"text-green-600 mt-4 flex items-center gap-2"}
+                    >
+                      <IoMdCheckmark />
+                      비밀번호가 성공적으로 변경되었습니다.
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
           {/* 구분선 */}
           <div
             className={
