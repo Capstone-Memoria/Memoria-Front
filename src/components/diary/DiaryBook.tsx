@@ -2,14 +2,14 @@ import { cn } from "@/lib/utils/className";
 import { HTMLAttributes } from "react";
 import DiaryCover from "./DiaryCover";
 
-interface DiaryProps extends HTMLAttributes<HTMLDivElement> {
+interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   memberCount: number;
   pinned: boolean;
   notificationCount: number;
 }
 
-const Diary: React.FC<DiaryProps> = ({
+const DiaryBook: React.FC<DiaryBookProps> = ({
   title,
   memberCount,
   pinned,
@@ -37,4 +37,4 @@ const Diary: React.FC<DiaryProps> = ({
   );
 };
 
-export default Diary;
+export default DiaryBook;

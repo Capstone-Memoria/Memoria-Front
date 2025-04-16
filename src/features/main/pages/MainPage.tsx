@@ -1,6 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
-import Diary from "@/components/diary/Diary";
+import DiaryBook from "@/components/diary/DiaryBook";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
@@ -153,7 +153,7 @@ const MainPage = () => {
               </div>
             ) : (
               filteredDiaries.map((diary) => (
-                <Diary
+                <DiaryBook
                   onClick={() => navigate(`/diary/${diary.id}`)}
                   key={diary.id}
                   title={diary.title}

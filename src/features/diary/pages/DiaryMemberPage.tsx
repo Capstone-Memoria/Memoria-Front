@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { IoMdAdd, IoMdClose, IoMdCopy } from "react-icons/io";
-import { FaCrown } from "react-icons/fa";
+import Card from "@/components/base/Banner";
+import Button from "@/components/base/Button";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
-import Card from "@/components/base/Card";
-import Button from "@/components/base/Button";
-import Input from "@/components/base/Input";
+import { useState } from "react";
+import { FaCrown } from "react-icons/fa";
+import { IoMdAdd, IoMdClose, IoMdCopy } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
 // 멤버 더미 데이터
@@ -66,17 +65,19 @@ const DiaryMemberPage = () => {
   // 멤버 삭제 핸들러
   const handleRemoveMember = (memberId: string) => {
     // 실제 구현에서는 API 호출을 통해 멤버를 삭제해야 합니다.
-    setMembers(members.filter(member => member.id !== memberId));
+    setMembers(members.filter((member) => member.id !== memberId));
   };
 
   // 관리자 권한 변경 핸들러
   const handleToggleAdmin = (memberId: string) => {
     // 실제 구현에서는 API 호출을 통해 권한을 변경해야 합니다.
-    setMembers(members.map(member => 
-      member.id === memberId 
-        ? { ...member, role: member.role === "admin" ? "member" : "admin" } 
-        : member
-    ));
+    setMembers(
+      members.map((member) =>
+        member.id === memberId
+          ? { ...member, role: member.role === "admin" ? "member" : "admin" }
+          : member
+      )
+    );
   };
 
   return (
@@ -90,13 +91,28 @@ const DiaryMemberPage = () => {
           <h2 className={"text-lg font-medium mb-4"}>멤버 목록</h2>
           <div className={"flex flex-col gap-3"}>
             {members.map((member) => (
-              <div key={member.id} className={"flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0"}>
+              <div
+                key={member.id}
+                className={
+                  "flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0"
+                }
+              >
                 <div className={"flex items-center gap-3"}>
-                  <div className={"w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"}>
+                  <div
+                    className={
+                      "w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"
+                    }
+                  >
                     {member.profileImg ? (
-                      <img src={member.profileImg} alt={member.name} className={"w-full h-full rounded-full object-cover"} />
+                      <img
+                        src={member.profileImg}
+                        alt={member.name}
+                        className={"w-full h-full rounded-full object-cover"}
+                      />
                     ) : (
-                      <span className={"text-gray-500"}>{member.name.charAt(0)}</span>
+                      <span className={"text-gray-500"}>
+                        {member.name.charAt(0)}
+                      </span>
                     )}
                   </div>
                   <div>
@@ -106,20 +122,22 @@ const DiaryMemberPage = () => {
                         <FaCrown className={"text-yellow-500 text-xs"} />
                       )}
                     </div>
-                    <span className={"text-xs text-gray-500"}>{member.email}</span>
+                    <span className={"text-xs text-gray-500"}>
+                      {member.email}
+                    </span>
                   </div>
                 </div>
                 <div className={"flex gap-2"}>
-                  <Button 
-                    variant={"text"} 
-                    size={"sm"} 
+                  <Button
+                    variant={"text"}
+                    size={"sm"}
                     onClick={() => handleToggleAdmin(member.id)}
                   >
                     {member.role === "admin" ? "관리자 해제" : "관리자 지정"}
                   </Button>
-                  <Button 
-                    variant={"text"} 
-                    size={"sm"} 
+                  <Button
+                    variant={"text"}
+                    size={"sm"}
                     className={"text-red-500"}
                     onClick={() => handleRemoveMember(member.id)}
                   >
@@ -136,31 +154,28 @@ const DiaryMemberPage = () => {
           <h2 className={"text-lg font-medium mb-4"}>멤버 초대</h2>
           {isGeneratingInvite ? (
             <div className={"flex flex-col gap-4"}>
-              <div className={"flex items-center gap-2 bg-gray-100 p-3 rounded-md"}>
+              <div
+                className={"flex items-center gap-2 bg-gray-100 p-3 rounded-md"}
+              >
                 <span className={"text-sm flex-1 break-all"}>{inviteLink}</span>
-                <Button 
-                  variant={"text"} 
-                  size={"sm"} 
-                  onClick={handleCopyLink}
-                >
+                <Button variant={"text"} size={"sm"} onClick={handleCopyLink}>
                   <IoMdCopy />
                 </Button>
               </div>
               {linkCopied && (
-                <p className={"text-xs text-green-500"}>링크가 클립보드에 복사되었습니다!</p>
+                <p className={"text-xs text-green-500"}>
+                  링크가 클립보드에 복사되었습니다!
+                </p>
               )}
               <div className={"flex gap-2 justify-end"}>
-                <Button 
-                  variant={"secondary"} 
-                  size={"sm"} 
+                <Button
+                  variant={"secondary"}
+                  size={"sm"}
                   onClick={() => setIsGeneratingInvite(false)}
                 >
                   닫기
                 </Button>
-                <Button 
-                  size={"sm"} 
-                  onClick={handleGenerateInvite}
-                >
+                <Button size={"sm"} onClick={handleGenerateInvite}>
                   새 링크 생성
                 </Button>
               </div>
@@ -172,9 +187,9 @@ const DiaryMemberPage = () => {
                 <br />
                 초대 링크는 7일간 유효합니다.
               </p>
-              <Button 
-                size={"md"} 
-                className={"flex items-center gap-2"} 
+              <Button
+                size={"md"}
+                className={"flex items-center gap-2"}
                 onClick={handleGenerateInvite}
               >
                 <IoMdAdd />

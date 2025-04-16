@@ -1,9 +1,11 @@
 import api from "@/api";
+import Banner from "@/components/base/Banner";
+import Input from "@/components/base/Input";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
@@ -90,8 +92,20 @@ const ViewDiaryPage = () => {
           </div>
         </div>
       </Page.Header>
-      <Page.Content>PageContent</Page.Content>
-      <Page.Footer>Footer</Page.Footer>
+      <Page.Content>
+        <Banner
+          variant={"green"}
+          title={"우리 일기장은 어떤 일기장일까?"}
+          className={"mt-2"}
+        >
+          메모리아에게 일기장 분석받기
+        </Banner>
+        <Input
+          icon={<IoSearch className={"text-base"} />}
+          placeholder={"작성자, 제목, 내용 검색"}
+          className={"text-[13px] w-full mt-5"}
+        />
+      </Page.Content>
     </Page.Container>
   );
 };
