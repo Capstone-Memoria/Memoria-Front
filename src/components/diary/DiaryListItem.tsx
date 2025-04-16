@@ -32,7 +32,7 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
         }
       >
         <div>{item.createdBy.nickName}, </div>
-        <div>{item.createAt.day}시간 전</div>
+        <div>{item.createAt.toRelative()}</div>
       </div>
     </div>
   );

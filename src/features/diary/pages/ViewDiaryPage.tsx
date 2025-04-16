@@ -59,7 +59,7 @@ const diaryList = [
     },
     summary:
       "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
-    createAt: DateTime.fromISO("2023-01-01"),
+    createAt: DateTime.fromISO("2025-01-01"),
     createdBy: {
       email: "pkhjack@naver.com",
       nickName: "진욱",
