@@ -1,14 +1,56 @@
 import api from "@/api";
 import Banner from "@/components/base/Banner";
 import Input from "@/components/base/Input";
+import DiaryListItem from "@/components/diary/DiaryListItem";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import { useState } from "react";
 import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
+
+// dummy diaryList data
+const diaryList = [
+  {
+    title: "느좋카페에서 카공",
+    coverImage: {
+      id: "1",
+      fileName: "image.jpg",
+      size: 10,
+    },
+    summary:
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+    createAt: DateTime.fromISO("2023-01-01"),
+    createdBy: {
+      email: "pkhjack@naver.com",
+      nickName: "기현",
+      createdAt: DateTime.fromISO("2023-01-01"),
+    },
+    likeCount: 2,
+    commentCount: 10,
+  },
+  {
+    title: "느좋카페에서 카공",
+    coverImage: {
+      id: "1",
+      fileName: "image.jpg",
+      size: 10,
+    },
+    summary:
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+    createAt: DateTime.fromISO("2023-01-01"),
+    createdBy: {
+      email: "pkhjack@naver.com",
+      nickName: "기현",
+      createdAt: DateTime.fromISO("2023-01-01"),
+    },
+    likeCount: 2,
+    commentCount: 10,
+  },
+];
 
 const ViewDiaryPage = () => {
   /* Properties */
@@ -105,6 +147,18 @@ const ViewDiaryPage = () => {
           placeholder={"작성자, 제목, 내용 검색"}
           className={"text-[13px] w-full mt-5"}
         />
+        <div className={"flex flex-col gap-4 mt-5"}>
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                />
+              ))
+            : diaryList.map((diary, index) => (
+                <DiaryListItem key={index} item={diary} />
+              ))}
+        </div>
       </Page.Content>
     </Page.Container>
   );

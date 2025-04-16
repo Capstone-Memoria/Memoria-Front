@@ -9,57 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const diaryDummyData = [
-  {
-    id: 1,
-    title: "AO JS 스터디",
-    memberCount: 8,
-    pinned: true,
-    diaryCoverImg: "",
-    notificationCount: 4,
-  },
-  {
-    id: 2,
-    title: "우리 가족",
-    memberCount: 4,
-    pinned: false,
-    diaryCoverImg: "",
-    notificationCount: 0,
-  },
-  {
-    id: 3,
-    title: "2025 대학팸",
-    memberCount: 9,
-    pinned: true,
-    diaryCoverImg: "",
-    notificationCount: 0,
-  },
-  {
-    id: 4,
-    title: "2025년 기록",
-    memberCount: 0,
-    pinned: true,
-    diaryCoverImg: "",
-    notificationCount: 0,
-  },
-  {
-    id: 5,
-    title: "새해 다짐 모임",
-    memberCount: 3,
-    pinned: false,
-    diaryCoverImg: "",
-    notificationCount: 120,
-  },
-  {
-    id: 6,
-    title: "개발 기록장",
-    memberCount: 0,
-    pinned: false,
-    diaryCoverImg: "",
-    notificationCount: 0,
-  },
-];
-
 const MainPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
@@ -77,7 +26,7 @@ const MainPage = () => {
   /* States */
   const [tab, setTab] = useState<"all" | "pinned">("all");
 
-  const filteredDiaries = useMemo(() => {
+  const filteredDiaryBooks = useMemo(() => {
     if (tab === "all") {
       return data?.content ?? [];
     } else if (tab === "pinned") {
@@ -96,7 +45,7 @@ const MainPage = () => {
               {authStore.context?.user?.nickName} 님의 책장,
             </p>
             <p className={"font-regular text-gray-1 text-sm"}>
-              {diaryDummyData.length}권의 일기장
+              {filteredDiaryBooks.length}권의 일기장
             </p>
           </div>
           <Button
@@ -141,7 +90,7 @@ const MainPage = () => {
                   />
                 ))
               : null}
-            {filteredDiaries.length === 0 && tab === "pinned" ? (
+            {filteredDiaryBooks.length === 0 && tab === "pinned" ? (
               <div
                 className={
                   "col-span-full text-center text-gray-400 text-sm py-20"
@@ -152,11 +101,11 @@ const MainPage = () => {
                 일기장 관리에서 즐겨찾기를 설정할 수 있어요.
               </div>
             ) : (
-              filteredDiaries.map((diary) => (
+              filteredDiaryBooks.map((diaryBook) => (
                 <DiaryBook
-                  onClick={() => navigate(`/diary/${diary.id}`)}
-                  key={diary.id}
-                  title={diary.title}
+                  onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                  key={diaryBook.id}
+                  title={diaryBook.title}
                   memberCount={1}
                   pinned={false}
                   notificationCount={1}
