@@ -79,39 +79,80 @@ const MainPage = () => {
           즐겨 찾는
         </button>
       </div>
-      <div className={"bg-white h-full min-h-[calc(100vh-160px)] py-8"}>
-        <div className={"px-6"}>
-          <div className={"grid grid-cols-3 gap-6"}>
-            {isLoading
-              ? Array.from({ length: 9 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
-                  />
-                ))
-              : null}
-            {filteredDiaryBooks.length === 0 && tab === "pinned" ? (
-              <div
-                className={
-                  "col-span-full text-center text-gray-400 text-sm py-20"
-                }
-              >
-                즐겨찾는 일기장이 없습니다.
-                <br />
-                일기장 관리에서 즐겨찾기를 설정할 수 있어요.
+      {/* Tab Content Container */}
+      <div className={"w-full overflow-x-hidden"}>
+        <div
+          className={cn(
+            "flex w-[200%] transition-transform duration-700 ease-expo-out",
+            tab === "pinned" ? "-translate-x-1/2" : "translate-x-0"
+          )}
+        >
+          {/* All Diaries Tab Content */}
+          <div
+            className={"w-1/2 bg-white h-full min-h-[calc(100vh-160px)] py-8"}
+          >
+            <div className={"px-6"}>
+              <div className={"grid grid-cols-3 gap-6"}>
+                {isLoading
+                  ? Array.from({ length: 9 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                      />
+                    ))
+                  : (data?.content ?? []).map((diaryBook) => (
+                      <DiaryBook
+                        onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                        key={diaryBook.id}
+                        title={diaryBook.title}
+                        memberCount={1}
+                        pinned={diaryBook.isPinned ?? false}
+                        notificationCount={1}
+                      />
+                    ))}
               </div>
-            ) : (
-              filteredDiaryBooks.map((diaryBook) => (
-                <DiaryBook
-                  onClick={() => navigate(`/diary/${diaryBook.id}`)}
-                  key={diaryBook.id}
-                  title={diaryBook.title}
-                  memberCount={1}
-                  pinned={diaryBook.isPinned ?? false}
-                  notificationCount={1}
-                />
-              ))
-            )}
+            </div>
+          </div>
+
+          {/* Pinned Diaries Tab Content */}
+          <div
+            className={"w-1/2 bg-white h-full min-h-[calc(100vh-160px)] py-8"}
+          >
+            <div className={"px-6"}>
+              <div className={"grid grid-cols-3 gap-6"}>
+                {isLoading
+                  ? Array.from({ length: 9 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                      />
+                    ))
+                  : (data?.content ?? [])
+                      .filter((book) => book.isPinned)
+                      .map((diaryBook) => (
+                        <DiaryBook
+                          onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                          key={diaryBook.id}
+                          title={diaryBook.title}
+                          memberCount={1}
+                          pinned={diaryBook.isPinned ?? false}
+                          notificationCount={1}
+                        />
+                      ))}
+                {(data?.content ?? []).filter((book) => book.isPinned)
+                  .length === 0 && !isLoading ? (
+                  <div
+                    className={
+                      "col-span-full text-center text-gray-400 text-sm py-20"
+                    }
+                  >
+                    즐겨찾는 일기장이 없습니다.
+                    <br />
+                    일기장 관리에서 즐겨찾기를 설정할 수 있어요.
+                  </div>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </div>
