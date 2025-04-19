@@ -30,7 +30,7 @@ const MainPage = () => {
     if (tab === "all") {
       return data?.content ?? [];
     } else if (tab === "pinned") {
-      return data?.content ?? []; // TODO: filter by pinned
+      return (data?.content ?? []).filter((book) => book.isPinned); // TODO: filter by pinned
     }
     return [];
   }, [tab, data]);
@@ -107,7 +107,7 @@ const MainPage = () => {
                   key={diaryBook.id}
                   title={diaryBook.title}
                   memberCount={1}
-                  pinned={false}
+                  pinned={diaryBook.isPinned ?? false}
                   notificationCount={1}
                 />
               ))

@@ -6,7 +6,7 @@ import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
@@ -115,9 +115,24 @@ const ViewDiaryPage = () => {
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
-      onClick: () => setIsPinned(!isPinned),
+      onClick: async () => {
+        try {
+          await api.diary.updateDiaryBook(Number(diaryId), {
+            isPinned: !isPinned,
+          });
+          setIsPinned(!isPinned);
+        } catch (e) {
+          console.log("즐겨찾기 추가 실패", e);
+        }
+      },
     },
   ];
+
+  useEffect(() => {
+    if (data) {
+      setIsPinned(data.isPinned ?? false);
+    }
+  }, [data]);
 
   // 날짜 적용
   const today = DateTime.now().startOf("day");
