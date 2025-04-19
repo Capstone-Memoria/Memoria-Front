@@ -67,7 +67,6 @@ const ManageDiaryPage = () => {
 
   // 삭제 핸들러
   const handleDelete = () => {
-    // API 호출 로직이 여기에 들어갈 예정
     tryDelete();
   };
 
