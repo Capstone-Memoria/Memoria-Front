@@ -83,7 +83,7 @@ const MainPage = () => {
       <div className={"w-full overflow-x-hidden"}>
         <div
           className={cn(
-            "flex w-[200%] transition-transform duration-700 ease-expo-out",
+            "flex w-[200%] transition-transform duration-600 ease-expo-out",
             tab === "pinned" ? "-translate-x-1/2" : "translate-x-0"
           )}
         >
