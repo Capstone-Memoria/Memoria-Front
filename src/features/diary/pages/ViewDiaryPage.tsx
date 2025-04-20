@@ -23,7 +23,7 @@ const diaryList = [
       size: 10,
     },
     summary:
-      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. ",
     createAt: DateTime.fromISO("2025-04-16"),
     createdBy: {
       email: "pkhjack@naver.com",
@@ -41,7 +41,7 @@ const diaryList = [
       size: 10,
     },
     summary:
-      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다.",
     createAt: DateTime.fromISO("2025-04-16"),
     createdBy: {
       email: "pkhjack@naver.com",
@@ -59,7 +59,7 @@ const diaryList = [
       size: 10,
     },
     summary:
-      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다.",
     createAt: DateTime.fromISO("2025-01-01"),
     createdBy: {
       email: "pkhjack@naver.com",
@@ -77,7 +77,7 @@ const diaryList = [
       size: 10,
     },
     summary:
-      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다. 커피도 맛있고 날씨도 좋아서 콧노래가 절로 나오는 날이었다.",
+      "오늘은 날씨가 좋아서 가고 싶었던 동네 카페에 나와서 카공을 좀 해봤다.",
     createAt: DateTime.fromISO("2023-01-01"),
     createdBy: {
       email: "pkhjack@naver.com",
@@ -208,7 +208,7 @@ const ViewDiaryPage = () => {
         <Input
           icon={<IoSearch className={"text-base"} />}
           placeholder={"작성자, 제목, 내용 검색"}
-          className={"text-[13px] w-full mt-5"}
+          className={"text-sm w-full mt-5"}
         />
 
         <div className={"flex flex-col gap-4 mt-5"}>
