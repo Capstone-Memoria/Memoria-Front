@@ -2,6 +2,7 @@ import api from "@/api";
 import Banner from "@/components/base/Banner";
 import Input from "@/components/base/Input";
 import DiaryListItem from "@/components/diary/DiaryListItem";
+import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
@@ -245,6 +246,7 @@ const ViewDiaryPage = () => {
             </>
           )}
         </div>
+        <DiaryWriteButton className={"fixed bottom-20 right-5"} />
       </Page.Content>
     </Page.Container>
   );
