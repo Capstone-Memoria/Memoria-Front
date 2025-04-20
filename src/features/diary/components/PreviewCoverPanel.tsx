@@ -1,4 +1,5 @@
 import Button from "@/components/base/Button";
+import { ImageIcon } from "lucide-react";
 
 interface PreviewCoverPanelProps {
   onBack: () => void;
@@ -12,10 +13,13 @@ export const PreviewCoverPanel = ({ onBack }: PreviewCoverPanelProps) => {
       <div className={"flex-1 flex"}>
         <div
           className={
-            "w-full flex-1 bg-gray-200 rounded-lg flex items-center justify-center"
+            "w-full flex-1 bg-gray-200 rounded-lg flex items-center justify-center animate-pulse"
           }
         >
-          <span className={"text-gray-400"}>이미지 로딩 중...</span>
+          <div className={"flex flex-col items-center gap-2"}>
+            <ImageIcon className={"w-12 h-12 text-gray-400 animate-bounce"} />
+            <span className={"text-gray-400"}>이미지 로딩 중...</span>
+          </div>
         </div>
       </div>
 
