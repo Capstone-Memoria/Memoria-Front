@@ -17,6 +17,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperTextClassName?: string;
   isError?: boolean;
   variant?: keyof typeof variantMap;
+  icon?: React.ReactNode;
 }
 
 export default function Input({
@@ -40,19 +41,34 @@ export default function Input({
           {label}
         </div>
       )}
+
       <div className={"relative w-full"}>
-        <input
-          {...props}
-          className={cn("w-full py-2 focus:outline-none", variantMap[variant])}
-          onFocus={(e) => {
-            setFocused(true);
-            props.onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setFocused(false);
-            props.onBlur?.(e);
-          }}
-        />
+        <div className={"w-full flex items-center gap-3"}>
+          {props.icon && (
+            <div
+              className={cn("", {
+                "text-red-500": isError,
+              })}
+            >
+              {props.icon}
+            </div>
+          )}
+          <input
+            {...props}
+            className={cn(
+              "flex-1 py-2 focus:outline-none",
+              variantMap[variant]
+            )}
+            onFocus={(e) => {
+              setFocused(true);
+              props.onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setFocused(false);
+              props.onBlur?.(e);
+            }}
+          />
+        </div>
 
         <div
           className={cn(

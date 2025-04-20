@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { FaSearch } from "react-icons/fa";
 import Input from "./Input";
 
 const meta = {
@@ -14,7 +15,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { placeholder: "텍스트를 입력해주세요" },
+  args: {
+    placeholder: "텍스트를 입력해주세요",
+    icon: (
+      <div>
+        <FaSearch />
+      </div>
+    ),
+  },
+};
+
+export const Icon: Story = {
+  args: {
+    placeholder: "텍스트를 입력해주세요",
+  },
 };
 
 export const HelperText: Story = {

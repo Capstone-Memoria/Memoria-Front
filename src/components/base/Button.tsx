@@ -4,6 +4,7 @@ import { ButtonHTMLAttributes, useMemo } from "react";
 const ButtonVariants = {
   primary: "bg-black text-white rounded-xl",
   secondary: "bg-gray-300 text-black rounded-md",
+  danger: "bg-red-400 text-white rounded-md",
   text: "bg-transparent text-black",
 };
 
@@ -18,6 +19,7 @@ const ButtonSizes = {
 const DisabledVariants = {
   primary: "bg-gray-300 text-gray-500 rounded-xl",
   secondary: "bg-gray-200 text-gray-400 rounded-md",
+  danger: "bg-red-200 text-red-400 rounded-md",
   text: "bg-transparent text-gray-3",
 };
 
@@ -45,6 +47,14 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       {...props}
+      onClick={(e) => {
+        if (disabled) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        props.onClick?.(e);
+      }}
       className={cn(
         "focus:outline-none cursor-pointer transition-all active:scale-95",
         variantClasses,
