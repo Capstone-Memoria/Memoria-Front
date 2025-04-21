@@ -5,6 +5,7 @@ export interface DiaryBook {
   id: number;
   title: string;
   isPinned: boolean;
+  memberCount: number;
   createAt: DateTime;
   lastModified: DateTime;
   createdBy: User;

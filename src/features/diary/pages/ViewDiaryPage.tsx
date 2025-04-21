@@ -146,6 +146,10 @@ const ViewDiaryPage = () => {
     (diary) => diary.createAt.startOf("day") < today
   );
 
+  const openWritePage = () => {
+    navigate(`/diary/write`);
+  };
+
   return (
     <Page.Container>
       <Page.Header>
@@ -246,7 +250,10 @@ const ViewDiaryPage = () => {
             </>
           )}
         </div>
-        <DiaryWriteButton className={"fixed bottom-20 right-5"} />
+        <DiaryWriteButton
+          className={"fixed bottom-20 right-5 touch-"}
+          onClick={openWritePage}
+        />
       </Page.Content>
     </Page.Container>
   );

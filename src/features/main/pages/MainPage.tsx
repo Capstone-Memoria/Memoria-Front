@@ -105,9 +105,9 @@ const MainPage = () => {
                         onClick={() => navigate(`/diary/${diaryBook.id}`)}
                         key={diaryBook.id}
                         title={diaryBook.title}
-                        memberCount={1}
+                        memberCount={diaryBook.memberCount}
                         pinned={diaryBook.isPinned ?? false}
-                        notificationCount={1}
+                        notificationCount={120}
                       />
                     ))}
               </div>
