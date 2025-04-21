@@ -1,4 +1,5 @@
 import api from "@/api";
+import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
@@ -13,10 +14,12 @@ const WriteDiaryPage = () => {
   // 저장 회색으로 보이다가 제목 입력하면 검정색으로.
   const [submit, setSubmit] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [diaryBookTitle, setDiaryBookTitle] = useState("");
+  const [diaryTitle, setDiaryTitle] = useState("");
 
   useEffect(() => {
-    setSubmit(false);
-  }, []);
+    setSubmit(diaryTitle.length > 0);
+  }, [diaryTitle]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaries"],
@@ -34,11 +37,21 @@ const WriteDiaryPage = () => {
   return (
     <Page.Container>
       <Page.Header>
-        <div className={"text-2xl"}>
+        <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
         </div>
         <div className={"text-lg"}>일기 작성하기</div>
-        <div className={"text-base"}>저장</div>
+        <Button
+          variant={"text"}
+          disabled={!submit}
+          size={"sm"}
+          className={"text-sm font-normal"}
+          onClick={() => {
+            navigate("/diary");
+          }}
+        >
+          완료
+        </Button>
       </Page.Header>
       <Page.Content
         className={
@@ -51,12 +64,16 @@ const WriteDiaryPage = () => {
           }
           onClick={openDrawer}
         >
-          {data?.content[0]?.title ?? "일기장을 선택해주세요."}
+          {diaryBookTitle || "일기장 선택하기"}
           <IoIosArrowDown />
         </div>
         <div className={"flex flex-col gap-2"}>
           <div>일기의 제목을 입력해주세요.</div>
-          <Input className={"w-full"} placeholder={"ex) 오늘의 하루"} />
+          <Input
+            className={"w-full"}
+            placeholder={"ex) 오늘의 하루"}
+            onChange={(e) => setDiaryTitle(e.target.value)}
+          />
         </div>
         <div>일기 내용을 입력해주세요.</div>
       </Page.Content>
@@ -74,7 +91,15 @@ const WriteDiaryPage = () => {
                 key={diary.id}
                 className={"flex items-center justify-center"}
               >
-                <div className={"text-base"}>{diary.title}</div>
+                <div
+                  className={"text-base"}
+                  onClick={() => {
+                    setDiaryBookTitle(diary.title);
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  {diary.title}
+                </div>
               </div>
             ))}
             <div
