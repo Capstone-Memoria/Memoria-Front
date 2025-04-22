@@ -92,7 +92,7 @@ const diaryList = [
 const ViewDiaryPage = () => {
   /* Properties */
   const navigate = useNavigate();
-  const { diaryId } = useParams();
+  const { diaryId: diaryBookId } = useParams();
 
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -100,25 +100,25 @@ const ViewDiaryPage = () => {
 
   /* Server Side */
   const { data, isLoading } = useQuery({
-    queryKey: ["fetchDiaryBookById", diaryId],
-    queryFn: () => api.diary.fetchDiaryBookById(Number(diaryId)),
+    queryKey: ["fetchDiaryBookById", diaryBookId],
+    queryFn: () => api.diary.fetchDiaryBookById(Number(diaryBookId)),
   });
 
   /* UI */
   const menuItems = [
     {
       label: "일기장 관리",
-      onClick: () => navigate(`/diary/${diaryId}/manage`),
+      onClick: () => navigate(`/diary/${diaryBookId}/manage`),
     },
     {
       label: "일기장 멤버 관리",
-      onClick: () => navigate(`/diary/${diaryId}/members`),
+      onClick: () => navigate(`/diary/${diaryBookId}/members`),
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
       onClick: async () => {
         try {
-          await api.diary.updateDiaryBook(Number(diaryId), {
+          await api.diary.updateDiaryBook(Number(diaryBookId), {
             isPinned: !isPinned,
           });
           setIsPinned(!isPinned);
@@ -147,7 +147,7 @@ const ViewDiaryPage = () => {
   );
 
   const openWritePage = () => {
-    navigate(`/diary/write`);
+    navigate(`/diary/write/?diaryBookId=${diaryBookId}`);
   };
 
   return (

@@ -52,7 +52,7 @@ export const routes: ContextRoutes = {
       element: <ManageDiaryPage />,
     },
     {
-      path: "/diary/write",
+      path: "/diary/write/",
       element: <WriteDiaryPage />,
     },
     {

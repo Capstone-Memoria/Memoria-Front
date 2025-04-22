@@ -12,12 +12,12 @@ export const fetchMyDiaries = async (PageParam: PageParam) => {
   return response.data;
 };
 
-interface DiaryBookCreateRequest {
-  title: string;
-}
+// interface DiaryBookCreateRequest {
+//   title: string;
+// }
 
-export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
-  const response = await server.post<DiaryBook>("api/diary-book", request);
+export const createDiaryBook = async (formData: FormData) => {
+  const response = await server.post<DiaryBook>("api/diary-book", formData);
 
   return response.data;
 };
