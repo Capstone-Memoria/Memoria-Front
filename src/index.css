@@ -1,12 +1,21 @@
 @import url("../src/assets/css/transitions.css");
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 html,
 body {
   height: 100%;
+}
+
+.tiptap p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 
 * {
@@ -38,7 +47,7 @@ body {
 }
 
 @theme {
-  --slide-up:        
+  --slide-up:           
 ;
 }
 

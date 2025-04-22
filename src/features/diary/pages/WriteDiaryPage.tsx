@@ -1,6 +1,7 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
+import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
@@ -35,7 +36,7 @@ const WriteDiaryPage = () => {
   };
 
   return (
-    <Page.Container>
+    <Page.Container className={"h-full flex flex-col"}>
       <Page.Header>
         <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
@@ -53,11 +54,7 @@ const WriteDiaryPage = () => {
           완료
         </Button>
       </Page.Header>
-      <Page.Content
-        className={
-          "bg-white flex flex-col gap-6 h-full min-h-[calc(100vh-160px)]"
-        }
-      >
+      <Page.Content className={"flex flex-col gap-6 flex-1"}>
         <div
           className={
             "w-full flex justify-between items-center mt-2 bg-gray-100 rounded-3xl px-4 py-2"
@@ -68,14 +65,15 @@ const WriteDiaryPage = () => {
           <IoIosArrowDown />
         </div>
         <div className={"flex flex-col gap-2"}>
-          <div>일기의 제목을 입력해주세요.</div>
           <Input
-            className={"w-full"}
-            placeholder={"ex) 오늘의 하루"}
+            className={"w-full text-2xl"}
+            placeholder={"일기 제목"}
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-        <div>일기 내용을 입력해주세요.</div>
+        <div className={"bg-gray-100 flex-1 rounded-lg p-2"}>
+          <Tiptap />
+        </div>
       </Page.Content>
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DrawerContent
