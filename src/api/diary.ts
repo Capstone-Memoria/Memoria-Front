@@ -1,8 +1,9 @@
+import { Diary } from "@/models/Diary";
 import { DiaryBook } from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
 import server from "./axios";
 
-export const fetchMyDiaries = async (PageParam: PageParam) => {
+export const fetchMyDiaryBook = async (PageParam: PageParam) => {
   const response = await server.get<Page<DiaryBook>>("/api/diary-book", {
     params: {
       ...PageParam,
@@ -48,4 +49,19 @@ export const updateDiaryBook = async (
 
 export const deleteDiaryBook = async (diaryBookId: number) => {
   await server.delete(`/api/diary-book/${diaryBookId}`);
+};
+
+export const fetchMyDiaries = async (
+  diaryBookId: number,
+  PageParam: PageParam
+) => {
+  const response = await server.get<Page<Diary>>(
+    `/api/diary-book/${diaryBookId}/diary`,
+    {
+      params: {
+        ...PageParam,
+      },
+    }
+  );
+  return response.data;
 };

@@ -15,9 +15,9 @@ const MainPage = () => {
 
   /* Server-State */
   const { data, isLoading } = useQuery({
-    queryKey: ["fetchMyDiaries"],
+    queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
-      api.diary.fetchMyDiaries({
+      api.diary.fetchMyDiaryBook({
         size: 10,
         page: 1, // TODO: pagination
       }),

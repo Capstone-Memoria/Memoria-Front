@@ -31,9 +31,9 @@ const WriteDiaryPage = () => {
   }, [selectedDiaryBookId, diaryTitle]);
 
   const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ["fetchMyDiaries"],
+    queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
-      api.diary.fetchMyDiaries({
+      api.diary.fetchMyDiaryBook({
         size: 10,
         page: 1, // TODO: pagination
       }),
@@ -140,12 +140,8 @@ const WriteDiaryPage = () => {
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-        <div className={"bg-gray-100 flex-1 rounded-lg p-3"}>
-          <Tiptap
-            content={diaryContent}
-            onChange={handleContentChange}
-            placeholder={"오늘 이야기"}
-          />
+        <div className={"flex-1 rounded-lg"}>
+          <Tiptap />
         </div>
       </Page.Content>
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
