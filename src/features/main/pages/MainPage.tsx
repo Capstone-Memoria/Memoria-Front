@@ -1,6 +1,7 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import DiaryBook from "@/components/diary/DiaryBook";
+import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
@@ -156,6 +157,10 @@ const MainPage = () => {
           </div>
         </div>
       </div>
+      <DiaryWriteButton
+        className={"fixed bottom-20 right-5"}
+        onClick={() => navigate("/diary/write")}
+      />
     </Page.Container>
   );
 };

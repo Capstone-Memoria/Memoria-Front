@@ -251,7 +251,7 @@ const ViewDiaryPage = () => {
           )}
         </div>
         <DiaryWriteButton
-          className={"fixed bottom-20 right-5 touch-"}
+          className={"fixed bottom-20 right-5"}
           onClick={openWritePage}
         />
       </Page.Content>
