@@ -71,7 +71,7 @@ const WriteDiaryPage = () => {
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-        <div className={"bg-gray-100 flex-1 rounded-lg p-2"}>
+        <div className={"flex-1 rounded-lg"}>
           <Tiptap />
         </div>
       </Page.Content>

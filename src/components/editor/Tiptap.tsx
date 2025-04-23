@@ -1,14 +1,10 @@
+import { cn } from "@/lib/utils";
 import Placeholder from "@tiptap/extension-placeholder";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  Bold,
-  Heading1,
-  Heading2,
-  Italic,
-  List,
-  ListOrdered,
-} from "lucide-react";
+import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+import Toolbar from "./Toolbar";
 
 const extensions = [
   Placeholder.configure({ placeholder: "내용을 입력해주세요" }),
@@ -16,6 +12,8 @@ const extensions = [
 ];
 
 const Tiptap = () => {
+  const [isCursorNearBottom, setIsCursorNearBottom] = useState(false);
+
   const editor = useEditor({
     extensions,
     editorProps: {
@@ -24,6 +22,39 @@ const Tiptap = () => {
       },
     },
   });
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const checkCursorPosition = () => {
+      const { view } = editor;
+      const { state } = editor;
+      const { selection } = state;
+
+      if (selection.empty) {
+        const cursorEndPos = selection.from;
+        const cursorCoords = view.coordsAtPos(cursorEndPos);
+
+        const editorRect = view.dom.getBoundingClientRect();
+
+        const editorMiddleY = editorRect.top + editorRect.height / 2;
+
+        const nearBottom = cursorCoords.bottom > editorMiddleY + 10;
+
+        if (isCursorNearBottom !== nearBottom) {
+          setIsCursorNearBottom(nearBottom);
+        }
+      }
+    };
+
+    editor.on("selectionUpdate", checkCursorPosition);
+
+    return () => {
+      editor.off("selectionUpdate", checkCursorPosition);
+    };
+  }, [editor, isCursorNearBottom]);
 
   const handleWrapperClick = () => {
     if (editor) {
@@ -54,55 +85,27 @@ const Tiptap = () => {
           "bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-2"
         }
       >
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("bold") ? "bg-gray-100" : ""}`}
-          title={"굵게"}
-        >
-          <Bold size={16} />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("italic") ? "bg-gray-100" : ""}`}
-          title={"기울임"}
-        >
-          <Italic size={16} />
-        </button>
-        <div className={"h-6 w-px bg-gray-200 mx-1"} />
-        <button
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("heading", { level: 1 }) ? "bg-gray-100" : ""}`}
-          title={"제목 1"}
-        >
-          <Heading1 size={16} />
-        </button>
-        <button
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("heading", { level: 2 }) ? "bg-gray-100" : ""}`}
-          title={"제목 2"}
-        >
-          <Heading2 size={16} />
-        </button>
-        <div className={"h-6 w-px bg-gray-200 mx-1"} />
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("bulletList") ? "bg-gray-100" : ""}`}
-          title={"글머리 기호"}
-        >
-          <List size={16} />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded hover:bg-gray-100 ${editor.isActive("orderedList") ? "bg-gray-100" : ""}`}
-          title={"번호 매기기"}
-        >
-          <ListOrdered size={16} />
-        </button>
+        <Toolbar editor={editor} />
       </BubbleMenu>
+      <motion.div
+        layout
+        className={cn("absolute w-fit flex left-1/2 -translate-x-1/2", {
+          "bottom-0": !isCursorNearBottom,
+          "top-0": isCursorNearBottom,
+        })}
+        transition={{
+          duration: 0.3,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      >
+        <div
+          className={
+            "bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex"
+          }
+        >
+          <Toolbar editor={editor} />
+        </div>
+      </motion.div>
     </div>
   );
 };

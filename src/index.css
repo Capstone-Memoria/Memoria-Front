@@ -2,6 +2,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
+@config "../tailwind.config.js";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -47,7 +48,7 @@ body {
 }
 
 @theme {
-  --slide-up:           
+  --slide-up:                
 ;
 }
 
