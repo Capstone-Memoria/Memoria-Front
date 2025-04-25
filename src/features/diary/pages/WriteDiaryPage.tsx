@@ -95,7 +95,7 @@ const WriteDiaryPage = () => {
           <div className={"text-lg pt-5 pb-8"}>일기장을 선택해주세요.</div>
           <div
             className={
-              "flex-1 w-full overflow-y-auto max-h-[40vh] [&::-webkit-scrollbar]:hidden"
+              "flex-1 w-full overflow-y-auto max-h-[30vh] [&::-webkit-scrollbar]:hidden"
             }
           >
             <div className={"flex flex-col items-center gap-2"}>
