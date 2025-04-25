@@ -31,11 +31,7 @@ const ManageDiaryPage = () => {
     queryFn: () => api.diary.fetchDiaryBookById(Number(diaryId)),
   });
 
-  const {
-    mutate: trySave,
-    isPending: isSaving,
-    error,
-  } = useMutation({
+  const { mutate: trySave, isPending: isSaving } = useMutation({
     mutationFn: () => api.diary.updateDiaryBook(Number(diaryId), { title }),
     onSuccess: () => {
       queryClient.invalidateQueries({

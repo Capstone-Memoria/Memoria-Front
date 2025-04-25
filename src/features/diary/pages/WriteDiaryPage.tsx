@@ -20,7 +20,7 @@ const WriteDiaryPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [diaryTitle, setDiaryTitle] = useState("");
 
-  const { data, isLoading, isSuccess } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
       api.diary.fetchMyDiaryBook({
