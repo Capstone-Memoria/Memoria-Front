@@ -31,18 +31,16 @@ export const fetchDiaryBookById = async (diaryBookId: number) => {
   return response.data;
 };
 
-interface DiaryBookUpdateRequest {
-  title?: string;
-  isPinned?: boolean;
-}
+// interface DiaryBookUpdateRequest {
+//   title?: string;
+//   isPinned?: boolean;
+//   coverImage?: string;
+// }
 
-export const updateDiaryBook = async (
-  diaryBookId: number,
-  request: DiaryBookUpdateRequest
-) => {
+export const updateDiaryBook = async (formData: FormData) => {
   const response = await server.patch<DiaryBook>(
-    `/api/diary-book/${diaryBookId}`,
-    request
+    `/api/diary-book/${formData.get("diaryBookId")}`,
+    formData
   );
   return response.data;
 };

@@ -116,14 +116,30 @@ const ViewDiaryPage = () => {
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
+
       onClick: async () => {
+        const updateFormData = new FormData(); // FormData 생성
+
+        if (diaryBookId) {
+          updateFormData.append("diaryBookId", diaryBookId); // API 경로용 ID 추가
+          updateFormData.append("isPinned", String(!isPinned)); // 변경할 isPinned 값만 추가
+        } else {
+          console.error("Diary book ID is missing!");
+          setIsMenuOpen(false);
+          return;
+        }
+
         try {
-          await api.diary.updateDiaryBook(Number(diaryBookId), {
-            isPinned: !isPinned,
+          console.log("Updating diary book (pin toggle) with data:", {
+            diaryBookId: updateFormData.get("diaryBookId"),
+            isPinned: updateFormData.get("isPinned"),
           });
+          await api.diary.updateDiaryBook(updateFormData); // isPinned 업데이트 요청
           setIsPinned(!isPinned);
         } catch (e) {
-          console.log("즐겨찾기 추가 실패", e);
+          console.error("즐겨찾기 업데이트 실패", e);
+        } finally {
+          setIsMenuOpen(false);
         }
       },
     },
