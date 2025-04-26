@@ -25,7 +25,7 @@ const colorPairs = [
 ];
 
 interface KeywordInputPanelProps {
-  onNext: () => void;
+  onNext: (keywords: string[]) => void;
 }
 
 const KeywordProgressBar = ({ count }: { count: number }) => {
@@ -262,7 +262,7 @@ export const KeywordInputPanel = ({ onNext }: KeywordInputPanelProps) => {
                     className={"w-full"}
                     size={"xl"}
                     variant={"blue"}
-                    onClick={onNext}
+                    onClick={() => onNext(keywords)}
                   >
                     커버 이미지 생성하기
                   </Button>

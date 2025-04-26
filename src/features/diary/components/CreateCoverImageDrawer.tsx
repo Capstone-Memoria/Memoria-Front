@@ -1,4 +1,6 @@
+import api from "@/api";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { KeywordInputPanel } from "./KeywordInputPanel";
 import { PreviewCoverPanel } from "./PreviewCoverPanel";
@@ -17,6 +19,27 @@ export const CreateCoverImageDrawer = ({
   const [currentPanel, setCurrentPanel] = useState<"keyword" | "preview">(
     "keyword"
   );
+  const [currentImageBase64, setCurrentImageBase64] = useState<string>();
+  const [isError, setIsError] = useState(false);
+
+  const handleClickGenerate = (keywords: string[]) => {
+    generateCoverImageMutation.mutate(
+      `일기장 커버 이미지 키워드: ${keywords.join(", ")}`
+    );
+    setCurrentImageBase64(undefined);
+    setIsError(false);
+    setCurrentPanel("preview");
+  };
+
+  const generateCoverImageMutation = useMutation({
+    mutationFn: (description: string) => api.ai.generateCoverImage(description),
+    onSuccess: (data) => {
+      setCurrentImageBase64(data);
+    },
+    onError: () => {
+      setIsError(true);
+    },
+  });
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -31,10 +54,14 @@ export const CreateCoverImageDrawer = ({
           }}
         >
           <div className={"w-screen px-4 flex flex-col flex-shrink-0"}>
-            <KeywordInputPanel onNext={() => setCurrentPanel("preview")} />
+            <KeywordInputPanel onNext={handleClickGenerate} />
           </div>
           <div className={"w-screen px-4 flex flex-col flex-shrink-0"}>
-            <PreviewCoverPanel onBack={() => setCurrentPanel("keyword")} />
+            <PreviewCoverPanel
+              onBack={() => setCurrentPanel("keyword")}
+              imageBase64={currentImageBase64}
+              isError={isError}
+            />
           </div>
         </div>
       </DrawerContent>

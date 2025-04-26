@@ -3,9 +3,15 @@ import { ImageIcon } from "lucide-react";
 
 interface PreviewCoverPanelProps {
   onBack: () => void;
+  imageBase64?: string;
+  isError?: boolean;
 }
 
-export const PreviewCoverPanel = ({ onBack }: PreviewCoverPanelProps) => {
+export const PreviewCoverPanel = ({
+  onBack,
+  imageBase64,
+  isError,
+}: PreviewCoverPanelProps) => {
   return (
     <div className={"flex flex-col flex-1 gap-4"}>
       <div className={"text-xl text-center mt-4"}>커버 이미지 미리보기</div>
@@ -13,13 +19,28 @@ export const PreviewCoverPanel = ({ onBack }: PreviewCoverPanelProps) => {
       <div className={"flex-1 flex"}>
         <div
           className={
-            "w-full flex-1 bg-gray-200 rounded-lg flex items-center justify-center animate-pulse"
+            "w-full flex-1 bg-gray-200 rounded-lg flex items-center justify-center"
           }
         >
-          <div className={"flex flex-col items-center gap-2"}>
-            <ImageIcon className={"w-12 h-12 text-gray-400 animate-bounce"} />
-            <span className={"text-gray-400"}>이미지 로딩 중...</span>
-          </div>
+          {isError ? (
+            <div className={"flex flex-col items-center gap-2"}>
+              <ImageIcon className={"w-12 h-12 text-red-500"} />
+              <span className={"text-red-500"}>
+                이미지 로딩 중 에러가 발생했습니다.
+              </span>
+            </div>
+          ) : imageBase64 ? (
+            <img
+              src={`data:image/png;base64,${imageBase64}`}
+              alt={"Preview"}
+              className={"max-w-full max-h-full object-contain rounded-lg"}
+            />
+          ) : (
+            <div className={"flex flex-col items-center gap-2"}>
+              <ImageIcon className={"w-12 h-12 text-gray-400 animate-bounce"} />
+              <span className={"text-gray-400"}>이미지 로딩 중...</span>
+            </div>
+          )}
         </div>
       </div>
 
