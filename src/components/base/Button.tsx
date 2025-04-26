@@ -3,8 +3,9 @@ import { ButtonHTMLAttributes, useMemo } from "react";
 
 const ButtonVariants = {
   primary: "bg-black text-white rounded-xl",
-  secondary: "bg-gray-300 text-black rounded-md",
-  danger: "bg-red-400 text-white rounded-md",
+  blue: "bg-blue-500 text-white rounded-xl",
+  secondary: "bg-gray-300 text-black rounded-xl",
+  danger: "bg-red-400 text-white rounded-xl",
   text: "bg-transparent text-black",
 };
 
@@ -18,8 +19,9 @@ const ButtonSizes = {
 
 const DisabledVariants = {
   primary: "bg-gray-300 text-gray-500 rounded-xl",
-  secondary: "bg-gray-200 text-gray-400 rounded-md",
-  danger: "bg-red-200 text-red-400 rounded-md",
+  blue: "bg-gray-300 text-gray-500 rounded-xl",
+  secondary: "bg-gray-200 text-gray-400 rounded-xl",
+  danger: "bg-red-200 text-red-400 rounded-xl",
   text: "bg-transparent text-gray-3",
 };
 
