@@ -7,6 +7,7 @@ import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useQuery } from "@tanstack/react-query";
+import { BookPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -51,10 +52,10 @@ const MainPage = () => {
           </div>
           <Button
             size={"sm"}
-            variant={"secondary"}
+            className={"flex items-center gap-2"}
             onClick={() => navigate("/create-diary")}
           >
-            새 일기장
+            <BookPlus className={"size-4"} />새 일기장
           </Button>
         </div>
       </Page.Content>

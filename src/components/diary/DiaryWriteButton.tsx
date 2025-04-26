@@ -14,7 +14,7 @@ const DiaryWriteButton: React.FC<DiaryWriteButtonProps> = ({
     <div>
       <button
         className={cn(
-          "size-12 bg-black flex justify-center items-center rounded-full text-white",
+          "size-14 bg-gray-800 shadow-lg border border-black flex justify-center items-center rounded-full text-white transition-all active:scale-95",
           props.className
         )}
         onClick={onClick}
