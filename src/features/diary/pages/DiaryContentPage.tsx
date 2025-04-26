@@ -2,7 +2,7 @@ import api from "@/api";
 import CommentIcon from "@/assets/svgs/Comment";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
 import { useState } from "react";
 import { IoMdHeart } from "react-icons/io";
@@ -27,6 +27,19 @@ const DiaryContentPage = () => {
     queryFn: () => api.diary.fetchDiary(Number(diaryBookId), Number(diaryId)),
   });
 
+  /* Mutations */
+  const deleteMutation = useMutation({
+    mutationFn: () =>
+      api.diary.deleteDiary(Number(diaryBookId), Number(diaryId)),
+    onSuccess: () => {
+      navigate(`/diary/${diaryBookId}`);
+    },
+    onError: (error) => {
+      console.error("일기 삭제 실패", error);
+      alert("일기 삭제에 실패했습니다. 다시 시도해주세요.");
+    },
+  });
+
   /* UI */
   const menuItems = [
     {
@@ -36,15 +49,10 @@ const DiaryContentPage = () => {
     {
       label: "일기 삭제",
       onClick: async () => {
-        // TODO: 삭제 기능 구현
-        try {
-          // await api.diary.deleteDiary(Number(diaryBookId), Number(diaryId));
-          navigate(`/diary/${diaryBookId}`);
-        } catch (e) {
-          console.error("일기 삭제 실패", e);
-        } finally {
-          setIsMenuOpen(false);
+        if (window.confirm("정말로 이 일기를 삭제하시겠습니까?")) {
+          deleteMutation.mutate();
         }
+        setIsMenuOpen(false);
       },
     },
   ];
