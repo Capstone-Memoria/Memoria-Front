@@ -212,9 +212,15 @@ const ViewDiaryListPage = () => {
             ))
           ) : (
             <>
-              {diaryList?.content.map((diary) => (
-                <DiaryListItem key={diary.id} item={diary} />
-              ))}
+              {diaryList?.content && diaryList.content.length > 0 ? (
+                diaryList.content.map((diary) => (
+                  <DiaryListItem key={diary.id} item={diary} />
+                ))
+              ) : (
+                <div className={"text-center text-gray-500 mt-10"}>
+                  아직 작성된 일기가 없어요. 첫 일기를 작성해보세요!
+                </div>
+              )}
             </>
           )}
         </div>
