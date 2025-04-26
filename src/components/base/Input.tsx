@@ -7,6 +7,7 @@ const variantMap = {
   default: "bg-transparent placeholder:text-gray-300",
   white:
     "bg-white px-4 rounded-md placeholder:text-gray-300 mt-1 border border-transparent focus:border-green-500 transition-colors",
+  gray: "bg-gray-100 px-4 rounded-md placeholder:text-gray-400 mt-1 border border-transparent focus:border-green-500 transition-colors",
 };
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
