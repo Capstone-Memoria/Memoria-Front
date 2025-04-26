@@ -5,12 +5,15 @@ import { Dot } from "lucide-react";
 import { HTMLAttributes, useMemo } from "react";
 import { IoMdHeart } from "react-icons/io";
 import { MdImageNotSupported } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 interface DiaryListItemProps extends HTMLAttributes<HTMLDivElement> {
   item: Diary;
 }
 
 const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
+  const navigate = useNavigate();
+
   const summary = useMemo(() => {
     const content = item.content;
     //content에서 HTML 태그 제거, 텍스트만 추출.
@@ -20,13 +23,18 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
     return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join(" ");
   }, [item.content]);
 
+  const handleDiaryClick = () => {
+    navigate(`/diary/${item.diaryBookId}/diary/${item.id}`);
+  };
+
   return (
     <div
       {...props}
       className={cn(
-        "flex bg-white overflow-hidden rounded-md border h-26",
+        "flex bg-white overflow-hidden rounded-md border h-26 cursor-pointer",
         props.className
       )}
+      onClick={handleDiaryClick}
     >
       <div
         className={
