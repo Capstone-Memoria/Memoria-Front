@@ -4,7 +4,7 @@ import Input from "@/components/base/Input";
 import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
@@ -20,10 +20,12 @@ const WriteDiaryPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [diaryTitle, setDiaryTitle] = useState("");
 
+  const [content, setContent] = useState("");
+
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
-      api.diary.fetchMyDiaryBook({
+      api.diaryBook.fetchMyDiaryBook({
         size: 10,
         page: 1, // TODO: pagination
       }),
@@ -47,6 +49,21 @@ const WriteDiaryPage = () => {
     setIsMenuOpen(true);
   };
 
+  const submitMutation = useMutation({
+    mutationFn: () =>
+      api.diary.createDiary(Number(diaryBookId), {
+        title: diaryTitle,
+        content: content,
+      }),
+    onSuccess: () => {
+      navigate(`/diary/${diaryBookId}`);
+    },
+  });
+
+  const handleSubmit = () => {
+    submitMutation.mutate();
+  };
+
   return (
     <Page.Container className={"h-full flex flex-col"}>
       <Page.Header>
@@ -59,6 +76,7 @@ const WriteDiaryPage = () => {
           disabled={!canSubmit}
           size={"sm"}
           className={"text-sm font-normal"}
+          onClick={handleSubmit}
         >
           완료
         </Button>
@@ -85,7 +103,10 @@ const WriteDiaryPage = () => {
           />
         </div>
         <div className={"flex-1 rounded-lg"}>
-          <Tiptap />
+          <Tiptap
+            content={content}
+            onContentUpdate={(content) => setContent(content)}
+          />
         </div>
       </Page.Content>
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>

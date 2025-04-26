@@ -41,7 +41,7 @@ const CreateDiaryPage = () => {
       // }
 
       // 수정된 API 함수 호출 (FormData 객체 전달)
-      return api.diary.createDiaryBook(formData);
+      return api.diaryBook.createDiaryBook(formData);
     },
     onSuccess: (data) => {
       console.log("Diary created successfully", data);

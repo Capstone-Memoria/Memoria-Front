@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/className";
-import { InputHTMLAttributes, useState } from "react";
+import React, { InputHTMLAttributes, useState } from "react";
 
 export type InputVariant = "default" | "white";
 
@@ -10,6 +10,7 @@ const variantMap = {
 };
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  ref?: React.Ref<HTMLInputElement>;
   label?: string;
   labelClassName?: string;
   required?: boolean;
@@ -25,6 +26,7 @@ export default function Input({
   label,
   labelClassName,
   required,
+  ref,
   helperText,
   helperTextClassName,
   isError,
@@ -55,6 +57,7 @@ export default function Input({
           )}
           <input
             {...props}
+            ref={ref}
             className={cn(
               "flex-1 py-2 focus:outline-none",
               variantMap[variant]

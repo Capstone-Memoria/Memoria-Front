@@ -18,7 +18,7 @@ const MainPage = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
-      api.diary.fetchMyDiaryBook({
+      api.diaryBook.fetchMyDiaryBook({
         size: 10,
         page: 1, // TODO: pagination
       }),
@@ -50,7 +50,7 @@ const MainPage = () => {
             </p>
           </div>
           <Button
-            size={"xs"}
+            size={"sm"}
             variant={"secondary"}
             onClick={() => navigate("/create-diary")}
           >

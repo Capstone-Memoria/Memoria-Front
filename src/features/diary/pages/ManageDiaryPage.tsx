@@ -28,13 +28,13 @@ const ManageDiaryPage = () => {
   // server side
   const { data, isFetching: isDiaryBookFetching } = useQuery({
     queryKey: ["fetchDiaryBookById", diaryId],
-    queryFn: () => api.diary.fetchDiaryBookById(Number(diaryId)),
+    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryId)),
     enabled: !!diaryId,
   });
 
   const { mutate: tryUpdateDiaryBook, isPending: isSaving } = useMutation({
     // mutationFn은 FormData를 인자로 받도록 수정
-    mutationFn: (formData: FormData) => api.diary.updateDiaryBook(formData),
+    mutationFn: (formData: FormData) => api.diaryBook.updateDiaryBook(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookById", diaryId], // diaryId를 포함한 queryKey 무효화
@@ -50,7 +50,7 @@ const ManageDiaryPage = () => {
 
   const { mutate: tryDelete, isPending: isDeleting } = useMutation({
     // isPending 변수명 변경 (isSaving과 충돌 방지)
-    mutationFn: () => api.diary.deleteDiaryBook(Number(diaryId)),
+    mutationFn: () => api.diaryBook.deleteDiaryBook(Number(diaryId)),
     onSuccess: () => {
       // 삭제 성공 시 캐시 무효화보다는 제거가 더 적절할 수 있음
       queryClient.removeQueries({ queryKey: ["fetchDiaryBookById", diaryId] });

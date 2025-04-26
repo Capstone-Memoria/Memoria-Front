@@ -11,17 +11,36 @@ const extensions = [
   StarterKit,
 ];
 
-const Tiptap = () => {
+interface TiptapProps {
+  content?: string; // HTML 형식의 초기 콘텐츠
+  onContentUpdate?: (html: string) => void; // 콘텐츠 변경 시 호출될 콜백 함수
+}
+
+const Tiptap: React.FC<TiptapProps> = ({ content = "", onContentUpdate }) => {
   const [isCursorNearBottom, setIsCursorNearBottom] = useState(false);
 
   const editor = useEditor({
     extensions,
+    content,
     editorProps: {
       attributes: {
         class: "prose focus:outline-none min-h-[200px]",
       },
     },
+    onUpdate: ({ editor }) => {
+      // 콘텐츠가 변경될 때마다 콜백 함수 호출
+      if (onContentUpdate) {
+        onContentUpdate(editor.getHTML());
+      }
+    },
   });
+
+  // 외부에서 content prop이 변경될 경우 에디터 내용 업데이트
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   useEffect(() => {
     if (!editor) {
