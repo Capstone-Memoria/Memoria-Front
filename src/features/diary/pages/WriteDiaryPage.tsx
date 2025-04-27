@@ -61,6 +61,7 @@ const WriteDiaryPage = () => {
       api.diary.createDiary(Number(diaryBookId), {
         title: diaryTitle,
         content: content,
+        images: uploadedImages,
       }),
     onSuccess: () => {
       navigate(`/diary/${diaryBookId}`);
