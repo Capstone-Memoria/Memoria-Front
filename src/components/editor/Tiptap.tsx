@@ -1,23 +1,28 @@
-import { cn } from "@/lib/utils";
 import Placeholder from "@tiptap/extension-placeholder";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import Toolbar from "./Toolbar";
 
-const extensions = [
-  Placeholder.configure({ placeholder: "내용을 입력해주세요" }),
-  StarterKit,
-];
-
 interface TiptapProps {
   content?: string; // HTML 형식의 초기 콘텐츠
+  placeholder?: string; // 플레이스홀더 텍스트
   onContentUpdate?: (html: string) => void; // 콘텐츠 변경 시 호출될 콜백 함수
 }
 
-const Tiptap: React.FC<TiptapProps> = ({ content = "", onContentUpdate }) => {
+const Tiptap: React.FC<TiptapProps> = ({
+  content = "",
+  placeholder = "내용을 입력해주세요",
+  onContentUpdate,
+}) => {
   const [isCursorNearBottom, setIsCursorNearBottom] = useState(false);
+
+  const extensions = [
+    StarterKit,
+    Placeholder.configure({
+      placeholder,
+    }),
+  ];
 
   const editor = useEditor({
     extensions,
@@ -41,39 +46,6 @@ const Tiptap: React.FC<TiptapProps> = ({ content = "", onContentUpdate }) => {
       editor.commands.setContent(content);
     }
   }, [content, editor]);
-
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    const checkCursorPosition = () => {
-      const { view } = editor;
-      const { state } = editor;
-      const { selection } = state;
-
-      if (selection.empty) {
-        const cursorEndPos = selection.from;
-        const cursorCoords = view.coordsAtPos(cursorEndPos);
-
-        const editorRect = view.dom.getBoundingClientRect();
-
-        const editorMiddleY = editorRect.top + editorRect.height / 2;
-
-        const nearBottom = cursorCoords.bottom > editorMiddleY + 10;
-
-        if (isCursorNearBottom !== nearBottom) {
-          setIsCursorNearBottom(nearBottom);
-        }
-      }
-    };
-
-    editor.on("selectionUpdate", checkCursorPosition);
-
-    return () => {
-      editor.off("selectionUpdate", checkCursorPosition);
-    };
-  }, [editor, isCursorNearBottom]);
 
   const handleWrapperClick = () => {
     if (editor) {
@@ -106,25 +78,6 @@ const Tiptap: React.FC<TiptapProps> = ({ content = "", onContentUpdate }) => {
       >
         <Toolbar editor={editor} />
       </BubbleMenu>
-      <motion.div
-        layout
-        className={cn("absolute w-fit flex left-1/2 -translate-x-1/2", {
-          "bottom-0": !isCursorNearBottom,
-          "top-0": isCursorNearBottom,
-        })}
-        transition={{
-          duration: 0.3,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-      >
-        <div
-          className={
-            "bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex"
-          }
-        >
-          <Toolbar editor={editor} />
-        </div>
-      </motion.div>
     </div>
   );
 };

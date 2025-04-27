@@ -1,7 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Modal from "@/components/base/Modal";
-import Spinner from "@/components/base/Spinner";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -11,7 +10,7 @@ import {
   MdImageNotSupported,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
-import { RiMore2Fill } from "react-icons/ri";
+import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
 
 const DiaryContentPage = () => {
@@ -128,13 +127,18 @@ const DiaryContentPage = () => {
               {/* 사진 넣기 */}
               <div
                 className={
-                  "h-48 w-full gap-2 flex flex-col justify-center items-center bg-gray-200 animate-pulse rounded-md overflow-hidden"
+                  "h-48 w-full gap-4 flex flex-col justify-center items-center bg-gray-200 rounded-md overflow-hidden"
                 }
               >
-                <Spinner className={"text-xl"} />
-                <div className={"text-sm text-center text-gray-600"}>
-                  <p>사진을 업로드 하거나,</p>
-                  <p>일기 업로드 후, AI가 생성해줘요.</p>
+                <RiImageCircleAiFill
+                  className={"text-5xl text-gray-400 animate-pulse"}
+                />
+                <div
+                  className={"text-sm text-gray-500 text-center animate-pulse"}
+                >
+                  AI가 어울리는 사진을 그리고 있어요
+                  <br />
+                  조금만 기다려주세요
                 </div>
               </div>
               {/* 일기 제목 */}
@@ -151,22 +155,7 @@ const DiaryContentPage = () => {
                 <span>{diary.createdBy?.nickName}</span>
                 <Dot className={"size-4"} />
                 <span>{diary.createdAt?.toRelative()}</span>
-
-                {/* 좋아요 및 댓글 카운트 */}
-                {/* <div className={"flex gap-2"}>
-                  <div className={"flex items-center gap-1"}>
-                    <IoMdHeart className={"text-xs"} />
-                    <span>{diary.likeCount ?? 0}</span>
-                  </div>
-                  <div className={"flex items-center gap-1"}>
-                    <CommentIcon className={"size-xs"} />
-                    <span>{diary.commentCount ?? 0}</span>
-                  </div>
-                </div> */}
               </div>
-
-              {/* 구분선 */}
-              {/* <div className={"h-px bg-gray-200 my-4"} /> */}
 
               {/* 일기 내용 */}
               <div className={"mt-6 px-5 font-light"}>
