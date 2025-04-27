@@ -1,5 +1,7 @@
 import api from "@/api";
 import CommentIcon from "@/assets/svgs/Comment";
+import Button from "@/components/base/Button";
+import Modal from "@/components/base/Modal";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -20,6 +22,7 @@ const DiaryContentPage = () => {
 
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   /* Server Side */
   const { data: diary, isLoading } = useQuery({
@@ -48,10 +51,8 @@ const DiaryContentPage = () => {
     },
     {
       label: "일기 삭제",
-      onClick: async () => {
-        if (window.confirm("정말로 이 일기를 삭제하시겠습니까?")) {
-          deleteMutation.mutate();
-        }
+      onClick: () => {
+        setIsDeleteModalOpen(true);
         setIsMenuOpen(false);
       },
     },
@@ -68,7 +69,7 @@ const DiaryContentPage = () => {
             {isLoading ? (
               <div className={"h-5 w-16 bg-gray-200 animate-pulse"} />
             ) : (
-              <>일기 상세보기</>
+              <div>{diary?.createdBy?.nickName}님의 일기</div>
             )}
           </div>
           <div className={"py-2 pl-2"}>
@@ -86,7 +87,7 @@ const DiaryContentPage = () => {
                         setIsMenuOpen(false);
                       }}
                       className={
-                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 border-b border-gray-400"
+                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 first:border-b border-gray-300 last:text-red-500"
                       }
                     >
                       {item.label}
@@ -191,6 +192,35 @@ const DiaryContentPage = () => {
               )}
             </div>
           )
+        )}
+        {isDeleteModalOpen && (
+          <Modal
+            open={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            description={`일기를 삭제하시겠어요?\n삭제한 일기는 복구할 수 없습니다.`}
+          >
+            <div className={"mt-8 flex justify-between font-medium"}>
+              <Button
+                variant={"text"}
+                size={"md"}
+                className={"p-0"}
+                onClick={async () => {
+                  deleteMutation.mutate();
+                  setIsDeleteModalOpen(false);
+                }}
+              >
+                일기 삭제
+              </Button>
+              <Button
+                variant={"text"}
+                className={"text-red-500 p-0"}
+                size={"md"}
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                취소
+              </Button>
+            </div>
+          </Modal>
         )}
       </Page.Content>
     </Page.Container>
