@@ -4,6 +4,7 @@ import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
 import DiaryBookDrawer from "@/features/diary/components/DiaryBookDrawer";
 import DiaryBookSelectButton from "@/features/diary/components/DiaryBookSelectButton";
+import ImageUploader from "@/features/diary/components/ImageUploader";
 import WriteDiaryPageHeader from "@/features/diary/components/WriteDiaryPageHeader";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -26,6 +27,7 @@ const WriteDiaryPage = () => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const [content, setContent] = useState("");
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
@@ -118,6 +120,7 @@ const WriteDiaryPage = () => {
                   <Dot />
                   <div>{authStore.context?.user?.nickName}</div>
                 </div>
+                <ImageUploader onImagesChange={setUploadedImages} />
                 <div className={"flex-1 rounded-lg"}>
                   <Tiptap
                     content={content}
