@@ -6,10 +6,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
 import { useState } from "react";
-import {
-  MdImageNotSupported,
-  MdOutlineKeyboardBackspace,
-} from "react-icons/md";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -161,33 +158,6 @@ const DiaryContentPage = () => {
               <div className={"mt-6 px-5 font-light"}>
                 <div dangerouslySetInnerHTML={{ __html: diary.content }} />
               </div>
-
-              {/* 이미지가 있는 경우 이미지 표시 */}
-              {diary.images && diary.images.length > 0 && (
-                <div className={"mt-4 grid grid-cols-2 gap-2"}>
-                  {diary.images.map((image, index) => (
-                    <div
-                      key={image.id}
-                      className={
-                        "aspect-square rounded-md overflow-hidden bg-gray-100 flex items-center justify-center"
-                      }
-                    >
-                      {/* 이미지 정보만 표시하고 실제 이미지는 아직 표시하지 않음 */}
-                      {/* 백엔드 API로부터 이미지 URL을 받아올 경우 이 부분 업데이트 필요 */}
-                      <MdImageNotSupported
-                        className={"text-gray-400 text-4xl"}
-                      />
-                      <div
-                        className={
-                          "absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate"
-                        }
-                      >
-                        {image.fileName}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               {/* 요약 내용이 있는 경우 */}
               {diary.summary && (
