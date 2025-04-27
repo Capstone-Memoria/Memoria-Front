@@ -1,13 +1,12 @@
 import api from "@/api";
-import CommentIcon from "@/assets/svgs/Comment";
 import Button from "@/components/base/Button";
 import Modal from "@/components/base/Modal";
+import Spinner from "@/components/base/Spinner";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
 import { useState } from "react";
-import { IoMdHeart } from "react-icons/io";
 import {
   MdImageNotSupported,
   MdOutlineKeyboardBackspace,
@@ -125,20 +124,36 @@ const DiaryContentPage = () => {
           </div>
         ) : (
           diary && (
-            <div className={"space-y-4"}>
+            <div className={"space-y-2"}>
+              {/* 사진 넣기 */}
+              <div
+                className={
+                  "h-48 w-full gap-2 flex flex-col justify-center items-center bg-gray-200 animate-pulse rounded-md overflow-hidden"
+                }
+              >
+                <Spinner className={"text-xl"} />
+                <div className={"text-sm text-center text-gray-600"}>
+                  <p>사진을 업로드 하거나,</p>
+                  <p>일기 업로드 후, AI가 생성해줘요.</p>
+                </div>
+              </div>
               {/* 일기 제목 */}
-              <h1 className={"text-xl font-medium"}>{diary.title}</h1>
+              <h1 className={"text-xl mt-6 text-center font-medium"}>
+                {diary.title}
+              </h1>
 
               {/* 작성 정보 */}
-              <div className={"flex items-center text-xs text-gray-600"}>
+              <div
+                className={
+                  "flex justify-center items-center text-xs text-gray-600"
+                }
+              >
                 <span>{diary.createdBy?.nickName}</span>
                 <Dot className={"size-4"} />
                 <span>{diary.createdAt?.toRelative()}</span>
 
-                <div className={"flex-1"} />
-
                 {/* 좋아요 및 댓글 카운트 */}
-                <div className={"flex gap-2"}>
+                {/* <div className={"flex gap-2"}>
                   <div className={"flex items-center gap-1"}>
                     <IoMdHeart className={"text-xs"} />
                     <span>{diary.likeCount ?? 0}</span>
@@ -147,14 +162,14 @@ const DiaryContentPage = () => {
                     <CommentIcon className={"size-xs"} />
                     <span>{diary.commentCount ?? 0}</span>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* 구분선 */}
-              <div className={"h-px bg-gray-200 my-4"} />
+              {/* <div className={"h-px bg-gray-200 my-4"} /> */}
 
               {/* 일기 내용 */}
-              <div className={"mt-4"}>
+              <div className={"mt-6 px-5 font-light"}>
                 <div dangerouslySetInnerHTML={{ __html: diary.content }} />
               </div>
 
