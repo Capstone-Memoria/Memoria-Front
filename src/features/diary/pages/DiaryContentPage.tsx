@@ -60,11 +60,11 @@ const DiaryContentPage = () => {
 
   return (
     <Page.Container>
-      <Page.Header>
+      <Page.Header className={"flex justify-between"}>
         <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
         </div>
-        <div className={"flex flex-grow items-center justify-between"}>
+        <div className={"flex items-center"}>
           <div>
             {isLoading ? (
               <div className={"h-5 w-16 bg-gray-200 animate-pulse"} />
@@ -72,6 +72,8 @@ const DiaryContentPage = () => {
               <div>{diary?.createdBy?.nickName}님의 일기</div>
             )}
           </div>
+        </div>
+        <div>
           <div className={"py-2 pl-2"}>
             <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DrawerTrigger asChild>
