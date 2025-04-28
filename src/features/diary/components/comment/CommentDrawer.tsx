@@ -1,5 +1,6 @@
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { CommentTree } from "@/models/Comment";
+import { motion } from "motion/react";
 import React, { useMemo } from "react";
 import { BsPersonFill } from "react-icons/bs";
 import { MdArrowUpward } from "react-icons/md";
@@ -57,13 +58,24 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             placeholder={"댓글을 입력해주세요."}
             className={"focus:outline-none ml-4 flex-1"}
           />
-          <div
+          <motion.div
             className={
-              "bg-green-500 px-5 py-2 rounded-full text-white text-base"
+              "bg-gray-300 h-8 w-16 rounded-full text-white text-base relative"
             }
           >
-            <MdArrowUpward />
-          </div>
+            <motion.div
+              initial={{ transform: "scale(0)" }}
+              animate={{ transform: "scale(1)" }}
+              exit={{ transform: "scale(0)" }}
+              transition={{ duration: 0.2 }}
+              className={"absolute inset-0 bg-green-500 rounded-full"}
+            />
+            <MdArrowUpward
+              className={
+                "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              }
+            />
+          </motion.div>
         </div>
       </DrawerContent>
     </Drawer>
