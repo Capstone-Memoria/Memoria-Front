@@ -1,3 +1,4 @@
+import * as ai from "./ai";
 import * as auth from "./auth";
 import * as diary from "./diary";
 import * as diaryBook from "./diary-book";
@@ -9,5 +10,6 @@ export default {
   user,
   diaryBook,
   diary,
+  ai,
   image,
 };

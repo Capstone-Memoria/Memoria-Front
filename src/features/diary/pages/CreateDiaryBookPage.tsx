@@ -6,13 +6,17 @@ import Page from "@/components/page/Page";
 import DiaryCreateHeader from "@/features/main/components/DiaryCreateHeader";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { FaMagic } from "react-icons/fa";
+import { MdUpload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
 
 const CreateDiaryPage = () => {
   const navigate = useNavigate();
   const [diaryTitle, setDiaryTitle] = useState("");
   const [submit, setSubmit] = useState(false);
   const [selectedPresetIndex, setSelectedPresetIndex] = useState(0);
+  const [createCoverDrawerOpen, setCreateCoverDrawerOpen] = useState(false);
 
   useEffect(() => {
     setSubmit(diaryTitle.length > 0);
@@ -84,19 +88,29 @@ const CreateDiaryPage = () => {
             onSelect={handlePresetSelect}
           />
         </div>
-        <div className={"flex gap-8 justify-center mt-5"}>
+        <div className={"grid grid-cols-2 justify-items-center mt-5"}>
+          <CreateCoverImageDrawer
+            open={createCoverDrawerOpen}
+            onOpenChange={setCreateCoverDrawerOpen}
+          >
+            <Button
+              className={
+                "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+              }
+              variant={"secondary"}
+            >
+              <FaMagic />
+              AI로 커버 만들기
+            </Button>
+          </CreateCoverImageDrawer>
           <Button
             size={"sm"}
-            className={"w-36 rounded-sm bg-gray-200"}
+            className={
+              "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+            }
             variant={"secondary"}
           >
-            AI로 배경사진 만들기
-          </Button>
-          <Button
-            size={"sm"}
-            className={"w-36 rounded-sm bg-gray-200"}
-            variant={"secondary"}
-          >
+            <MdUpload className={"text-base"} />
             사진 업로드
           </Button>
         </div>
