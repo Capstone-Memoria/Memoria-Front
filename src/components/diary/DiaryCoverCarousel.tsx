@@ -1,5 +1,9 @@
 // src/components/DiaryCoverCarousel.tsx
 import CoverExampleImg1 from "@/assets/images/CoverImage1.jpeg";
+import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
+import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
+import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
+import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
 import { useCarouselInteraction } from "@/hooks/useCarouselInteraction"; // 커스텀 훅 import
 import { cn } from "@/lib/utils/className"; // 경로는 실제 프로젝트에 맞게 수정하세요.
 import React from "react"; // React import 추가
@@ -18,10 +22,10 @@ const diaryPresets = [
     coverColor: "bg-green-500",
     imageSrc: CoverExampleImg1,
   },
-  { id: 2, coverColor: "bg-blue-500" },
-  { id: 3, coverColor: "bg-red-500" },
-  { id: 4, coverColor: "bg-yellow-500" },
-  { id: 5, coverColor: "bg-purple-500" },
+  { id: 2, coverColor: "bg-black", imageSrc: CoverExampleImg2 },
+  { id: 3, coverColor: "bg-sky-500", imageSrc: CoverExampleImg3 },
+  { id: 4, coverColor: "bg-black", imageSrc: CoverExampleImg4 },
+  { id: 5, coverColor: "bg-gray-700", imageSrc: CoverExampleImg5 },
 ];
 
 const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
