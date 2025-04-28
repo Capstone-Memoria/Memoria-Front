@@ -4,8 +4,8 @@ import { Diary } from "@/models/Diary";
 import { Dot } from "lucide-react";
 import { HTMLAttributes, useMemo } from "react";
 import { IoMdHeart } from "react-icons/io";
-import { MdImageNotSupported } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import Image from "../base/Image";
 
 interface DiaryListItemProps extends HTMLAttributes<HTMLDivElement> {
   item: Diary;
@@ -36,13 +36,13 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
       )}
       onClick={handleDiaryClick}
     >
-      <div
+      <Image
+        imageId={item.images?.[0]?.id}
+        imageClassName={"object-cover"}
         className={
           "flex-shrink-0 h-full aspect-square bg-gray-200 flex justify-center items-center"
         }
-      >
-        <MdImageNotSupported className={"text-gray-400"} />
-      </div>
+      />
       <div className={"py-2 px-3 flex flex-col w-full "}>
         <div className={"font-medium"}>{item.title}</div>
         <div className={"text-xs text-gray-500 overflow-hidden"}>{summary}</div>
