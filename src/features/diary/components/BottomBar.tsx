@@ -3,7 +3,11 @@ import { HTMLAttributes } from "react";
 import { BsChat } from "react-icons/bs";
 import { IoHeartOutline } from "react-icons/io5";
 
-const BottomBar: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
+interface BottomBarProps extends HTMLAttributes<HTMLDivElement> {
+  onCommentClick?: () => void;
+}
+
+const BottomBar: React.FC<BottomBarProps> = ({ onCommentClick, ...props }) => {
   return (
     <div
       {...props}
@@ -17,7 +21,7 @@ const BottomBar: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
         <IoHeartOutline className={"size-5"} />
         <div>2</div>
       </div>
-      <div className={"flex items-center gap-2"}>
+      <div className={"flex items-center gap-2"} onClick={onCommentClick}>
         <BsChat className={"size-4.5"} />
         <div>10</div>
       </div>
