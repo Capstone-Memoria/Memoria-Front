@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
+import BottomBar from "../components/BottomBar";
 
 const DiaryContentPage = () => {
   /* Properties */
@@ -82,7 +83,7 @@ const DiaryContentPage = () => {
   }, [carouselApi]);
 
   return (
-    <Page.Container>
+    <Page.Container className={"h-full flex flex-col "}>
       <Page.Header className={"flex justify-between"}>
         <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
@@ -124,7 +125,7 @@ const DiaryContentPage = () => {
           </div>
         </div>
       </Page.Header>
-      <Page.Content>
+      <Page.Content className={"flex flex-1"}>
         {isLoading ? (
           // 로딩 상태 UI
           <div className={"space-y-4"}>
@@ -262,6 +263,7 @@ const DiaryContentPage = () => {
           </Modal>
         )}
       </Page.Content>
+      <BottomBar />
     </Page.Container>
   );
 };
