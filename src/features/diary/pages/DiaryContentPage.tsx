@@ -157,7 +157,7 @@ const DiaryContentPage = () => {
                             imageClassName={"object-fill blur-3xl"}
                             imageId={image.id}
                             className={
-                              "size-full absolute rounded-md overflow-hidden"
+                              "size-full absolute rounded-md overflow-hidden top-0 left-0"
                             }
                           />
                           <Image
