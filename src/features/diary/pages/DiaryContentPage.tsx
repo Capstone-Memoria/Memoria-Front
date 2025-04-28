@@ -129,16 +129,23 @@ const DiaryContentPage = () => {
         {isLoading ? (
           // 로딩 상태 UI
           <div className={""}>
-            <div className={"h-7 bg-gray-200 animate-pulse rounded w-3/4"} />
-            <div className={"flex items-center gap-2"}>
+            {/* 이미지 스켈레톤 */}
+            <div
+              className={
+                "h-48 w-full bg-gray-200 rounded-md animate-pulse mt-4"
+              }
+            />
+            {/* 이미지 인디케이터 스켈레톤 */}
+            <div className={"flex justify-center items-center gap-2 mt-2"}>
               <div
-                className={"h-4 w-4 bg-gray-200 animate-pulse rounded-full"}
+                className={"size-2 rounded-full bg-gray-300 animate-pulse"}
               />
-              <div className={"h-4 w-20 bg-gray-200 animate-pulse rounded"} />
               <div
-                className={"h-4 w-4 bg-gray-200 animate-pulse rounded-full"}
+                className={"size-2 rounded-full bg-gray-300 animate-pulse"}
               />
-              <div className={"h-4 w-20 bg-gray-200 animate-pulse rounded"} />
+              <div
+                className={"size-2 rounded-full bg-gray-300 animate-pulse"}
+              />
             </div>
             <div className={"space-y-2 mt-4"}>
               <div className={"h-4 bg-gray-200 animate-pulse rounded w-full"} />
@@ -146,6 +153,10 @@ const DiaryContentPage = () => {
               <div className={"h-4 bg-gray-200 animate-pulse rounded w-full"} />
               <div className={"h-4 bg-gray-200 animate-pulse rounded w-5/6"} />
             </div>
+            {/* 요약 스켈레톤 */}
+            <div
+              className={"mt-6 p-4 bg-gray-200 rounded-md animate-pulse h-20"}
+            />
           </div>
         ) : (
           diary && (
