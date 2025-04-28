@@ -235,7 +235,7 @@ const DiaryContentPage = () => {
               <Button
                 variant={"text"}
                 size={"md"}
-                className={"p-0"}
+                className={"p-0 text-red-500"}
                 onClick={async () => {
                   deleteMutation.mutate();
                   setIsDeleteModalOpen(false);
@@ -245,7 +245,7 @@ const DiaryContentPage = () => {
               </Button>
               <Button
                 variant={"text"}
-                className={"text-red-500 p-0"}
+                className={"p-0"}
                 size={"md"}
                 onClick={() => setIsDeleteModalOpen(false)}
               >
