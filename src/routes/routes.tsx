@@ -3,6 +3,7 @@ import DiaryMemberPage from "@/features/diary/pages/DiaryMemberPage";
 import ManageDiaryPage from "@/features/diary/pages/ManageDiaryPage";
 import ViewDiaryPage from "@/features/diary/pages/ViewDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
+import InviteAcceptPage from "@/features/invite/InviteAcceptPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import MainPage from "@/features/main/pages/MainPage";
@@ -53,6 +54,10 @@ export const routes: ContextRoutes = {
     {
       path: "/diary/:diaryId/members",
       element: <DiaryMemberPage />,
+    },
+    {
+      path: "/code-invite/:inviteCode",
+      element: <InviteAcceptPage />, // 위에서 import한 초대 수락 페이지 컴포넌트 연결
     },
     {
       path: "/*",
