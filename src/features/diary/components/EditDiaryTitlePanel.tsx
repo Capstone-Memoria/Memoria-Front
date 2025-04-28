@@ -7,6 +7,7 @@ interface EditDiaryTitlePanelProps extends HTMLAttributes<HTMLDivElement> {
   setTitle: (title: string) => void;
   onCancel?: () => void;
   onSave?: () => void;
+  isSaving?: boolean;
 }
 
 const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
@@ -14,6 +15,7 @@ const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
   setTitle,
   onCancel,
   onSave,
+  isSaving = false,
 }) => {
   const [isFormValid, setIsFormValid] = React.useState(true);
 
@@ -31,6 +33,7 @@ const EditDiaryTitlePanel: React.FC<EditDiaryTitlePanelProps> = ({
         labelClassName={"text-black mb-2 text-sm"}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        disabled={isSaving}
       />
       {/* error message */}
       {!isFormValid && (

@@ -1,12 +1,21 @@
 @import url("../src/assets/css/transitions.css");
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 html,
 body {
   height: 100%;
+}
+
+.tiptap p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 
 * {
@@ -35,11 +44,6 @@ body {
   --color-gray-3: #a5a5a5;
   --color-gray-4: #202020;
   --color-gray-5: #39a580;
-}
-
-@theme {
-  --slide-up:        
-;
 }
 
 @theme {

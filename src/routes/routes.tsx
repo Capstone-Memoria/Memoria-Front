@@ -1,7 +1,10 @@
-import CreateDiaryPage from "@/features/diary/pages/CreateDiaryPage";
+import CreateDiaryPage from "@/features/diary/pages/CreateDiaryBookPage";
+import DiaryContentPage from "@/features/diary/pages/DiaryContentPage";
 import DiaryMemberPage from "@/features/diary/pages/DiaryMemberPage";
+import EditDiaryPage from "@/features/diary/pages/EditDiaryPage";
 import ManageDiaryPage from "@/features/diary/pages/ManageDiaryPage";
-import ViewDiaryPage from "@/features/diary/pages/ViewDiaryPage";
+import ViewDiaryListPage from "@/features/diary/pages/ViewDiaryListPage";
+import WriteDiaryPage from "@/features/diary/pages/WriteDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
@@ -44,15 +47,27 @@ export const routes: ContextRoutes = {
     },
     {
       path: "/diary/:diaryId",
-      element: <ViewDiaryPage />,
+      element: <ViewDiaryListPage />,
     },
     {
       path: "/diary/:diaryId/manage",
       element: <ManageDiaryPage />,
     },
     {
+      path: "/diary/write/",
+      element: <WriteDiaryPage />,
+    },
+    {
       path: "/diary/:diaryId/members",
       element: <DiaryMemberPage />,
+    },
+    {
+      path: "/diary/:diaryBookId/diary/:diaryId",
+      element: <DiaryContentPage />,
+    },
+    {
+      path: "/diary/:diaryBookId/diary/:diaryId/edit",
+      element: <EditDiaryPage />,
     },
     {
       path: "/*",

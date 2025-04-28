@@ -29,8 +29,8 @@ const Banner: React.FC<BannerProps> = ({
       )}
     >
       <div className={"flex flex-col gap-0.5"}>
-        <div className={"text-[11px]"}>{title}</div>
-        <div className={"text-[15px]"}>{children}</div>
+        <div className={"text-xs"}>{title}</div>
+        <div className={"text-base"}>{children}</div>
       </div>
       <div>
         <FaArrowRightLong />
