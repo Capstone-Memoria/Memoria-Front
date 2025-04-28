@@ -1,4 +1,5 @@
 // src/components/DiaryCoverCarousel.tsx
+import CoverExampleImg1 from "@/assets/images/CoverImage1.jpeg";
 import { useCarouselInteraction } from "@/hooks/useCarouselInteraction"; // 커스텀 훅 import
 import { cn } from "@/lib/utils/className"; // 경로는 실제 프로젝트에 맞게 수정하세요.
 import React from "react"; // React import 추가
@@ -12,7 +13,11 @@ interface DiaryCoverCarouselProps {
 // 표시할 다이어리 데이터 (예시)
 // 실제로는 props로 받거나 외부에서 가져올 수 있습니다.
 const diaryPresets = [
-  { id: 1, coverColor: "bg-green-500" },
+  {
+    id: 1,
+    coverColor: "bg-green-500",
+    imageSrc: CoverExampleImg1,
+  },
   { id: 2, coverColor: "bg-blue-500" },
   { id: 3, coverColor: "bg-red-500" },
   { id: 4, coverColor: "bg-yellow-500" },
@@ -99,6 +104,7 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
                   showPin={false}
                   className={"w-42 h-60 pointer-events-none"} // 내부 요소 이벤트 방지
                   coverColor={preset.coverColor}
+                  imageSrc={preset.imageSrc} // 이미지 src (예시)
                 />
               </div>
             );

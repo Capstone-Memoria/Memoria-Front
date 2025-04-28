@@ -7,6 +7,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   showPin?: boolean;
   notificationCount?: number;
   coverColor?: string;
+  imageSrc?: string;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
@@ -14,13 +15,14 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
   showPin = true,
   coverColor = "bg-green-500",
   notificationCount,
+  imageSrc,
   ...props
 }) => {
   return (
     <div
       {...props}
       className={cn(
-        "w-22 h-32 flex relative rounded-r-md bg-gray-300 shadow-md",
+        "w-22 h-32 flex relative rounded-r-md bg-gray-300 shadow-md overflow-hidden",
         props.className
       )}
     >
@@ -31,6 +33,8 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
           coverColor
         )}
       ></div>
+      <img src={imageSrc} className={"w-full"} />
+
       {showPin && pinned ? (
         <div
           className={
