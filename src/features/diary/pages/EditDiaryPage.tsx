@@ -3,6 +3,7 @@ import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
+import ImageUploader from "@/features/diary/components/ImageUploader";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
@@ -15,9 +16,10 @@ const EditDiaryPage = () => {
     diaryId: string;
   }>();
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // 일기장 선택 Drawer 상태 (수정 페이지에서는 필요 없을 수 있지만 일단 유지)
   const [diaryTitle, setDiaryTitle] = useState("");
   const [content, setContent] = useState("");
+  const [toAddImages, setToAddImages] = useState<File[]>([]);
+  const [toDeleteImageIds, setToDeleteImageIds] = useState<string[]>([]);
 
   /* Server-State */
   const { data: diaryData, isLoading: isDiaryLoading } = useQuery({
@@ -54,16 +56,14 @@ const EditDiaryPage = () => {
     );
   }, [diaryBookData, diaryData]);
 
-  const openDrawer = () => {
-    setIsMenuOpen(true); // 일기장 변경은 지원하지 않으므로 이 기능은 필요 없을 수 있습니다.
-  };
-
   /* Mutations */
   const updateMutation = useMutation({
     mutationFn: () =>
       api.diary.updateDiary(Number(diaryBookId), Number(diaryId), {
         title: diaryTitle,
         content: content,
+        toAddImages: toAddImages, // 새로 추가된 이미지
+        toDeleteImageIds: toDeleteImageIds, // 삭제될 이미지 ID
       }),
     onSuccess: () => {
       navigate(`/diary/${diaryBookId}/diary/${diaryId}`);
@@ -72,6 +72,17 @@ const EditDiaryPage = () => {
 
   const handleSubmit = () => {
     updateMutation.mutate();
+  };
+
+  const handleImagesChange = ({
+    addedImages,
+    deletedImageIds,
+  }: {
+    addedImages: File[];
+    deletedImageIds: string[];
+  }) => {
+    setToAddImages(addedImages);
+    setToDeleteImageIds(deletedImageIds);
   };
 
   return (
@@ -94,15 +105,10 @@ const EditDiaryPage = () => {
       <Page.Content className={"flex flex-col gap-6 flex-1"}>
         {isDiaryLoading || isDiaryBookLoading ? (
           <div className={"space-y-6"}>
-            {/* 일기장 정보 로딩 스켈레톤 */}
             <div className={"h-12 bg-gray-200 animate-pulse rounded-3xl"}></div>
-
-            {/* 제목 로딩 스켈레톤 */}
             <div
               className={"h-8 bg-gray-200 animate-pulse rounded w-3/4"}
             ></div>
-
-            {/* 내용 로딩 스켈레톤 */}
             <div className={"flex-1 space-y-2"}>
               <div
                 className={"h-4 bg-gray-200 animate-pulse rounded w-full"}
@@ -138,6 +144,10 @@ const EditDiaryPage = () => {
                 onChange={(e) => setDiaryTitle(e.target.value)}
               />
             </div>
+            <ImageUploader
+              initialImages={diaryData?.images}
+              onImagesChange={handleImagesChange}
+            />
             <div className={"flex-1 rounded-lg"}>
               <Tiptap
                 content={content}

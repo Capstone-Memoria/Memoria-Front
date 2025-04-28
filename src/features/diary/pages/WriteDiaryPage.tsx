@@ -74,6 +74,10 @@ const WriteDiaryPage = () => {
 
   const isSubmitting = submitMutation.isPending;
 
+  const handleImagesChange = ({ addedImages }: { addedImages: File[] }) => {
+    setUploadedImages(addedImages);
+  };
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <WriteDiaryPageHeader
@@ -121,7 +125,7 @@ const WriteDiaryPage = () => {
                   <Dot />
                   <div>{authStore.context?.user?.nickName}</div>
                 </div>
-                <ImageUploader onImagesChange={setUploadedImages} />
+                <ImageUploader onImagesChange={handleImagesChange} />
                 <div className={"flex-1 rounded-lg"}>
                   <Tiptap
                     content={content}

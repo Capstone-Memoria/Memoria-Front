@@ -1,55 +1,94 @@
+import Image from "@/components/base/Image";
 import { cn } from "@/lib/utils";
+import { AttachedFile } from "@/models/AttachedFile";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import { MdArrowDownward } from "react-icons/md";
 
+type ImageModification = {
+  addedImages: File[];
+  deletedImageIds: string[];
+};
+
 interface ImageUploaderProps {
-  onImagesChange: (images: File[]) => void;
+  onImagesChange: (params: ImageModification) => void;
+  initialImages?: ServerUploadedImage[];
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesChange }) => {
-  const [images, setImages] = useState<string[]>([]);
-  const [fileObjects, setFileObjects] = useState<File[]>([]);
+type ServerUploadedImage = AttachedFile;
+type StagedImage = {
+  file: File;
+  url: string;
+};
+
+type EditingImage = ServerUploadedImage | StagedImage;
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({
+  onImagesChange,
+  initialImages = [],
+}) => {
+  const [images, setImages] = useState<EditingImage[]>(initialImages);
+  const [toDeleteImageIds, setToDeleteImageIds] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const displayedImages = useMemo(() => {
+    if (isExpanded) {
+      // 모든 이미지 보여줌
+      return images;
+    } else {
+      // 최대 6개만 보여줌
+      return images.slice(0, 6);
+    }
+  }, [images, isExpanded]);
+
+  const handleRemoveImage = (editingImage: EditingImage) => {
+    if ("id" in editingImage) {
+      const newToDeleteImageIds = [...toDeleteImageIds, editingImage.id];
+      setToDeleteImageIds(newToDeleteImageIds);
+      onImagesChange({
+        addedImages: [
+          ...images.filter((img) => "url" in img).map((img) => img.file),
+        ],
+        deletedImageIds: newToDeleteImageIds,
+      });
+    }
+
+    setImages((prevImages) => prevImages.filter((img) => img !== editingImage));
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const newImageUrls = files.map((file) => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...newImageUrls]);
-    setFileObjects((prevFiles) => [...prevFiles, ...files]);
-    onImagesChange([...fileObjects, ...files]);
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+    setImages([...images, ...newImages]);
 
+    onImagesChange({
+      addedImages: [
+        ...images.filter((img) => "url" in img).map((img) => img.file),
+        ...files,
+      ],
+      deletedImageIds: toDeleteImageIds,
+    });
+
+    fileInputRef.current!.value = "";
     setIsExpanded(true);
-
-    // 파일 입력 초기화
-    event.target.value = "";
   };
 
-  const handleButtonClick = () => {
+  const handleFileUploadClick = () => {
     fileInputRef.current?.click();
   };
-
-  const handleRemoveImage = (indexToRemove: number) => {
-    const newImages = images.filter((_, index) => index !== indexToRemove);
-    const newFileObjects = fileObjects.filter(
-      (_, index) => index !== indexToRemove
-    );
-    setImages(newImages);
-    setFileObjects(newFileObjects);
-    onImagesChange(newFileObjects);
-  };
-
-  const displayedImages = isExpanded ? images : images.slice(0, 6);
 
   return (
     <div className={"flex flex-col gap-2"}>
       <AnimatePresence>
-        <div className={"grid grid-cols-3 gap-2"}>
-          {displayedImages.map((image, index) => (
+        <div className={"grid grid-cols-3 gap-2 place-items-center"}>
+          {displayedImages.map((image) => (
             <motion.div
-              key={image}
+              key={"id" in image ? image.id : image.url}
               layout
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -61,16 +100,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesChange }) => {
               className={
                 "relative w-24 h-24 overflow-hidden rounded-md group cursor-pointer"
               }
-              onClick={() => handleRemoveImage(index)}
+              onClick={() => handleRemoveImage(image)}
             >
-              <img
-                src={image}
-                alt={`uploaded image ${index + 1}`}
-                className={"object-cover w-full h-full"}
-              />
+              {"id" in image ? (
+                <Image
+                  className={"size-full"}
+                  imageId={image.id}
+                  imageClassName={"object-cover"}
+                />
+              ) : (
+                <img src={image.url} className={"size-full object-cover"} />
+              )}
               <div
                 className={
-                  "absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  "absolute inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 }
               >
                 <IoCloseCircle className={"text-white text-3xl"} />
@@ -90,7 +133,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesChange }) => {
               className={
                 "w-24 h-24 border border-dashed border-gray-300 rounded-md flex items-center justify-center cursor-pointer"
               }
-              onClick={handleButtonClick}
+              onClick={handleFileUploadClick}
             >
               <span className={"text-gray-500 text-2xl"}>+</span>
               <input
