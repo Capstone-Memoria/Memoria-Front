@@ -148,13 +148,24 @@ const DiaryContentPage = () => {
                   <CarouselContent>
                     {diary.images.map((image: { id: string }) => (
                       <CarouselItem key={image.id}>
-                        <Image
-                          imageClassName={"object-cover"}
-                          imageId={image.id}
+                        <div
                           className={
-                            "h-48 w-full bg-gray-200 rounded-md overflow-hidden"
+                            "w-full flex items-center justify-center relative h-48"
                           }
-                        />
+                        >
+                          <Image
+                            imageClassName={"object-fill blur-3xl"}
+                            imageId={image.id}
+                            className={
+                              "size-full absolute rounded-md overflow-hidden"
+                            }
+                          />
+                          <Image
+                            imageClassName={"object-contain"}
+                            imageId={image.id}
+                            className={"h-48 w-fit overflow-hidden absolute"}
+                          />
+                        </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
