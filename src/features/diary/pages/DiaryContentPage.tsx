@@ -1,11 +1,18 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
+import Image from "@/components/base/Image";
 import Modal from "@/components/base/Modal";
 import Page from "@/components/page/Page";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,6 +25,8 @@ const DiaryContentPage = () => {
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   /* Server Side */
   const { data: diary, isLoading } = useQuery({
@@ -52,6 +61,25 @@ const DiaryContentPage = () => {
       },
     },
   ];
+
+  /* Effects */
+  useEffect(() => {
+    if (!carouselApi) {
+      return;
+    }
+
+    setCurrentImageIndex(carouselApi.selectedScrollSnap());
+
+    const handleSelect = () => {
+      setCurrentImageIndex(carouselApi.selectedScrollSnap());
+    };
+
+    carouselApi.on("select", handleSelect);
+
+    return () => {
+      carouselApi.off("select", handleSelect);
+    };
+  }, [carouselApi]);
 
   return (
     <Page.Container>
@@ -122,22 +150,57 @@ const DiaryContentPage = () => {
           diary && (
             <div className={"space-y-2"}>
               {/* 사진 넣기 */}
-              <div
-                className={
-                  "h-48 w-full gap-4 flex flex-col justify-center items-center bg-gray-200 rounded-md overflow-hidden"
-                }
-              >
-                <RiImageCircleAiFill
-                  className={"text-5xl text-gray-400 animate-pulse"}
-                />
-                <div
-                  className={"text-sm text-gray-500 text-center animate-pulse"}
-                >
-                  AI가 어울리는 사진을 그리고 있어요
-                  <br />
-                  조금만 기다려주세요
+              {diary.images && diary.images.length > 0 && (
+                <Carousel className={"w-full"} setApi={setCarouselApi}>
+                  <CarouselContent>
+                    {diary.images.map((image: { id: string }) => (
+                      <CarouselItem key={image.id}>
+                        <Image
+                          imageClassName={"object-cover"}
+                          imageId={image.id}
+                          className={
+                            "h-48 w-full bg-gray-200 rounded-md overflow-hidden"
+                          }
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
+              )}
+              {/* 이미지 인디케이터 */}
+              {diary?.images && diary.images.length > 1 && (
+                <div className={"flex justify-center items-center gap-2 mt-2"}>
+                  {diary.images.map((_: unknown, index: number) => (
+                    <div
+                      key={index}
+                      className={`size-2 rounded-full ${index === currentImageIndex ? "bg-gray-800" : "bg-gray-300"}`}
+                    />
+                  ))}
                 </div>
-              </div>
+              )}
+              {/* AI 이미지 생성 중 표시 */}
+              {!diary.images ||
+                (diary.images.length === 0 && (
+                  <div
+                    className={
+                      "h-48 w-full gap-4 flex flex-col justify-center items-center bg-gray-200 rounded-md overflow-hidden"
+                    }
+                  >
+                    <RiImageCircleAiFill
+                      className={"text-5xl text-gray-400 animate-pulse"}
+                    />
+                    <div
+                      className={
+                        "text-sm text-gray-500 text-center animate-pulse"
+                      }
+                    >
+                      AI가 어울리는 사진을 그리고 있어요
+                      <br />
+                      조금만 기다려주세요
+                    </div>
+                  </div>
+                ))}
+
               {/* 일기 제목 */}
               <h1 className={"text-xl mt-6 text-center font-medium"}>
                 {diary.title}
