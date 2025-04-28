@@ -125,10 +125,10 @@ const DiaryContentPage = () => {
           </div>
         </div>
       </Page.Header>
-      <Page.Content className={"flex flex-1"}>
+      <Page.Content className={"flex-1"}>
         {isLoading ? (
           // 로딩 상태 UI
-          <div className={"space-y-4"}>
+          <div className={""}>
             <div className={"h-7 bg-gray-200 animate-pulse rounded w-3/4"} />
             <div className={"flex items-center gap-2"}>
               <div
