@@ -9,7 +9,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -99,29 +99,10 @@ const DiaryContentPage = () => {
         </div>
         <div>
           <div className={"py-2 pl-2"}>
-            <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <DrawerTrigger asChild>
-                <RiMore2Fill className={"text-xl"} />
-              </DrawerTrigger>
-              <DrawerContent className={"pb-8"}>
-                <div className={"flex flex-col gap-2 p-4"}>
-                  {menuItems.map((item, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        item.onClick();
-                        setIsMenuOpen(false);
-                      }}
-                      className={
-                        "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 first:border-b border-gray-300 last:text-red-500"
-                      }
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              </DrawerContent>
-            </Drawer>
+            <RiMore2Fill
+              className={"text-xl"}
+              onClick={() => setIsMenuOpen(true)}
+            />
           </div>
         </div>
       </Page.Header>
@@ -275,6 +256,26 @@ const DiaryContentPage = () => {
         )}
       </Page.Content>
       <BottomBar />
+      <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <DrawerContent className={"pb-8"}>
+          <div className={"flex flex-col gap-2 p-4"}>
+            {menuItems.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  item.onClick();
+                  setIsMenuOpen(false);
+                }}
+                className={
+                  "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 first:border-b border-gray-300 last:text-red-500"
+                }
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </Page.Container>
   );
 };
