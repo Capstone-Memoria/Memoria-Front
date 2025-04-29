@@ -81,7 +81,7 @@ const CreateDiaryPage = () => {
         </div>
         <div className={"mt-8"}>
           <p className={"text-base font-normal mb-4"}>
-            일기장 커버 스타일을 선택해주세요.
+            일기장 커버를 자유롭게 꾸며보세요!
           </p>
           <DiaryCoverCarousel
             className={"w-fit py-8"}

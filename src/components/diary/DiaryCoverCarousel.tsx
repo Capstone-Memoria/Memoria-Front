@@ -1,5 +1,5 @@
 // src/components/DiaryCoverCarousel.tsx
-import CoverExampleImg1 from "@/assets/images/CoverImage1.jpeg";
+import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
 import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
 import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
 import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
@@ -19,13 +19,13 @@ interface DiaryCoverCarouselProps {
 const diaryPresets = [
   {
     id: 1,
-    coverColor: "bg-green-500",
+    coverColor: "bg-sky-500",
     imageSrc: CoverExampleImg1,
   },
   { id: 2, coverColor: "bg-black", imageSrc: CoverExampleImg2 },
   { id: 3, coverColor: "bg-sky-500", imageSrc: CoverExampleImg3 },
-  { id: 4, coverColor: "bg-black", imageSrc: CoverExampleImg4 },
-  { id: 5, coverColor: "bg-gray-700", imageSrc: CoverExampleImg5 },
+  { id: 4, coverColor: "bg-gray-700", imageSrc: CoverExampleImg4 },
+  { id: 5, coverColor: "bg-gray-800", imageSrc: CoverExampleImg5 },
 ];
 
 const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
