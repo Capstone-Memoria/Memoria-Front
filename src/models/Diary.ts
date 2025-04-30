@@ -20,9 +20,20 @@ export interface Diary {
 
 export interface Reaction {
   id: number;
-  reactionType: string; // TODO: enum 타입 정의
+  reactionType: ReactionType;
   createdAt: DateTime;
   createdBy: User;
   lastModifiedAt: DateTime;
   lastModifiedBy: User;
+}
+
+export enum ReactionType {
+  LIKE = "LIKE",
+  HEART = "HEART",
+  SMILE = "SMILE",
+  SAD = "SAD",
+  HUG = "HUG",
+  LAUGH = "LAUGH",
+  WOW = "WOW",
+  CONGRATS = "CONGRATS",
 }

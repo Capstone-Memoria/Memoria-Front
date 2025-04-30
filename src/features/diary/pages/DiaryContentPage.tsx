@@ -293,7 +293,12 @@ const DiaryContentPage = () => {
           </Modal>
         )}
       </Page.Content>
-      <BottomBar onCommentClick={() => setIsCommentDrawerOpen(true)} />
+      <BottomBar
+        onCommentClick={() => setIsCommentDrawerOpen(true)}
+        diaryBookId={Number(diaryBookId)}
+        diaryId={Number(diaryId)}
+        commentCount={diary?.commentCount || 0}
+      />
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DrawerContent className={"pb-8"}>
           <div className={"flex flex-col gap-2 p-4"}>
