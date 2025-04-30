@@ -1,6 +1,8 @@
+import api from "@/api";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import React, {
   createContext,
@@ -10,31 +12,53 @@ import React, {
   useState,
 } from "react";
 import { BsArrowReturnRight, BsPersonFill } from "react-icons/bs";
+import { IoReturnUpForwardOutline } from "react-icons/io5";
 import { MdArrowUpward, MdClose } from "react-icons/md";
 import CommentItem from "./CommentItem";
 
 interface CommentDrawerProps {
   open: boolean;
   onClose: () => void;
-  comments: CommentTree[];
+  diaryBookId: number;
+  diaryId: number;
 }
 
 interface CommentDrawerContextProps {
   selectedComment: CommentTree | undefined;
   setSelectedComment: (comment: CommentTree | undefined) => void;
+  diaryBookId: number;
+  diaryId: number;
+  refetchComments: () => void;
 }
 
 export const CommentDrawerContext = createContext<CommentDrawerContextProps>({
   selectedComment: undefined,
   setSelectedComment: () => {},
+  diaryBookId: 0,
+  diaryId: 0,
+  refetchComments: () => {},
 });
 
 const CommentDrawer: React.FC<CommentDrawerProps> = ({
   open,
   onClose,
-  comments,
+  diaryBookId,
+  diaryId,
 }) => {
+  const queryClient = useQueryClient();
+
+  const {
+    data: comments,
+    isLoading,
+    refetch: refetchComments,
+  } = useQuery<CommentTree[]>({
+    queryKey: ["fetchComments", diaryBookId, diaryId],
+    queryFn: () => api.comment.fetchComments(diaryBookId, diaryId),
+    enabled: open,
+  });
+
   const allCommentsLength = useMemo(() => {
+    if (!comments) return 0;
     const stack: CommentTree[] = [...comments];
     let count = 0;
     while (stack.length > 0) {
@@ -61,8 +85,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
 
   useEffect(() => {
     if (textareaRef.current) {
-      //내용이 한줄이면 height 스타일 제거
-      if (commentInput.split("\n").length === 1) {
+      if (commentInput.split("\n").length <= 1) {
         textareaRef.current.style.height = "24px";
       } else {
         textareaRef.current.style.height = "auto";
@@ -82,7 +105,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     };
 
     if (window.visualViewport) {
-      updateViewportHeight(); // Set initial height
+      updateViewportHeight();
       window.visualViewport.addEventListener("resize", updateViewportHeight);
     }
 
@@ -97,35 +120,91 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
   }, []);
 
   const drawerContentHeight = useMemo(() => {
-    if (viewportHeight === undefined) return "97%"; // Fallback to initial style
+    if (viewportHeight === undefined) return "97%";
     const windowHeight = window.innerHeight;
     const availableHeight = viewportHeight;
-    // Adjust height based on the visible viewport height when the keyboard is open
-    // You might need to fine-tune the offset based on your layout
-    const offset = windowHeight - availableHeight; // Calculate height taken by keyboard/browser UI
+    const offset = windowHeight - availableHeight;
     return `calc(97% - ${offset}px)`;
   }, [viewportHeight]);
 
+  const createCommentMutation = useMutation({
+    mutationFn: (content: string) =>
+      selectedComment
+        ? api.comment.createReply(diaryBookId, diaryId, selectedComment.id, {
+            content,
+          })
+        : api.comment.createComment(diaryBookId, diaryId, { content }),
+    onSuccess: () => {
+      setCommentInput("");
+      setSelectedComment(undefined);
+      refetchComments();
+    },
+    onError: (error) => {
+      console.error("댓글/대댓글 생성 실패", error);
+      alert("댓글/대댓글 생성에 실패했습니다.");
+    },
+  });
+
+  const handleSubmitComment = () => {
+    if (canSubmit && !createCommentMutation.isPending) {
+      createCommentMutation.mutate(commentInput);
+    }
+  };
+
   return (
     <CommentDrawerContext.Provider
-      value={{ selectedComment, setSelectedComment }}
+      value={{
+        selectedComment,
+        setSelectedComment,
+        diaryBookId,
+        diaryId,
+        refetchComments,
+      }}
     >
       <Drawer open={open} onOpenChange={onClose} repositionInputs={false}>
         <DrawerContent
-          className={"min-h-[97%] flex flex-col "}
+          className={"min-h-[97%] flex flex-col"}
           style={{ maxHeight: drawerContentHeight }}
         >
-          <div className={"px-4 pt-6"}>
+          <div className={"px-4 pt-6 flex-1 flex flex-col"}>
             <div className={"text-center text-sm text-gray-500 mb-4"}>
-              {allCommentsLength}개의 댓글
+              {isLoading ? (
+                <div className={"h-4 w-20 bg-gray-200 animate-pulse mx-auto"} />
+              ) : (
+                `${allCommentsLength}개의 댓글`
+              )}
             </div>
-            <div>
-              {comments.map((comment) => (
-                <CommentItem key={comment.id} comment={comment} />
-              ))}
+            <div
+              className={"flex flex-col gap-2 flex-[1_1_0] overflow-y-auto"}
+              data-vaul-no-drag
+            >
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={"mb-4 p-4 bg-gray-100 rounded-lg animate-pulse"}
+                  >
+                    <div className={"flex items-center gap-3 mb-2"}>
+                      <div className={"size-6 bg-gray-300 rounded-full"} />
+
+                      <div className={"h-4 w-24 bg-gray-300 rounded"} />
+                      <div className={"flex-1"} />
+                      <div className={"h-3 w-16 bg-gray-300 rounded"} />
+                    </div>
+                    <div className={"h-4 bg-gray-300 rounded w-5/6"} />
+                  </div>
+                ))
+              ) : comments && comments.length > 0 ? (
+                comments.map((comment) => (
+                  <CommentItem key={comment.id} comment={comment} />
+                ))
+              ) : (
+                <div className={"text-center text-gray-500"}>
+                  아직 댓글이 없습니다.
+                </div>
+              )}
             </div>
           </div>
-          <div className={"flex-1"} />
           <AnimatePresence>
             {selectedComment && (
               <motion.div
@@ -177,26 +256,34 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
             />
-            <div
+            <button
               className={cn(
                 "bg-gray-300 h-8 w-16 rounded-full text-white text-base relative transition-colors flex items-center justify-center overflow-hidden",
                 {
-                  "text-white": canSubmit,
-                  "text-gray-500": !canSubmit,
+                  "bg-green-500 text-white":
+                    canSubmit && !createCommentMutation.isPending,
+                  "bg-gray-300 text-gray-500":
+                    !canSubmit || createCommentMutation.isPending,
                 }
               )}
+              onClick={handleSubmitComment}
+              disabled={!canSubmit || createCommentMutation.isPending}
             >
               <div
                 className={cn(
-                  "bg-green-500 rounded-full absolute aspect-square transition-all",
+                  "rounded-full absolute aspect-square transition-all",
                   {
-                    "w-0": !canSubmit,
-                    "w-full": canSubmit,
+                    "w-0": !canSubmit || createCommentMutation.isPending,
+                    "w-full": canSubmit && !createCommentMutation.isPending,
                   }
                 )}
               />
-              <MdArrowUpward className={"z-10"} />
-            </div>
+              {selectedComment ? (
+                <IoReturnUpForwardOutline className={"z-10 text-xl"} />
+              ) : (
+                <MdArrowUpward className={"z-10 text-xl"} />
+              )}
+            </button>
           </div>
         </DrawerContent>
       </Drawer>

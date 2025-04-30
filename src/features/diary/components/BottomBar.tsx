@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HTMLAttributes, useEffect, useState } from "react";
 import { BsChatFill } from "react-icons/bs";
 import ReactionAddPanel from "./reactions/ReactionAddPanel";
-import ReactionIcon from "./reactions/ReactionIcon";
+import { ReactionIcon } from "./reactions/ReactionIcon";
 
 interface BottomBarProps extends HTMLAttributes<HTMLDivElement> {
   onCommentClick?: () => void;
@@ -163,25 +163,24 @@ const BottomBar: React.FC<BottomBarProps> = ({
       />
       <div className={"flex gap-2 flex-1 select-none"}>
         {isFetching || updateReactionMutation.isPending ? (
-          <div className={"flex gap-2 animate-pulse"}>
-            <div className={"w-12 h-6 bg-gray-200 rounded-full"}></div>
-            <div className={"w-12 h-6 bg-gray-200 rounded-full"}></div>
+          <div
+            className={
+              "flex flex-1 items-center justify-center gap-2 animate-pulse"
+            }
+          >
+            <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
+            <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
           </div>
         ) : groupedReactions.length > 0 ? (
           groupedReactions.map((reaction, index) => {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-2 px-2 py-1 rounded-full`}
+                className={`flex flex-1 items-center justify-center gap-2 px-2 py-1 rounded-full`}
               >
                 <ReactionIcon
+                  className={"text-2xl"}
                   reactionType={reaction.reactionType}
-                  distance={null}
-                  isHovering={false}
-                  isSelected={
-                    userReaction?.reactionType === reaction.reactionType
-                  }
-                  baseScale={0.8}
                 />
               </div>
             );

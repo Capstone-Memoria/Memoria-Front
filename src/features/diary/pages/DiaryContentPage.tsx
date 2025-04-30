@@ -12,48 +12,12 @@ import {
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
-import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomBar from "../components/BottomBar";
 import CommentDrawer from "../components/comment/CommentDrawer";
-
-const dummyComments = [
-  {
-    id: "1",
-    content: "좋은 일기네요",
-    createdAt: DateTime.now(),
-    createdBy: {
-      nickName: "홍길동",
-      email: "hong@example.com",
-      createdAt: DateTime.now(),
-    },
-    children: [
-      {
-        id: "2",
-        content: "좋은 일기네요",
-        createdAt: DateTime.now(),
-        createdBy: {
-          nickName: "홍길동",
-          email: "hong@example.com",
-          createdAt: DateTime.now(),
-        },
-      },
-      {
-        id: "3",
-        content: "좋은 일기네요",
-        createdAt: DateTime.now(),
-        createdBy: {
-          nickName: "홍길동",
-          email: "hong@example.com",
-          createdAt: DateTime.now(),
-        },
-      },
-    ],
-  },
-];
 
 const DiaryContentPage = () => {
   /* Properties */
@@ -322,7 +286,8 @@ const DiaryContentPage = () => {
       <CommentDrawer
         open={isCommentDrawerOpen}
         onClose={() => setIsCommentDrawerOpen(false)}
-        comments={dummyComments}
+        diaryBookId={Number(diaryBookId)}
+        diaryId={Number(diaryId)}
       />
     </Page.Container>
   );

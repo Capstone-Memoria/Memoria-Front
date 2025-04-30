@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import { FaHandsClapping } from "react-icons/fa6";
 
-interface ReactionIconProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ReactionHoverIconProps extends React.HTMLAttributes<HTMLDivElement> {
   reactionType: ReactionType;
   ref?: React.Ref<HTMLDivElement | null>;
   distance: number | null;
@@ -70,7 +70,7 @@ const ReactionIconMap: Record<ReactionType, ReactionIconMapProps> = {
   },
 };
 
-const ReactionIcon = ({
+const ReactionHoverIcon = ({
   reactionType,
   ref,
   distance,
@@ -79,7 +79,7 @@ const ReactionIcon = ({
   debug = false,
   baseScale = 1.0,
   ...props
-}: ReactionIconProps) => {
+}: ReactionHoverIconProps) => {
   // 맥북 dock처럼 distance에 따라 scale 계산
   const calculateScale = () => {
     if (distance === null) return baseScale;
@@ -156,4 +156,23 @@ const ReactionIcon = ({
   );
 };
 
-export default ReactionIcon;
+interface ReactionIconProps extends React.HTMLAttributes<HTMLDivElement> {
+  reactionType: ReactionType;
+}
+
+const ReactionIcon = ({ reactionType, ...props }: ReactionIconProps) => {
+  return (
+    <div
+      {...props}
+      className={cn(
+        "rounded-full flex items-center justify-center relative",
+        ReactionIconMap[reactionType].color,
+        props.className
+      )}
+    >
+      {ReactionIconMap[reactionType].icon}
+    </div>
+  );
+};
+
+export { ReactionHoverIcon, ReactionIcon };

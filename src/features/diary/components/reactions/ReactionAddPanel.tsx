@@ -1,7 +1,7 @@
 import { ReactionType } from "@/models/Diary";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import ReactionIcon from "./ReactionIcon";
+import { ReactionHoverIcon } from "./ReactionIcon";
 
 interface ReactionAddPanelProps {
   open: boolean;
@@ -195,7 +195,7 @@ const ReactionAddPanel = ({
               const isSelected = selectedReaction === type;
 
               return (
-                <ReactionIcon
+                <ReactionHoverIcon
                   key={reaction}
                   reactionType={type}
                   ref={reactionRefsMap[type]}

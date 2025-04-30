@@ -1,5 +1,6 @@
 import * as ai from "./ai";
 import * as auth from "./auth";
+import * as comment from "./comment";
 import * as diary from "./diary";
 import * as diaryBook from "./diary-book";
 import * as image from "./image";
@@ -14,4 +15,5 @@ export default {
   ai,
   image,
   reaction,
+  comment,
 };
