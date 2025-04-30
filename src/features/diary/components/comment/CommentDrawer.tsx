@@ -72,12 +72,49 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     }
   }, [commentInput]);
 
+  const [viewportHeight, setViewportHeight] = useState<number | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const updateViewportHeight = () => {
+      setViewportHeight(window.visualViewport?.height);
+    };
+
+    if (window.visualViewport) {
+      updateViewportHeight(); // Set initial height
+      window.visualViewport.addEventListener("resize", updateViewportHeight);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener(
+          "resize",
+          updateViewportHeight
+        );
+      }
+    };
+  }, []);
+
+  const drawerContentHeight = useMemo(() => {
+    if (viewportHeight === undefined) return "97%"; // Fallback to initial style
+    const windowHeight = window.innerHeight;
+    const availableHeight = viewportHeight;
+    // Adjust height based on the visible viewport height when the keyboard is open
+    // You might need to fine-tune the offset based on your layout
+    const offset = windowHeight - availableHeight; // Calculate height taken by keyboard/browser UI
+    return `calc(97% - ${offset}px)`;
+  }, [viewportHeight]);
+
   return (
     <CommentDrawerContext.Provider
       value={{ selectedComment, setSelectedComment }}
     >
-      <Drawer open={open} onOpenChange={onClose}>
-        <DrawerContent className={"min-h-[97%] flex flex-col "}>
+      <Drawer open={open} onOpenChange={onClose} repositionInputs={false}>
+        <DrawerContent
+          className={"min-h-[97%] flex flex-col "}
+          style={{ maxHeight: drawerContentHeight }}
+        >
           <div className={"px-4 pt-6"}>
             <div className={"text-center text-sm text-gray-500 mb-4"}>
               {allCommentsLength}개의 댓글
