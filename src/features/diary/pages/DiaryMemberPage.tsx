@@ -2,12 +2,8 @@ import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
-<<<<<<< Updated upstream
-import { useEffect, useMemo, useState } from "react";
-=======
 import { cn } from "@/lib/utils";
-import { useState } from "react";
->>>>>>> Stashed changes
+import { useState } from "react"; // Added useEffect, useMemo from Updated upstream
 import { FaCrown } from "react-icons/fa";
 import { IoMdAdd, IoMdClose, IoMdCopy } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +15,7 @@ interface Member {
   email: string;
   role: "admin" | "member";
   profileImg?: string;
-  profileBgColor?: string;
+  profileBgColor?: string; // Keep profileBgColor property in Member interface
 }
 
 const profileBgColors = [
@@ -59,7 +55,8 @@ const DiaryMemberPage = () => {
   const [directInviteEmail, setDirectInviteEmail] = useState("");
   const [directInviteSent, setDirectInviteSent] = useState(false);
   const [invitedEmail, setInvitedEmail] = useState("");
-  // 멤버 더미 데이터
+
+  // Keep members state from both versions (they define the same initial data structure)
   const [members, setMembers] = useState<Member[]>([
     {
       id: "1",
@@ -103,35 +100,27 @@ const DiaryMemberPage = () => {
     },
   ]);
 
-<<<<<<< Updated upstream
-  const [memberBgColors, setMemberBgColors] = useState<Record<string, string>>(
-    {}
-  );
-
-  useEffect(() => {
-    // 사용 가능한 색상 목록을 랜덤하게 섞음
-    const shuffledColors = shuffleArray(profileBgColors);
-    // 새로운 색상 할당 객체 생성
-    const initialColors: Record<string, string> = {};
-    // 현재 members 배열을 순회하며 색상 할당
-    members.forEach((member, index) => {
-      // 프로필 이미지가 없는 멤버에게만 색상 할당
-      if (!member.profileImg) {
-        // 섞인 색상 배열에서 순서대로 할당 (멤버 수 > 색상 수 이면 반복됨)
-        initialColors[member.id] =
-          shuffledColors[index % shuffledColors.length];
-      }
-    });
-    // 계산된 초기 색상들을 상태에 저장
-    setMemberBgColors(initialColors);
-  }, []);
-=======
+  // Add state and logic for edit mode from Stashed changes
   const [isEditMode, setIsEditMode] = useState(false);
-
-  const currentUserId = "2";
+  const currentUserId = "2"; // Assuming current user is 명현 (id: "2")
   const currentUser = members.find((m) => m.id === currentUserId);
   const currentUserRole = currentUser?.role;
->>>>>>> Stashed changes
+
+  // The color assignment logic from Updated upstream using useEffect and useMemo
+  // seems intended for dynamic assignment based on profileImg or index,
+  // but the rendering code in both versions already uses the profileBgColor
+  // property directly from the member object.
+  // Given the rendering relies on member.profileBgColor already in the state,
+  // and the admin edit mode logic from Stashed changes is integrated with the member list rendering,
+  // we will keep the direct use of member.profileBgColor in the rendering
+  // and omit the dynamic assignment logic (useEffect and useMemo for colors)
+  // as it's not clearly used in the provided rendering context and might conflict.
+  /*
+  // Omitted from merge as rendering relies on member.profileBgColor directly:
+  const [memberBgColors, setMemberBgColors] = useState<Record<string, string>>({});
+  useEffect(() => { ... }, []); // color assignment logic
+  const memberColors = useMemo(() => { ... }, [members]); // color list logic
+  */
 
   // 초대 링크 생성 핸들러
   const handleGenerateInvite = () => {
@@ -141,12 +130,6 @@ const DiaryMemberPage = () => {
     setIsGeneratingInvite(true);
   };
 
-  const memberColors = useMemo(() => {
-    const shuffled = shuffleArray(profileBgColors);
-    // 각 멤버에게 순서대로 색상 할당 (멤버 수가 색상 수보다 많으면 반복됨)
-    return members.map((_, index) => shuffled[index % shuffled.length]);
-  }, [members]);
-
   // 초대 링크 복사 핸들러
   const handleCopyLink = () => {
     navigator.clipboard.writeText(inviteLink);
@@ -154,15 +137,16 @@ const DiaryMemberPage = () => {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  // 멤버 삭제 핸들러
+  // 멤버 삭제 핸들러 (present in both, keep one version)
   const handleRemoveMember = (memberId: string) => {
     // 실제 구현에서는 API 호출을 통해 멤버를 삭제해야 합니다.
     setMembers(members.filter((member) => member.id !== memberId));
   };
 
+  // Add toggle admin handler from Stashed changes
   const handleToggleAdmin = (memberId: string) => {
     if (memberId === currentUserId && currentUserRole === "admin") {
-      // 마지막 관리자인 경우 해제 방지 로직 추가 필요할 수 있음
+      // Check if this is the last admin before removing admin role
       const adminCount = members.filter((m) => m.role === "admin").length;
       if (adminCount <= 1) {
         alert("최소 한 명의 관리자는 유지되어야 합니다.");
@@ -178,6 +162,7 @@ const DiaryMemberPage = () => {
     );
   };
 
+  // Direct invite handler (present in both, keep one version)
   const handleDirectInvite = () => {
     if (!directInviteEmail.trim()) return; // Basic validation
 
@@ -199,30 +184,29 @@ const DiaryMemberPage = () => {
       <DefaultHeader logoType={"back"} />
       <Page.Content className={"px-6 py-4"}>
         <h1 className={"text-xl font-medium mb-6"}>멤버 관리</h1>
-        {/* 멤버 목록 카드 */}
+        {/* 멤버 목록 카드 - Using the structure from Stashed changes */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
-<<<<<<< Updated upstream
-          <h2 className={"text-lg font-medium mb-4"}>멤버 목록</h2>
-          <div className={"flex flex-col gap-3"}>
-=======
-          {/* 헤더: 멤버 목록 제목 + 관리자 변경 버튼 (관리자에게만 보임) */}
+          {/* Header: Member list title + Admin Change button (visible to admin) */}
           <div className={"flex justify-between items-center mb-4"}>
             <h2 className={"text-lg font-medium"}>멤버 목록</h2>
-            {currentUserRole === "admin" && ( // 현재 사용자가 관리자일 때만 버튼 표시
+            {/* Show Admin Change button only if current user is admin */}
+            {currentUserRole === "admin" && (
               <Button
                 variant={"text"}
                 size={"sm"}
-                onClick={() => setIsEditMode(!isEditMode)} // 버튼 클릭 시 편집 모드 토글
+                onClick={() => setIsEditMode(!isEditMode)} // Toggle edit mode
                 className={"text-gray-600 hover:text-black"}
               >
-                {isEditMode ? "완료" : "관리자 변경"}
+                {isEditMode ? "완료" : "관리자 변경"}{" "}
+                {/* Button text based on edit mode */}
               </Button>
             )}
           </div>
 
-          {/* 멤버 리스트 */}
+          {/* Member List - Using the structure and rendering logic from Stashed changes */}
           <div className={"flex flex-col gap-1"}>
->>>>>>> Stashed changes
+            {" "}
+            {/* Using gap-1 from Stashed changes */}
             {members.map((member) => (
               <div
                 key={member.id}
@@ -230,26 +214,27 @@ const DiaryMemberPage = () => {
                   "flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
                 }
               >
-                {/* 멤버 정보 (왼쪽) */}
+                {/* Member Info (Left) */}
                 <div className={"flex items-center gap-3"}>
-                  {/* 프로필 이미지/이니셜 */}
+                  {/* Profile Image/Initials - Using rendering logic from Stashed changes */}
                   <div
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center overflow-hidden",
                       !member.profileImg && member.profileBgColor
-                        ? member.profileBgColor
-                        : "bg-gray-200"
+                        ? member.profileBgColor // Use profileBgColor from member object
+                        : "bg-gray-200" // Fallback gray
                     )}
                   >
                     {member.profileImg ? (
-                      <img /* ... */ />
+                      <img /* src={member.profileImg} alt={`${member.name} profile`} className="w-full h-full object-cover" */
+                      />
                     ) : (
                       <span className={"text-white text-lg font-medium"}>
                         {member.name.charAt(0)}
                       </span>
                     )}
                   </div>
-                  {/* 이름, 이메일, 관리자 아이콘 */}
+                  {/* Name, Email, Admin Icon */}
                   <div>
                     <div className={"flex items-center gap-1.5"}>
                       <span className={"font-medium"}>{member.name}</span>
@@ -266,63 +251,62 @@ const DiaryMemberPage = () => {
                   </div>
                 </div>
 
-                {/* 멤버 액션 버튼 (오른쪽) - 역할 및 모드에 따라 다름 */}
+                {/* Member Action Buttons (Right) - Using logic from Stashed changes */}
                 <div className={"flex items-center"}>
-                  {
-                    currentUserRole === "admin" ? ( // 현재 유저가 관리자일 경우
-                      isEditMode ? ( // 관리자 + 편집 모드
-                        // 자기 자신에게는 버튼 비활성화 또는 다른 표시
-                        member.id !== currentUserId ? (
-                          <Button
-                            variant={"text"}
-                            size={"sm"}
-                            onClick={() => handleToggleAdmin(member.id)}
-                            className={cn(
-                              "text-sm",
-                              member.role === "admin"
-                                ? "text-orange-500 hover:text-orange-700"
-                                : "text-blue-500 hover:text-blue-700"
-                            )}
-                            title={
-                              member.role === "admin"
-                                ? "관리자 권한 해제"
-                                : "관리자로 지정"
-                            }
-                          >
-                            {member.role === "admin"
-                              ? "관리자 해제"
-                              : "관리자 지정"}
-                          </Button>
-                        ) : (
-                          // 관리자 자신에게는 표시 안 함 또는 '나' 표시 등
-                          <span className={"text-xs text-gray-400 mr-2"}>
-                            (나)
-                          </span>
-                        )
-                      ) : // 관리자 + 일반 모드
-                      // 자기 자신 제외하고 삭제 버튼 표시
+                  {/* Logic based on current user's role and edit mode */}
+                  {currentUserRole === "admin" ? ( // If current user is admin
+                    isEditMode ? ( // Admin + Edit mode
+                      // For other members (not current user), show admin toggle button
                       member.id !== currentUserId ? (
                         <Button
-                          variant={"text"} // 아이콘 버튼 스타일
+                          variant={"text"}
                           size={"sm"}
-                          className={"text-red-500"} // 기본 회색, 호버 시 빨강
-                          onClick={() => handleRemoveMember(member.id)}
-                          title={"멤버 내보내기"}
+                          onClick={() => handleToggleAdmin(member.id)}
+                          className={cn(
+                            "text-sm",
+                            member.role === "admin"
+                              ? "text-orange-500 hover:text-orange-700" // Style for 'Remove Admin'
+                              : "text-blue-500 hover:text-blue-700" // Style for 'Make Admin'
+                          )}
+                          title={
+                            member.role === "admin"
+                              ? "관리자 권한 해제"
+                              : "관리자로 지정"
+                          }
                         >
-                          <IoMdClose size={20} />
+                          {member.role === "admin"
+                            ? "관리자 해제"
+                            : "관리자 지정"}
                         </Button>
-                      ) : // 관리자 자신에게는 표시 안 함
-                      null
-                    ) : // 현재 유저가 일반 멤버일 경우
-                    null // 아무 버튼도 표시하지 않음
-                  }
+                      ) : (
+                        // For the current admin user in edit mode
+                        <span className={"text-xs text-gray-400 mr-2"}>
+                          (나)
+                        </span>
+                      )
+                    ) : // Admin + Normal mode
+                    // For other members (not current user), show remove button
+                    member.id !== currentUserId ? (
+                      <Button
+                        variant={"text"} // Icon button style
+                        size={"sm"}
+                        className={"text-gray-400 hover:text-red-500"} // Default gray, red on hover
+                        onClick={() => handleRemoveMember(member.id)}
+                        title={"멤버 내보내기"}
+                      >
+                        <IoMdClose size={20} />
+                      </Button>
+                    ) : // For the current admin user in normal mode (no button needed)
+                    null
+                  ) : // If current user is a regular member (no buttons needed)
+                  null}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 멤버 초대 카드 */}
+        {/* 멤버 초대 카드 - Keep structure as it is similar in both */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
           <h2 className={"text-lg font-medium mb-4"}>멤버 초대</h2>
           {isGeneratingInvite ? (
@@ -371,6 +355,8 @@ const DiaryMemberPage = () => {
             </div>
           )}
         </div>
+
+        {/* 멤버 직접 초대 카드 - Keep structure as it is similar in both */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
           <h2 className={"text-lg font-medium mb-4"}>멤버 직접 초대</h2>
           <p className={"text-sm text-gray-500 mb-4"}>
@@ -391,7 +377,7 @@ const DiaryMemberPage = () => {
               <Button
                 size={"md"}
                 onClick={handleDirectInvite}
-                disabled={!directInviteEmail.trim()} // 이메일 입력이 없으면 버튼 비활성화
+                disabled={!directInviteEmail.trim()} // Disable if email is empty
               >
                 초대 보내기
               </Button>
