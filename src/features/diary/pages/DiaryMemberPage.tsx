@@ -2,7 +2,12 @@ import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
+<<<<<<< Updated upstream
 import { useEffect, useMemo, useState } from "react";
+=======
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+>>>>>>> Stashed changes
 import { FaCrown } from "react-icons/fa";
 import { IoMdAdd, IoMdClose, IoMdCopy } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +19,7 @@ interface Member {
   email: string;
   role: "admin" | "member";
   profileImg?: string;
+  profileBgColor?: string;
 }
 
 const profileBgColors = [
@@ -57,27 +63,47 @@ const DiaryMemberPage = () => {
   const [members, setMembers] = useState<Member[]>([
     {
       id: "1",
-      name: "김메모",
-      email: "memo@example.com",
-      role: "admin",
+      name: "기현",
+      email: "pkhjack@naver.com",
+      role: "member",
       profileImg: "",
+      profileBgColor: "bg-blue-300",
     },
     {
       id: "2",
-      name: "이리아",
-      email: "ria@example.com",
-      role: "member",
+      name: "명현",
+      email: "myeonghyeon@gmail.com",
+      role: "admin",
       profileImg: "",
-    },
+      profileBgColor: "bg-green-300",
+    }, // 관리자
     {
       id: "3",
-      name: "박다이어리",
-      email: "diary@example.com",
+      name: "용석",
+      email: "yongseok@hanmail.net",
       role: "member",
       profileImg: "",
+      profileBgColor: "bg-red-300",
+    },
+    {
+      id: "4",
+      name: "정민",
+      email: "jeongmin@gmail.com",
+      role: "member",
+      profileImg: "",
+      profileBgColor: "bg-purple-300",
+    },
+    {
+      id: "5",
+      name: "진욱",
+      email: "jinwook@naver.com",
+      role: "member",
+      profileImg: "",
+      profileBgColor: "bg-indigo-300",
     },
   ]);
 
+<<<<<<< Updated upstream
   const [memberBgColors, setMemberBgColors] = useState<Record<string, string>>(
     {}
   );
@@ -99,6 +125,13 @@ const DiaryMemberPage = () => {
     // 계산된 초기 색상들을 상태에 저장
     setMemberBgColors(initialColors);
   }, []);
+=======
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const currentUserId = "2";
+  const currentUser = members.find((m) => m.id === currentUserId);
+  const currentUserRole = currentUser?.role;
+>>>>>>> Stashed changes
 
   // 초대 링크 생성 핸들러
   const handleGenerateInvite = () => {
@@ -127,9 +160,15 @@ const DiaryMemberPage = () => {
     setMembers(members.filter((member) => member.id !== memberId));
   };
 
-  // 관리자 권한 변경 핸들러
   const handleToggleAdmin = (memberId: string) => {
-    // 실제 구현에서는 API 호출을 통해 권한을 변경해야 합니다.
+    if (memberId === currentUserId && currentUserRole === "admin") {
+      // 마지막 관리자인 경우 해제 방지 로직 추가 필요할 수 있음
+      const adminCount = members.filter((m) => m.role === "admin").length;
+      if (adminCount <= 1) {
+        alert("최소 한 명의 관리자는 유지되어야 합니다.");
+        return;
+      }
+    }
     setMembers(
       members.map((member) =>
         member.id === memberId
@@ -162,38 +201,63 @@ const DiaryMemberPage = () => {
         <h1 className={"text-xl font-medium mb-6"}>멤버 관리</h1>
         {/* 멤버 목록 카드 */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
+<<<<<<< Updated upstream
           <h2 className={"text-lg font-medium mb-4"}>멤버 목록</h2>
           <div className={"flex flex-col gap-3"}>
+=======
+          {/* 헤더: 멤버 목록 제목 + 관리자 변경 버튼 (관리자에게만 보임) */}
+          <div className={"flex justify-between items-center mb-4"}>
+            <h2 className={"text-lg font-medium"}>멤버 목록</h2>
+            {currentUserRole === "admin" && ( // 현재 사용자가 관리자일 때만 버튼 표시
+              <Button
+                variant={"text"}
+                size={"sm"}
+                onClick={() => setIsEditMode(!isEditMode)} // 버튼 클릭 시 편집 모드 토글
+                className={"text-gray-600 hover:text-black"}
+              >
+                {isEditMode ? "완료" : "관리자 변경"}
+              </Button>
+            )}
+          </div>
+
+          {/* 멤버 리스트 */}
+          <div className={"flex flex-col gap-1"}>
+>>>>>>> Stashed changes
             {members.map((member) => (
               <div
                 key={member.id}
                 className={
-                  "flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0"
+                  "flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
                 }
               >
+                {/* 멤버 정보 (왼쪽) */}
                 <div className={"flex items-center gap-3"}>
+                  {/* 프로필 이미지/이니셜 */}
                   <div
-                    className={
-                      "w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"
-                    }
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center overflow-hidden",
+                      !member.profileImg && member.profileBgColor
+                        ? member.profileBgColor
+                        : "bg-gray-200"
+                    )}
                   >
                     {member.profileImg ? (
-                      <img
-                        src={member.profileImg}
-                        alt={member.name}
-                        className={"w-full h-full rounded-full object-cover"}
-                      />
+                      <img /* ... */ />
                     ) : (
-                      <span className={"text-gray-500"}>
+                      <span className={"text-white text-lg font-medium"}>
                         {member.name.charAt(0)}
                       </span>
                     )}
                   </div>
+                  {/* 이름, 이메일, 관리자 아이콘 */}
                   <div>
-                    <div className={"flex items-center gap-2"}>
+                    <div className={"flex items-center gap-1.5"}>
                       <span className={"font-medium"}>{member.name}</span>
                       {member.role === "admin" && (
-                        <FaCrown className={"text-yellow-500 text-xs"} />
+                        <FaCrown
+                          className={"text-yellow-500 text-sm"}
+                          title={"관리자"}
+                        />
                       )}
                     </div>
                     <span className={"text-xs text-gray-500"}>
@@ -201,22 +265,57 @@ const DiaryMemberPage = () => {
                     </span>
                   </div>
                 </div>
-                <div className={"flex gap-2"}>
-                  <Button
-                    variant={"text"}
-                    size={"sm"}
-                    onClick={() => handleToggleAdmin(member.id)}
-                  >
-                    {member.role === "admin" ? "관리자 해제" : "관리자 지정"}
-                  </Button>
-                  <Button
-                    variant={"text"}
-                    size={"sm"}
-                    className={"text-red-500"}
-                    onClick={() => handleRemoveMember(member.id)}
-                  >
-                    <IoMdClose />
-                  </Button>
+
+                {/* 멤버 액션 버튼 (오른쪽) - 역할 및 모드에 따라 다름 */}
+                <div className={"flex items-center"}>
+                  {
+                    currentUserRole === "admin" ? ( // 현재 유저가 관리자일 경우
+                      isEditMode ? ( // 관리자 + 편집 모드
+                        // 자기 자신에게는 버튼 비활성화 또는 다른 표시
+                        member.id !== currentUserId ? (
+                          <Button
+                            variant={"text"}
+                            size={"sm"}
+                            onClick={() => handleToggleAdmin(member.id)}
+                            className={cn(
+                              "text-sm",
+                              member.role === "admin"
+                                ? "text-orange-500 hover:text-orange-700"
+                                : "text-blue-500 hover:text-blue-700"
+                            )}
+                            title={
+                              member.role === "admin"
+                                ? "관리자 권한 해제"
+                                : "관리자로 지정"
+                            }
+                          >
+                            {member.role === "admin"
+                              ? "관리자 해제"
+                              : "관리자 지정"}
+                          </Button>
+                        ) : (
+                          // 관리자 자신에게는 표시 안 함 또는 '나' 표시 등
+                          <span className={"text-xs text-gray-400 mr-2"}>
+                            (나)
+                          </span>
+                        )
+                      ) : // 관리자 + 일반 모드
+                      // 자기 자신 제외하고 삭제 버튼 표시
+                      member.id !== currentUserId ? (
+                        <Button
+                          variant={"text"} // 아이콘 버튼 스타일
+                          size={"sm"}
+                          className={"text-red-500"} // 기본 회색, 호버 시 빨강
+                          onClick={() => handleRemoveMember(member.id)}
+                          title={"멤버 내보내기"}
+                        >
+                          <IoMdClose size={20} />
+                        </Button>
+                      ) : // 관리자 자신에게는 표시 안 함
+                      null
+                    ) : // 현재 유저가 일반 멤버일 경우
+                    null // 아무 버튼도 표시하지 않음
+                  }
                 </div>
               </div>
             ))}

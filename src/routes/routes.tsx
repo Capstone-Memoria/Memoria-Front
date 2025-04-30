@@ -60,6 +60,10 @@ export const routes: ContextRoutes = {
       element: <InviteAcceptPage />, // 위에서 import한 초대 수락 페이지 컴포넌트 연결
     },
     {
+      path: "/code-invite/:inviteCode",
+      element: <InviteAcceptPage />, // 위에서 import한 초대 수락 페이지 컴포넌트 연결
+    },
+    {
       path: "/*",
       element: <ErrorPage defaultErrorCode={"404"} />,
     },
