@@ -110,6 +110,7 @@ const MainPage = () => {
                         memberCount={diaryBook.memberCount}
                         pinned={diaryBook.isPinned ?? false}
                         notificationCount={120}
+                        coverImage={diaryBook.coverImage}
                       />
                     ))}
               </div>

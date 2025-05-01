@@ -7,6 +7,7 @@ interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   memberCount: number;
   pinned: boolean;
   notificationCount: number;
+  coverImage?: string;
 }
 
 const DiaryBook: React.FC<DiaryBookProps> = ({
@@ -14,6 +15,7 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
   memberCount,
   pinned,
   notificationCount,
+  coverImage,
   ...props
 }) => {
   return (
@@ -28,6 +30,7 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
         className={"mb-2"}
         pinned={pinned}
         notificationCount={notificationCount}
+        imageSrc={coverImage}
       />
       <p className={"text-[13px] font-medium"}>{title}</p>
       <p className={"text-[11px] font-light text-gray-1"}>

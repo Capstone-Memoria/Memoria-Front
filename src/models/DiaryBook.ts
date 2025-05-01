@@ -11,4 +11,5 @@ export interface DiaryBook {
   createdBy: User;
   lastModifiedBy: User;
   owner: User;
+  coverImage?: string;
 }

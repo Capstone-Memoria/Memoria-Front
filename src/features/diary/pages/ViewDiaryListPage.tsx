@@ -214,7 +214,7 @@ const ViewDiaryListPage = () => {
             <>
               {diaryList?.content && diaryList.content.length > 0 ? (
                 diaryList.content.map((diary) => (
-                  <DiaryListItem key={diary.id} item={diary} />
+                  <DiaryListItem key={diary.id} item={diary}  />
                 ))
               ) : (
                 <div className={"text-center text-gray-500 mt-10"}>
