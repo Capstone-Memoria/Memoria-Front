@@ -85,7 +85,7 @@ const DiaryContentPage = () => {
   }, [carouselApi]);
 
   return (
-    <Page.Container className={"h-full flex flex-col "}>
+    <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <Page.Header className={"flex justify-between"}>
         <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />

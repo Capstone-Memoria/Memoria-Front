@@ -158,9 +158,10 @@ const ReactionHoverIcon = ({
 
 interface ReactionIconProps extends React.HTMLAttributes<HTMLDivElement> {
   reactionType: ReactionType;
+  count: number;
 }
 
-const ReactionIcon = ({ reactionType, ...props }: ReactionIconProps) => {
+const ReactionIcon = ({ reactionType, count, ...props }: ReactionIconProps) => {
   return (
     <div
       {...props}
@@ -171,6 +172,16 @@ const ReactionIcon = ({ reactionType, ...props }: ReactionIconProps) => {
       )}
     >
       {ReactionIconMap[reactionType].icon}
+      {count > 0 && (
+        <div
+          className={cn(
+            "text-xs absolute -bottom-2 -right-2 size-4 rounded-full flex items-center justify-center",
+            ReactionIconMap[reactionType].backgroundColor
+          )}
+        >
+          x{count}
+        </div>
+      )}
     </div>
   );
 };

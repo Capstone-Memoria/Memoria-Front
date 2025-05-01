@@ -31,6 +31,10 @@ const BottomBar: React.FC<BottomBarProps> = ({
     x: 0,
     y: 0,
   });
+  const [touchStartPosition, setTouchStartPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [hoveringReaction, setHoveringReaction] = useState<ReactionType | null>(
     null
   );
@@ -125,32 +129,24 @@ const BottomBar: React.FC<BottomBarProps> = ({
     []
   );
 
+  const handleCalcBarPosition = () => {
+    const deltaX = currentTouchPosition.x - touchStartPosition.x;
+    const deltaY = currentTouchPosition.y - touchStartPosition.y;
+    const barPosition = {
+      x: deltaX / 20,
+      y: deltaY / 20,
+    };
+    return barPosition;
+  };
+
   return (
     <div
       {...props}
-      className={cn(
-        "h-14 flex items-center px-3 gap-4 font-light border m-4 rounded-xl shadow-lg relative touch-none",
-        props.className
-      )}
-      onTouchStart={(e) => {
-        setCurrentTouchPosition({
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-        });
-        setOpen(true);
-      }}
-      onTouchMove={(e) => {
-        setCurrentTouchPosition({
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-        });
-      }}
-      onTouchEnd={() => {
-        if (hoveringReaction) {
-          handleReactionSelect(hoveringReaction);
-        }
-        setOpen(false);
-        setHoveringReaction(null);
+      className={cn("relative", props.className)}
+      style={{
+        transform: open
+          ? `translate(${handleCalcBarPosition().x}px, ${handleCalcBarPosition().y}px)`
+          : "translate(0px, 0px)",
       }}
     >
       <ReactionAddPanel
@@ -161,43 +157,81 @@ const BottomBar: React.FC<BottomBarProps> = ({
         }}
         selectedReaction={userReaction?.reactionType || null}
       />
-      <div className={"flex gap-2 flex-1 select-none"}>
-        {isFetching || updateReactionMutation.isPending ? (
-          <div
-            className={
-              "flex flex-1 items-center justify-center gap-2 animate-pulse"
-            }
-          >
-            <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
-            <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
-          </div>
-        ) : groupedReactions.length > 0 ? (
-          groupedReactions.map((reaction, index) => {
-            return (
-              <div
-                key={index}
-                className={`flex flex-1 items-center justify-center gap-2 px-2 py-1 rounded-full`}
-              >
-                <ReactionIcon
-                  className={"text-2xl"}
-                  reactionType={reaction.reactionType}
-                />
-              </div>
-            );
-          })
-        ) : (
-          <div className={"text-sm text-gray-400"}>첫 리액션을 남겨보세요</div>
-        )}
-      </div>
-      <div className={"h-fit justify-end flex"}>
-        <div className={"h-6 bg-gray-500 w-px"} />
-      </div>
       <div
-        className={"flex items-center gap-2 text-gray-700"}
-        onClick={onCommentClick}
+        className={cn(
+          "h-14 flex items-center px-3 gap-4 font-light border m-4 rounded-xl shadow-lg relative touch-none transition-all",
+          {
+            "scale-95": open,
+          }
+        )}
       >
-        <BsChatFill className={""} />
-        <div>{commentCount}</div>
+        <div
+          className={"flex gap-2 flex-1 select-none h-full items-center"}
+          onTouchStart={(e) => {
+            setCurrentTouchPosition({
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            });
+            setTouchStartPosition({
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            });
+            setOpen(true);
+          }}
+          onTouchMove={(e) => {
+            setCurrentTouchPosition({
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            });
+          }}
+          onTouchEnd={() => {
+            if (hoveringReaction) {
+              handleReactionSelect(hoveringReaction);
+            }
+            setOpen(false);
+            setHoveringReaction(null);
+          }}
+        >
+          {isFetching || updateReactionMutation.isPending ? (
+            <div
+              className={
+                "flex flex-1 items-center justify-center gap-2 animate-pulse"
+              }
+            >
+              <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
+              <div className={"w-6 h-6 bg-gray-200 rounded-full"}></div>
+            </div>
+          ) : groupedReactions.length > 0 ? (
+            groupedReactions.map((reaction, index) => {
+              return (
+                <div
+                  key={index}
+                  className={`flex flex-1 items-center justify-center gap-2 px-2 py-1 rounded-full`}
+                >
+                  <ReactionIcon
+                    count={reaction.count}
+                    className={"text-2xl"}
+                    reactionType={reaction.reactionType}
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <div className={"text-sm text-gray-400"}>
+              첫 리액션을 남겨보세요
+            </div>
+          )}
+        </div>
+        <div className={"h-fit justify-end flex"}>
+          <div className={"h-6 bg-gray-500 w-px"} />
+        </div>
+        <div
+          className={"flex items-center gap-2 text-gray-700"}
+          onClick={onCommentClick}
+        >
+          <BsChatFill className={""} />
+          <div>{commentCount}</div>
+        </div>
       </div>
     </div>
   );
