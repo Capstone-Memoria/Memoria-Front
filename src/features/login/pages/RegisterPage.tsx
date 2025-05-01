@@ -16,7 +16,7 @@ interface RegisterFormData {
 }
 
 const RegisterPage = () => {
-  const naviate = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     email: "",
     nickName: "",
@@ -38,7 +38,7 @@ const RegisterPage = () => {
   } = useMutation({
     mutationFn: () => api.auth.register(formData),
     onSuccess: () => {
-      naviate("/login");
+      navigate("/login", { replace: true });
     },
   });
 
@@ -63,7 +63,7 @@ const RegisterPage = () => {
           <IoMdArrowBack
             className={"text-xl"}
             onClick={() => {
-              naviate(-1);
+              navigate(-1);
             }}
           />
         </div>

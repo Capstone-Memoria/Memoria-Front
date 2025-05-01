@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/className";
-import React, { InputHTMLAttributes, useState } from "react";
+import React, { TextareaHTMLAttributes, useState } from "react";
 
-export type InputVariant = "default" | "white";
+export type TextareaVariant = "default" | "white" | "gray";
 
 const variantMap = {
   default: "bg-transparent placeholder:text-gray-300",
@@ -10,8 +10,8 @@ const variantMap = {
   gray: "bg-gray-100 px-4 rounded-md placeholder:text-gray-400 mt-1 border border-transparent focus:border-green-500 transition-colors",
 };
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  ref?: React.Ref<HTMLInputElement>;
+interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  ref?: React.Ref<HTMLTextAreaElement>;
   label?: string;
   labelClassName?: string;
   required?: boolean;
@@ -22,7 +22,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
 }
 
-export default function Input({
+export default function Textarea({
   className,
   label,
   labelClassName,
@@ -33,7 +33,7 @@ export default function Input({
   isError,
   variant = "default",
   ...props
-}: InputProps) {
+}: TextareaProps) {
   const [focused, setFocused] = useState(false);
 
   return (
@@ -56,11 +56,11 @@ export default function Input({
               {props.icon}
             </div>
           )}
-          <input
+          <textarea
             {...props}
             ref={ref}
             className={cn(
-              "flex-1 py-2 focus:outline-none",
+              "flex-1 py-2 focus:outline-none resize-none",
               variantMap[variant]
             )}
             onFocus={(e) => {

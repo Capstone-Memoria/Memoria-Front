@@ -3,11 +3,40 @@ import { AttachedFile } from "./AttachedFile";
 import { User } from "./User";
 
 export interface Diary {
+  id: number;
   title: string;
-  coverImage?: AttachedFile;
+  content: string;
+  diaryBookId: number;
   summary?: string;
-  createAt: DateTime;
-  createdBy: User;
+  createdAt: DateTime;
+  createdBy?: User;
+  lastModifiedAt?: DateTime;
+  lastModifiedBy?: User;
   likeCount?: number;
   commentCount?: number;
+  images?: AttachedFile[];
+  reactions?: Reaction[];
+}
+
+interface ReactionId {
+  diaryId: number;
+  user: User;
+}
+
+export interface Reaction {
+  id: ReactionId;
+  reactionType: ReactionType;
+  createdAt: DateTime;
+  lastModifiedAt: DateTime;
+}
+
+export enum ReactionType {
+  LIKE = "LIKE",
+  HEART = "HEART",
+  SMILE = "SMILE",
+  SAD = "SAD",
+  HUG = "HUG",
+  LAUGH = "LAUGH",
+  WOW = "WOW",
+  CONGRATS = "CONGRATS",
 }

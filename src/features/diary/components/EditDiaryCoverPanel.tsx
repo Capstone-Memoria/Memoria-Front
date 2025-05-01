@@ -4,10 +4,14 @@ import { HTMLAttributes } from "react";
 
 interface EditDiaryCoverPanelProps extends HTMLAttributes<HTMLDivElement> {
   onCancel?: () => void;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
   onCancel,
+  onSave,
+  isSaving = false,
   ...props
 }) => {
   return (

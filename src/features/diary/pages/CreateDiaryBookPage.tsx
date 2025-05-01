@@ -32,10 +32,24 @@ const CreateDiaryPage = () => {
     isPending,
     error,
   } = useMutation({
-    mutationFn: () => api.diary.createDiaryBook({ title: diaryTitle }),
+    mutationFn: () => {
+      const formData = new FormData();
+
+      // 제목 추가 (백엔드에서 받을 key 이름 확인 필요, 예: 'title')
+      formData.append("title", diaryTitle);
+
+      // TODO: 추후 선택된 프리셋 인덱스나 커버 이미지 파일 추가
+      // formData.append('presetIndex', selectedPresetIndex.toString());
+      // if (coverImageFile) {
+      //   formData.append('coverImage', coverImageFile); // 백엔드에서 받을 파일 key 이름 확인 필요
+      // }
+
+      // 수정된 API 함수 호출 (FormData 객체 전달)
+      return api.diaryBook.createDiaryBook(formData);
+    },
     onSuccess: (data) => {
       console.log("Diary created successfully", data);
-      navigate("/main");
+      navigate("/main", { replace: true });
     },
   });
 

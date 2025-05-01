@@ -1,11 +1,13 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import DiaryBook from "@/components/diary/DiaryBook";
+import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useQuery } from "@tanstack/react-query";
+import { BookPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,9 +17,9 @@ const MainPage = () => {
 
   /* Server-State */
   const { data, isLoading } = useQuery({
-    queryKey: ["fetchMyDiaries"],
+    queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
-      api.diary.fetchMyDiaries({
+      api.diaryBook.fetchMyDiaryBook({
         size: 10,
         page: 1, // TODO: pagination
       }),
@@ -49,11 +51,11 @@ const MainPage = () => {
             </p>
           </div>
           <Button
-            size={"xs"}
-            variant={"secondary"}
+            size={"sm"}
+            className={"flex items-center gap-2"}
             onClick={() => navigate("/create-diary")}
           >
-            새 일기장
+            <BookPlus className={"size-4"} />새 일기장
           </Button>
         </div>
       </Page.Content>
@@ -93,23 +95,34 @@ const MainPage = () => {
           >
             <div className={"px-6"}>
               <div className={"grid grid-cols-3 gap-6"}>
-                {isLoading
-                  ? Array.from({ length: 9 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
-                      />
-                    ))
-                  : (data?.content ?? []).map((diaryBook) => (
-                      <DiaryBook
-                        onClick={() => navigate(`/diary/${diaryBook.id}`)}
-                        key={diaryBook.id}
-                        title={diaryBook.title}
-                        memberCount={1}
-                        pinned={diaryBook.isPinned ?? false}
-                        notificationCount={1}
-                      />
-                    ))}
+                {isLoading ? (
+                  Array.from({ length: 9 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                    />
+                  ))
+                ) : (data?.content ?? []).length === 0 && !isLoading ? (
+                  <div
+                    className={
+                      "col-span-full text-center text-gray-400 text-sm py-20"
+                    }
+                  >
+                    일기장이 없습니다.
+                    <br />새 일기장을 만들어 보세요.
+                  </div>
+                ) : (
+                  (data?.content ?? []).map((diaryBook) => (
+                    <DiaryBook
+                      onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                      key={diaryBook.id}
+                      title={diaryBook.title}
+                      memberCount={diaryBook.memberCount}
+                      pinned={diaryBook.isPinned ?? false}
+                      notificationCount={120}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -156,6 +169,10 @@ const MainPage = () => {
           </div>
         </div>
       </div>
+      <DiaryWriteButton
+        className={"fixed bottom-20 right-5"}
+        onClick={() => navigate("/diary/write")}
+      />
     </Page.Container>
   );
 };

@@ -21,36 +21,45 @@ import EditDiaryTitlePanel from "../components/EditDiaryTitlePanel";
 
 const ManageDiaryPage = () => {
   const navigate = useNavigate();
-  const { diaryId } = useParams();
+  const { diaryId } = useParams<{ diaryId: string }>();
 
   const queryClient = useQueryClient();
 
   // server side
   const { data, isFetching: isDiaryBookFetching } = useQuery({
     queryKey: ["fetchDiaryBookById", diaryId],
-    queryFn: () => api.diary.fetchDiaryBookById(Number(diaryId)),
+    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryId)),
+    enabled: !!diaryId,
   });
 
-  const {
-    mutate: trySave,
-    isPending: isSaving,
-    error,
-  } = useMutation({
-    mutationFn: () => api.diary.updateDiaryBook(Number(diaryId), { title }),
+  const { mutate: tryUpdateDiaryBook, isPending: isSaving } = useMutation({
+    // mutationFn은 FormData를 인자로 받도록 수정
+    mutationFn: (formData: FormData) => api.diaryBook.updateDiaryBook(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["fetchDiaryBookById", diaryId],
+        queryKey: ["fetchDiaryBookById", diaryId], // diaryId를 포함한 queryKey 무효화
       });
+      // 필요하다면 성공 알림 표시
+      setOpenedPanel(""); // 성공 시 패널 닫기
+    },
+    onError: (error) => {
+      console.error("일기장 업데이트 실패:", error);
+      // 필요하다면 에러 알림 표시
     },
   });
 
-  const { mutate: tryDelete, isPending } = useMutation({
-    mutationFn: () => api.diary.deleteDiaryBook(Number(diaryId)),
+  const { mutate: tryDelete, isPending: isDeleting } = useMutation({
+    // isPending 변수명 변경 (isSaving과 충돌 방지)
+    mutationFn: () => api.diaryBook.deleteDiaryBook(Number(diaryId)),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["fetchDiaryBookById", diaryId],
-      });
-      navigate("/main");
+      // 삭제 성공 시 캐시 무효화보다는 제거가 더 적절할 수 있음
+      queryClient.removeQueries({ queryKey: ["fetchDiaryBookById", diaryId] });
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] }); // 목록 캐시 무효화 (선택 사항)
+      navigate("/main", { replace: true }); // 또는 다른 적절한 경로로 이동
+    },
+    onError: (error) => {
+      console.error("일기장 삭제 실패:", error);
+      // 필요하다면 에러 알림 표시
     },
   });
 
@@ -58,6 +67,7 @@ const ManageDiaryPage = () => {
   const [openedPanel, setOpenedPanel] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null); // 커버 이미지 파일 상태 추가
 
   useEffect(() => {
     if (data) {
@@ -70,10 +80,30 @@ const ManageDiaryPage = () => {
     tryDelete();
   };
 
-  // 저장 핸들러
-  const handleSave = () => {
-    trySave();
-    setOpenedPanel("");
+  const handleTitleSave = () => {
+    if (!diaryId) {
+      console.error("Diary ID is missing!");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("diaryBookId", diaryId);
+    formData.append("title", title);
+
+    tryUpdateDiaryBook(formData);
+  };
+
+  const handleCoverSave = () => {
+    if (!diaryId || !coverImageFile) {
+      console.error("Diary ID or cover image file is missing!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("diaryBookId", diaryId);
+    formData.append("coverImage", coverImageFile);
+
+    tryUpdateDiaryBook(formData);
+    setCoverImageFile(null); // 커버 이미지 파일 초기화
   };
 
   return (
@@ -112,8 +142,10 @@ const ManageDiaryPage = () => {
                 setTitle={setTitle}
                 onCancel={() => {
                   setOpenedPanel("");
+                  if (data) setTitle(data.title);
                 }}
-                onSave={handleSave}
+                onSave={handleTitleSave}
+                isSaving={isSaving}
               />
             </AccordionContent>
           </AccordionItem>
@@ -125,9 +157,15 @@ const ManageDiaryPage = () => {
             </AccordionTrigger>
             <AccordionContent>
               <EditDiaryCoverPanel
+                // currentCoverImageUrl={data?.coverImageUrl}
+                // selectedFile={coverImageFile}
+                // setSelectedFile={setCoverImageFile}
                 onCancel={() => {
                   setOpenedPanel("");
+                  setCoverImageFile(null);
                 }}
+                onMouseLeave={handleCoverSave}
+                isSaving={isSaving}
               />
             </AccordionContent>
           </AccordionItem>
@@ -152,9 +190,9 @@ const ManageDiaryPage = () => {
                   variant={"danger"}
                   onClick={handleDelete}
                   className={"flex items-center justify-center"}
-                  disabled={isPending}
+                  disabled={isDeleting}
                 >
-                  {isPending ? <Spinner className={"text-white"} /> : "네"}
+                  {isDeleting ? <Spinner className={"text-white"} /> : "네"}
                 </Button>
 
                 <Button

@@ -25,13 +25,17 @@ const Modal: React.FC<ModalProps> = ({
       {/* 모달 창 */}
       <div
         className={
-          "relative text-center rounded-xl pt-10 pb-8 px-15 w-4/5 bg-white"
+          "relative text-center rounded-xl pt-10 pb-8 px-12 w-4/5 bg-white"
         }
         onClick={(e) => e.stopPropagation()}
       >
         {title && <h2 className={"text-xl font-bold"}>{title}</h2>}
-        {description && <p className={"text-gray-600"}>{description}</p>}
-        {children}
+        {description && (
+          <p className={"text-gray-600"} style={{ whiteSpace: "pre-wrap" }}>
+            {description}
+          </p>
+        )}
+        <div className={""}>{children}</div>
       </div>
     </div>
   );
