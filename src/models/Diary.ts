@@ -18,13 +18,16 @@ export interface Diary {
   reactions?: Reaction[];
 }
 
+interface ReactionId {
+  diaryId: number;
+  user: User;
+}
+
 export interface Reaction {
-  id: number;
+  id: ReactionId;
   reactionType: ReactionType;
   createdAt: DateTime;
-  createdBy: User;
   lastModifiedAt: DateTime;
-  lastModifiedBy: User;
 }
 
 export enum ReactionType {
