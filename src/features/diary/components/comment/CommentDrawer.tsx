@@ -1,4 +1,5 @@
 import api from "@/api";
+import CommentLoadingIndicator from "@/components/ui/CommentLoadingIndicator";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
@@ -284,7 +285,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                   }
                 )}
               />
-              {selectedComment ? (
+              {createCommentMutation.isPending ? (
+                <CommentLoadingIndicator />
+              ) : selectedComment ? (
                 <IoReturnUpForwardOutline className={"z-10 text-xl"} />
               ) : (
                 <MdArrowUpward className={"z-10 text-xl"} />

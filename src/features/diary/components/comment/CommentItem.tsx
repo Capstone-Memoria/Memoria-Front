@@ -1,4 +1,5 @@
 import api from "@/api";
+import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation } from "@tanstack/react-query";
@@ -179,14 +180,18 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
                 >
-                  <MdDeleteSweep className={"text-2xl"} />
+                  <MdDeleteSweep
+                    className={cn("text-2xl", {
+                      "animate-pulse": isDeleting,
+                    })}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         )}
       </div>
-      {!comment.deleted && comment.children && comment.children.length > 0 && (
+      {comment.children && comment.children.length > 0 && (
         <div className={"pl-5 flex flex-col gap-2"}>
           {comment.children.map((child) => (
             <CommentItem key={child.id} comment={child} />
