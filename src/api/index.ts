@@ -16,5 +16,4 @@ export default {
   image,
   reaction,
   comment,
-  ai,
 };

@@ -1,5 +1,10 @@
 import { Diary } from "@/models/Diary";
-import { DiaryBook } from "@/models/DiaryBook";
+import {
+  DiaryBook,
+  DiaryBookMemer,
+  DirectInvaitation,
+  InvitationCode,
+} from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
 import server from "./axios";
 
@@ -62,4 +67,63 @@ export const fetchMyDiaries = async (
     }
   );
   return response.data;
+};
+
+export const createInviteCode = async (diaryBookId: number) => {
+  const response = await server.post<InvitationCode>(
+    `/api/diaries/${diaryBookId}/invitation/by-code`
+  );
+
+  return response.data;
+};
+
+export const acceptInvitationCode = async (code: string) => {
+  const response = await server.post<DiaryBookMemer>(
+    "/api/invitaion/accept/by-codee",
+    {
+      code: code,
+    }
+  );
+
+  return response.data;
+};
+
+export const directInvite = async (
+  diaryBookId: number,
+  targetEmail: string
+) => {
+  const response = await server.post<DirectInvaitation>(
+    `/api/diaries/${diaryBookId}/invitation/by-direct`,
+    {
+      targetEmail: targetEmail,
+    }
+  );
+
+  return response.data;
+};
+
+export const directInviteAccept = async (id: number) => {
+  const responcse = await server.post<DiaryBookMemer>(
+    "/api/invitaion/accept/by-direct",
+    {
+      id: id,
+    }
+  );
+
+  return responcse.data;
+};
+
+export const diaryMemberDelete = async (
+  diaryBookId: number,
+  memberId: number
+) => {
+  await server.delete(`/api/diary-book/${diaryBookId}/members/${memberId}`);
+};
+
+export const fetchDiaryMembers = async (diaryBookId: number) => {
+  const responcse = await server.get<DiaryBookMemer[]>(
+    `/api/diary-book/${diaryBookId}/members`
+  );
+
+  return responcse.data;
 };
