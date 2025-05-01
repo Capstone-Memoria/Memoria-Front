@@ -17,6 +17,7 @@ import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomBar from "../components/BottomBar";
+import CommentDrawer from "../components/comment/CommentDrawer";
 
 const DiaryContentPage = () => {
   /* Properties */
@@ -28,6 +29,7 @@ const DiaryContentPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   /* Server Side */
   const { data: diary, isLoading } = useQuery({
@@ -83,7 +85,7 @@ const DiaryContentPage = () => {
   }, [carouselApi]);
 
   return (
-    <Page.Container className={"h-full flex flex-col "}>
+    <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <Page.Header className={"flex justify-between"}>
         <div className={"text-2xl pr-4"}>
           <MdOutlineKeyboardBackspace onClick={() => navigate(-1)} />
@@ -266,7 +268,11 @@ const DiaryContentPage = () => {
           </Modal>
         )}
       </Page.Content>
-      <BottomBar />
+      <BottomBar
+        onCommentClick={() => setIsCommentDrawerOpen(true)}
+        diaryBookId={Number(diaryBookId)}
+        diaryId={Number(diaryId)}
+      />
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DrawerContent className={"pb-8"}>
           <div className={"flex flex-col gap-2 p-4"}>
@@ -287,6 +293,12 @@ const DiaryContentPage = () => {
           </div>
         </DrawerContent>
       </Drawer>
+      <CommentDrawer
+        open={isCommentDrawerOpen}
+        onClose={() => setIsCommentDrawerOpen(false)}
+        diaryBookId={Number(diaryBookId)}
+        diaryId={Number(diaryId)}
+      />
     </Page.Container>
   );
 };
