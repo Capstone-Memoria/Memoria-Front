@@ -95,23 +95,34 @@ const MainPage = () => {
           >
             <div className={"px-6"}>
               <div className={"grid grid-cols-3 gap-6"}>
-                {isLoading
-                  ? Array.from({ length: 9 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
-                      />
-                    ))
-                  : (data?.content ?? []).map((diaryBook) => (
-                      <DiaryBook
-                        onClick={() => navigate(`/diary/${diaryBook.id}`)}
-                        key={diaryBook.id}
-                        title={diaryBook.title}
-                        memberCount={diaryBook.memberCount}
-                        pinned={diaryBook.isPinned ?? false}
-                        notificationCount={120}
-                      />
-                    ))}
+                {isLoading ? (
+                  Array.from({ length: 9 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                    />
+                  ))
+                ) : (data?.content ?? []).length === 0 && !isLoading ? (
+                  <div
+                    className={
+                      "col-span-full text-center text-gray-400 text-sm py-20"
+                    }
+                  >
+                    일기장이 없습니다.
+                    <br />새 일기장을 만들어 보세요.
+                  </div>
+                ) : (
+                  (data?.content ?? []).map((diaryBook) => (
+                    <DiaryBook
+                      onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                      key={diaryBook.id}
+                      title={diaryBook.title}
+                      memberCount={diaryBook.memberCount}
+                      pinned={diaryBook.isPinned ?? false}
+                      notificationCount={120}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </div>

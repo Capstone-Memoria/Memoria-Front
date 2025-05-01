@@ -164,7 +164,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
         {isOwnComment && !comment.deleted && (
           <div
             className={
-              "absolute right-0 top-0 min-w-2 h-full bg-red-400 rounded-md flex items-center justify-center text-white"
+              "absolute right-0 top-0 min-w-2 h-full bg-red-400 rounded-md flex items-center justify-center text-white animate-tong-tong"
             }
             style={{
               width: !isDeleting ? `${Math.abs(swipeDistance)}px` : "100%",

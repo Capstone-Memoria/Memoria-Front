@@ -2,6 +2,7 @@ import api from "@/api";
 import Button from "@/components/base/Button";
 import Image from "@/components/base/Image";
 import Modal from "@/components/base/Modal";
+import Preview from "@/components/base/Preview";
 import Page from "@/components/page/Page";
 import {
   Carousel,
@@ -84,6 +85,11 @@ const DiaryContentPage = () => {
     };
   }, [carouselApi]);
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const [previewImageId, setPreviewImageId] = useState<string | undefined>(
+    undefined
+  );
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <Page.Header className={"flex justify-between"}>
@@ -154,6 +160,10 @@ const DiaryContentPage = () => {
                           className={
                             "w-full flex items-center justify-center relative h-48"
                           }
+                          onClick={() => {
+                            setPreviewImageId(image.id);
+                            setIsPreviewOpen(true);
+                          }}
                         >
                           <Image
                             imageClassName={"object-fill blur-3xl"}
@@ -162,6 +172,7 @@ const DiaryContentPage = () => {
                               "size-full absolute rounded-md overflow-hidden top-0 left-0"
                             }
                           />
+
                           <Image
                             imageClassName={"object-contain"}
                             imageId={image.id}
@@ -299,6 +310,13 @@ const DiaryContentPage = () => {
         diaryBookId={Number(diaryBookId)}
         diaryId={Number(diaryId)}
       />
+      {previewImageId && (
+        <Preview
+          imageId={previewImageId}
+          open={isPreviewOpen}
+          setIsOpen={setIsPreviewOpen}
+        />
+      )}
     </Page.Container>
   );
 };
