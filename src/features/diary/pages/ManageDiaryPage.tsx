@@ -55,7 +55,7 @@ const ManageDiaryPage = () => {
       // 삭제 성공 시 캐시 무효화보다는 제거가 더 적절할 수 있음
       queryClient.removeQueries({ queryKey: ["fetchDiaryBookById", diaryId] });
       queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] }); // 목록 캐시 무효화 (선택 사항)
-      navigate("/main"); // 또는 다른 적절한 경로로 이동
+      navigate("/main", { replace: true }); // 또는 다른 적절한 경로로 이동
     },
     onError: (error) => {
       console.error("일기장 삭제 실패:", error);

@@ -5,9 +5,11 @@ import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
 import ImageUploader from "@/features/diary/components/ImageUploader";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FiUploadCloud } from "react-icons/fi";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const EditDiaryPage = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const EditDiaryPage = () => {
   const [content, setContent] = useState("");
   const [toAddImages, setToAddImages] = useState<File[]>([]);
   const [toDeleteImageIds, setToDeleteImageIds] = useState<string[]>([]);
+  const nodeRef = useRef<HTMLDivElement>(null);
 
   /* Server-State */
   const { data: diaryData, isLoading: isDiaryLoading } = useQuery({
@@ -66,7 +69,7 @@ const EditDiaryPage = () => {
         toDeleteImageIds: toDeleteImageIds, // 삭제될 이미지 ID
       }),
     onSuccess: () => {
-      navigate(`/diary/${diaryBookId}/diary/${diaryId}`);
+      navigate(`/diary/${diaryBookId}/diary/${diaryId}`, { replace: true });
     },
   });
 
@@ -102,61 +105,99 @@ const EditDiaryPage = () => {
           완료
         </Button>
       </Page.Header>
-      <Page.Content className={"flex flex-col gap-6 flex-1"}>
-        {isDiaryLoading || isDiaryBookLoading ? (
-          <div className={"space-y-6"}>
-            <div className={"h-12 bg-gray-200 animate-pulse rounded-3xl"}></div>
-            <div
-              className={"h-8 bg-gray-200 animate-pulse rounded w-3/4"}
-            ></div>
-            <div className={"flex-1 space-y-2"}>
+      <SwitchTransition mode={"out-in"}>
+        <CSSTransition
+          key={updateMutation.isPending ? "loading" : "content"}
+          timeout={300}
+          classNames={"fade"}
+          nodeRef={nodeRef}
+        >
+          <div ref={nodeRef} className={"flex-1"}>
+            {updateMutation.isPending ? (
               <div
-                className={"h-4 bg-gray-200 animate-pulse rounded w-full"}
-              ></div>
-              <div
-                className={"h-4 bg-gray-200 animate-pulse rounded w-full"}
-              ></div>
-              <div
-                className={"h-4 bg-gray-200 animate-pulse rounded w-5/6"}
-              ></div>
-              <div
-                className={"h-4 bg-gray-200 animate-pulse rounded w-2/3"}
-              ></div>
-              <div
-                className={"h-4 bg-gray-200 animate-pulse rounded w-full"}
-              ></div>
-            </div>
+                className={
+                  "flex flex-col items-center justify-center h-full text-lg font-medium gap-4"
+                }
+              >
+                <FiUploadCloud
+                  className={"text-6xl animate-bounce text-gray-600"}
+                />
+                <div className={"text-lg text-gray-600"}>
+                  일기를 수정 중이에요
+                </div>
+              </div>
+            ) : (
+              <Page.Content className={"flex flex-col gap-6 flex-1"}>
+                {isDiaryLoading || isDiaryBookLoading ? (
+                  <div className={"space-y-6"}>
+                    <div
+                      className={"h-12 bg-gray-200 animate-pulse rounded-3xl"}
+                    ></div>
+                    <div
+                      className={"h-8 bg-gray-200 animate-pulse rounded w-3/4"}
+                    ></div>
+                    <div className={"flex-1 space-y-2"}>
+                      <div
+                        className={
+                          "h-4 bg-gray-200 animate-pulse rounded w-full"
+                        }
+                      ></div>
+                      <div
+                        className={
+                          "h-4 bg-gray-200 animate-pulse rounded w-full"
+                        }
+                      ></div>
+                      <div
+                        className={
+                          "h-4 bg-gray-200 animate-pulse rounded w-5/6"
+                        }
+                      ></div>
+                      <div
+                        className={
+                          "h-4 bg-gray-200 animate-pulse rounded w-2/3"
+                        }
+                      ></div>
+                      <div
+                        className={
+                          "h-4 bg-gray-200 animate-pulse rounded w-full"
+                        }
+                      ></div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      className={
+                        "w-full flex justify-between items-center mt-2 bg-gray-100 rounded-3xl px-4 py-2"
+                      }
+                    >
+                      {selectedDiaryBook?.title || "일기장 정보 없음"}
+                    </div>
+                    <div className={"flex flex-col gap-2"}>
+                      <Input
+                        className={"w-full text-2xl"}
+                        placeholder={"일기 제목"}
+                        value={diaryTitle}
+                        onChange={(e) => setDiaryTitle(e.target.value)}
+                      />
+                    </div>
+                    <ImageUploader
+                      initialImages={diaryData?.images}
+                      onImagesChange={handleImagesChange}
+                    />
+                    <div className={"flex-1 rounded-lg"}>
+                      <Tiptap
+                        content={content}
+                        onContentUpdate={(content) => setContent(content)}
+                      />
+                    </div>
+                  </>
+                )}
+              </Page.Content>
+            )}
           </div>
-        ) : (
-          <>
-            <div
-              className={
-                "w-full flex justify-between items-center mt-2 bg-gray-100 rounded-3xl px-4 py-2"
-              }
-            >
-              {selectedDiaryBook?.title || "일기장 정보 없음"}
-            </div>
-            <div className={"flex flex-col gap-2"}>
-              <Input
-                className={"w-full text-2xl"}
-                placeholder={"일기 제목"}
-                value={diaryTitle}
-                onChange={(e) => setDiaryTitle(e.target.value)}
-              />
-            </div>
-            <ImageUploader
-              initialImages={diaryData?.images}
-              onImagesChange={handleImagesChange}
-            />
-            <div className={"flex-1 rounded-lg"}>
-              <Tiptap
-                content={content}
-                onContentUpdate={(content) => setContent(content)}
-              />
-            </div>
-          </>
-        )}
-      </Page.Content>
+        </CSSTransition>
+      </SwitchTransition>
     </Page.Container>
   );
 };

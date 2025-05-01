@@ -38,7 +38,7 @@ const ErrorPage = ({ defaultErrorCode = "500" }: ErrorPageProps) => {
   };
 
   const goHome = () => {
-    navigate("/");
+    navigate("/", { replace: true });
   };
 
   return (

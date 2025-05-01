@@ -1,6 +1,7 @@
 import Image from "@/components/base/Image";
 import { cn } from "@/lib/utils";
 import { AttachedFile } from "@/models/AttachedFile";
+import heic2any from "heic2any";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useMemo, useRef, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
@@ -31,6 +32,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [images, setImages] = useState<EditingImage[]>(initialImages);
   const [toDeleteImageIds, setToDeleteImageIds] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const displayedImages = useMemo(() => {
@@ -58,9 +60,55 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     setImages((prevImages) => prevImages.filter((img) => img !== editingImage));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = Array.from(event.target.files || []);
-    const newImages = files.map((file) => ({
+    if (files.length === 0) return;
+
+    setIsConverting(true);
+
+    const processedFiles: File[] = [];
+
+    for (const file of files) {
+      if (file.type === "image/heic" || file.type === "image/heif") {
+        // HEIC 이미지를 JPG로 변환
+        try {
+          const jpegBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+            quality: 0.8,
+          });
+          if (Array.isArray(jpegBlob)) {
+            // If heic2any returns an array of blobs (e.g., for bursts), take the first one
+            processedFiles.push(
+              new File(
+                [jpegBlob[0] as Blob],
+                file.name.replace(/\.(heic|heif)$/i, ".jpg"),
+                { type: "image/jpeg" }
+              )
+            );
+          } else {
+            processedFiles.push(
+              new File(
+                [jpegBlob as Blob],
+                file.name.replace(/\.(heic|heif)$/i, ".jpg"),
+                { type: "image/jpeg" }
+              )
+            );
+          }
+        } catch (error) {
+          console.error("HEIC to JPG conversion failed:", error);
+          // 변환 실패 시 원본 파일 추가 (선택 사항)
+          // processedFiles.push(file);
+        }
+      } else {
+        // 그 외 이미지 파일은 그대로 추가
+        processedFiles.push(file);
+      }
+    }
+
+    const newImages = processedFiles.map((file) => ({
       url: URL.createObjectURL(file),
       file,
     }));
@@ -69,13 +117,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     onImagesChange({
       addedImages: [
         ...images.filter((img) => "url" in img).map((img) => img.file),
-        ...files,
+        ...processedFiles,
       ],
       deletedImageIds: toDeleteImageIds,
     });
 
     fileInputRef.current!.value = "";
     setIsExpanded(true);
+    setIsConverting(false);
   };
 
   const handleFileUploadClick = () => {
@@ -135,7 +184,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               }
               onClick={handleFileUploadClick}
             >
-              <span className={"text-gray-500 text-2xl"}>+</span>
+              {isConverting ? (
+                <span className={"text-gray-500 text-sm"}>변환 중...</span>
+              ) : (
+                <span className={"text-gray-500 text-2xl"}>+</span>
+              )}
               <input
                 type={"file"}
                 accept={"image/*"}

@@ -36,7 +36,7 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
         accessTokenExpiresAt: data.accessTokenExpiresAt,
         user: data.user,
       });
-      navigate("/main");
+      navigate("/main", { replace: true });
     },
   });
 

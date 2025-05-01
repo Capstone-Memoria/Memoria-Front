@@ -42,7 +42,7 @@ const DiaryContentPage = () => {
     mutationFn: () =>
       api.diary.deleteDiary(Number(diaryBookId), Number(diaryId)),
     onSuccess: () => {
-      navigate(`/diary/${diaryBookId}`);
+      navigate(`/diary/${diaryBookId}`, { replace: true });
     },
     onError: (error) => {
       console.error("일기 삭제 실패", error);

@@ -49,7 +49,7 @@ const CreateDiaryPage = () => {
     },
     onSuccess: (data) => {
       console.log("Diary created successfully", data);
-      navigate("/main");
+      navigate("/main", { replace: true });
     },
   });
 

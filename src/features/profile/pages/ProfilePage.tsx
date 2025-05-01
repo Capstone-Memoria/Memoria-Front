@@ -46,7 +46,7 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     authStore.logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   const {
