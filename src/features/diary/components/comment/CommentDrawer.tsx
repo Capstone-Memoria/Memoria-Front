@@ -2,7 +2,7 @@ import api from "@/api";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import React, {
   createContext,
@@ -45,8 +45,6 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
   diaryBookId,
   diaryId,
 }) => {
-  const queryClient = useQueryClient();
-
   const {
     data: comments,
     isLoading,
