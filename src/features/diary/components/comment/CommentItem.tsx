@@ -19,6 +19,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
     diaryBookId,
     diaryId,
     refetchComments,
+    queryClient,
   } = useContext(CommentDrawerContext);
 
   // 인증 상태 가져오기
@@ -51,6 +52,9 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
       if (!isAnimating) {
         refetchComments();
       }
+      queryClient.invalidateQueries({
+        queryKey: ["fetchCommentsCount", diaryBookId, diaryId],
+      });
     },
     onError: (error) => {
       console.error("댓글 삭제 실패", error);

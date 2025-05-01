@@ -272,7 +272,6 @@ const DiaryContentPage = () => {
         onCommentClick={() => setIsCommentDrawerOpen(true)}
         diaryBookId={Number(diaryBookId)}
         diaryId={Number(diaryId)}
-        commentCount={diary?.commentCount || 0}
       />
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DrawerContent className={"pb-8"}>

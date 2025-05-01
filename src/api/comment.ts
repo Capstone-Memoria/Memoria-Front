@@ -73,3 +73,15 @@ export const deleteComment = async (
   );
   // DELETE 요청은 보통 응답 본문이 없습니다.
 };
+
+// COMMENT-6: 일기별 댓글 개수 조회
+// 설명: 특정 다이어리(diaryId)에 달린 댓글의 총 개수를 조회합니다. (대댓글 포함)
+export const fetchCommentsCount = async (
+  diaryBookId: number,
+  diaryId: number
+): Promise<number> => {
+  const response = await server.get(
+    `/api/diary-book/${diaryBookId}/diary/${diaryId}/comments/count`
+  );
+  return response.data;
+};

@@ -2,7 +2,7 @@ import api from "@/api";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import React, {
   createContext,
@@ -29,6 +29,7 @@ interface CommentDrawerContextProps {
   diaryBookId: number;
   diaryId: number;
   refetchComments: () => void;
+  queryClient: ReturnType<typeof useQueryClient>;
 }
 
 export const CommentDrawerContext = createContext<CommentDrawerContextProps>({
@@ -37,6 +38,7 @@ export const CommentDrawerContext = createContext<CommentDrawerContextProps>({
   diaryBookId: 0,
   diaryId: 0,
   refetchComments: () => {},
+  queryClient: {} as ReturnType<typeof useQueryClient>,
 });
 
 const CommentDrawer: React.FC<CommentDrawerProps> = ({
@@ -54,6 +56,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     queryFn: () => api.comment.fetchComments(diaryBookId, diaryId),
     enabled: open,
   });
+
+  const queryClient = useQueryClient();
 
   const allCommentsLength = useMemo(() => {
     if (!comments) return 0;
@@ -136,6 +140,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
       setCommentInput("");
       setSelectedComment(undefined);
       refetchComments();
+      queryClient.invalidateQueries({
+        queryKey: ["fetchCommentsCount", diaryBookId, diaryId],
+      });
     },
     onError: (error) => {
       console.error("댓글/대댓글 생성 실패", error);
@@ -157,6 +164,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
         diaryBookId,
         diaryId,
         refetchComments,
+        queryClient,
       }}
     >
       <Drawer open={open} onOpenChange={onClose} repositionInputs={false}>

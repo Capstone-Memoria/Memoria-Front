@@ -11,7 +11,6 @@ interface BottomBarProps extends HTMLAttributes<HTMLDivElement> {
   onCommentClick?: () => void;
   diaryBookId: number;
   diaryId: number;
-  commentCount?: number;
 }
 
 interface GroupedReaction {
@@ -23,7 +22,6 @@ const BottomBar: React.FC<BottomBarProps> = ({
   onCommentClick,
   diaryBookId,
   diaryId,
-  commentCount = 0,
   ...props
 }) => {
   const [open, setOpen] = useState(false);
@@ -44,6 +42,11 @@ const BottomBar: React.FC<BottomBarProps> = ({
   const { data: reactions = [], isFetching } = useQuery({
     queryKey: ["fetchReactions", diaryBookId, diaryId],
     queryFn: () => api.reaction.fetchReactions(diaryBookId, diaryId),
+  });
+
+  const { data: commentCount = 0, isFetching: isFetchingComments } = useQuery({
+    queryKey: ["fetchCommentsCount", diaryBookId, diaryId],
+    queryFn: () => api.comment.fetchCommentsCount(diaryBookId, diaryId),
   });
 
   useEffect(() => {
@@ -197,7 +200,13 @@ const BottomBar: React.FC<BottomBarProps> = ({
           onClick={onCommentClick}
         >
           <BsChatFill className={""} />
-          <div>{commentCount}</div>
+          {isFetchingComments ? (
+            <div
+              className={"w-4 h-4 bg-gray-200 rounded-full animate-pulse"}
+            ></div>
+          ) : (
+            <div>{commentCount}</div>
+          )}
         </div>
       </div>
     </div>
