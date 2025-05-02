@@ -2,7 +2,7 @@ import api from "@/api";
 import { cn } from "@/lib/utils";
 import { useImageStore } from "@/stores/ImageStore";
 import { useMutation } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Spinner from "./Spinner";
@@ -11,10 +11,9 @@ interface PreviewProps {
   imageId: string | undefined;
   open: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onAnimationComplete?: () => void;
 }
 
-const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen, onAnimationComplete }) => {
+const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
   const imageStore = useImageStore();
   const [loadedImage, setLoadedImage] = useState<string>();
   const [error, setError] = useState<boolean>(false);
@@ -110,7 +109,6 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen, onAnimation
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onAnimationComplete={onAnimationComplete}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}

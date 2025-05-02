@@ -13,10 +13,12 @@ import {
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Dot } from "lucide-react";
+import { LayoutGroup, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
+import LetterFromAI from "../components/ai/LetterFromAI";
 import BottomBar from "../components/BottomBar";
 import CommentDrawer from "../components/comment/CommentDrawer";
 
@@ -31,7 +33,10 @@ const DiaryContentPage = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
-  const [renderPreview, setRenderPreview] = useState<boolean>(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const [previewImageId, setPreviewImageId] = useState<string | undefined>(
+    undefined
+  );
 
   /* Server Side */
   const { data: diary, isLoading } = useQuery({
@@ -85,11 +90,6 @@ const DiaryContentPage = () => {
       carouselApi.off("select", handleSelect);
     };
   }, [carouselApi]);
-
-  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
-  const [previewImageId, setPreviewImageId] = useState<string | undefined>(
-    undefined
-  );
 
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
@@ -164,7 +164,6 @@ const DiaryContentPage = () => {
                           onClick={() => {
                             setPreviewImageId(image.id);
                             setIsPreviewOpen(true);
-                            setRenderPreview(true);
                           }}
                         >
                           <Image
@@ -236,10 +235,17 @@ const DiaryContentPage = () => {
                 <span>{diary.createdAt?.toRelative()}</span>
               </div>
 
-              {/* 일기 내용 */}
-              <div className={"mt-6 px-5 font-light"}>
-                <div dangerouslySetInnerHTML={{ __html: diary.content }} />
-              </div>
+              <LayoutGroup>
+                {/* AI 캐릭터 댓글 컨텐츠 */}
+                <LetterFromAI />
+
+                {/* 일기 내용 */}
+                <motion.div
+                  layout
+                  className={"mt-6 px-5 font-light"}
+                  dangerouslySetInnerHTML={{ __html: diary.content }}
+                />
+              </LayoutGroup>
 
               {/* 요약 내용이 있는 경우 */}
               {diary.summary && (
@@ -312,18 +318,12 @@ const DiaryContentPage = () => {
         diaryBookId={Number(diaryBookId)}
         diaryId={Number(diaryId)}
       />
-      {renderPreview && (
-        <Preview
-          imageId={previewImageId}
-          open={isPreviewOpen}
-          setIsOpen={setIsPreviewOpen}
-          onAnimationComplete={() => {
-            if (!isPreviewOpen) {
-              setRenderPreview(false);
-            }
-          }}
-        />
-      )}
+
+      <Preview
+        imageId={previewImageId}
+        open={isPreviewOpen}
+        setIsOpen={setIsPreviewOpen}
+      />
     </Page.Container>
   );
 };
