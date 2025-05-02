@@ -55,7 +55,6 @@ const CreateDiaryPage = () => {
 
       setUploadedCoverFile(file); // 파일 객체 저장 (나중에 서버 전송용)
 
-      // 파일 리더를 사용하여 이미지 미리보기 URL 생성
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedCoverImageUrl(reader.result as string);
@@ -64,13 +63,11 @@ const CreateDiaryPage = () => {
       };
       reader.readAsDataURL(file);
     }
-    // 입력 값 초기화하여 동일한 파일 다시 선택 가능하게 함
     if (event.target) {
       event.target.value = "";
     }
   };
 
-  // "사진 업로드" 버튼 클릭 핸들러
   const handleUploadButtonClick = () => {
     fileInputRef.current?.click(); // 숨겨진 파일 입력 클릭 트리거
   };
