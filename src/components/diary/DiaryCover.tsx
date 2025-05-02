@@ -7,7 +7,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   showPin?: boolean;
   notificationCount?: number;
   coverColor?: string;
-  imageSrc?: string;
+  imageSrc?: string | null;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
@@ -20,13 +20,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
 }) => {
   return (
     // 1. 바깥쪽 div: 크기(w, h)와 상대 위치(relative)만 담당
-    <div
-      {...props}
-      className={cn(
-        "w-22 h-32 relative",
-        props.className
-      )}
-    >
+    <div {...props} className={cn("w-22 h-32 relative", props.className)}>
       {/* 2. 내부 래퍼 div: 시각적 요소(배경, 그림자, 라운딩)와 내용(flex, overflow) 담당 */}
       <div
         className={cn(
@@ -42,15 +36,12 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
         />
 
         {/* 이미지가 있을 경우에만 렌더링 */}
-        {imageSrc ? (
+        {imageSrc && (
           <img
             src={imageSrc}
             className={"flex-1 h-full object-cover"} // 이미지 스타일 유지
             alt={"Diary cover"}
           />
-        ) : (
-          // 이미지가 없을 경우 빈 공간을 유지하기 위한 플레이스홀더 (선택적)
-          <div className={"flex-1 h-full"}></div>
         )}
       </div>{" "}
       {/* 내부 래퍼 div 끝 */}
