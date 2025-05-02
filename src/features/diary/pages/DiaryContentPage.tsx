@@ -31,6 +31,7 @@ const DiaryContentPage = () => {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
+  const [renderPreview, setRenderPreview] = useState<boolean>(false);
 
   /* Server Side */
   const { data: diary, isLoading } = useQuery({
@@ -163,6 +164,7 @@ const DiaryContentPage = () => {
                           onClick={() => {
                             setPreviewImageId(image.id);
                             setIsPreviewOpen(true);
+                            setRenderPreview(true);
                           }}
                         >
                           <Image
@@ -310,11 +312,16 @@ const DiaryContentPage = () => {
         diaryBookId={Number(diaryBookId)}
         diaryId={Number(diaryId)}
       />
-      {previewImageId && (
+      {renderPreview && (
         <Preview
           imageId={previewImageId}
           open={isPreviewOpen}
           setIsOpen={setIsPreviewOpen}
+          onAnimationComplete={() => {
+            if (!isPreviewOpen) {
+              setRenderPreview(false);
+            }
+          }}
         />
       )}
     </Page.Container>

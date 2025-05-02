@@ -8,12 +8,13 @@ import { createPortal } from "react-dom";
 import Spinner from "./Spinner";
 
 interface PreviewProps {
-  imageId: string;
+  imageId: string | undefined;
   open: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onAnimationComplete?: () => void;
 }
 
-const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
+const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen, onAnimationComplete }) => {
   const imageStore = useImageStore();
   const [loadedImage, setLoadedImage] = useState<string>();
   const [error, setError] = useState<boolean>(false);
@@ -70,9 +71,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
     setIsTouching(true);
     setTouchStartPosition({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     setCurrentTouchPosition({
@@ -82,7 +81,6 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
     setCurrentTouchPosition({
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
@@ -90,7 +88,6 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault();
     setIsTouching(false);
 
     const distance = Math.sqrt(
@@ -113,6 +110,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          onAnimationComplete={onAnimationComplete}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
