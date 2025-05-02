@@ -11,6 +11,33 @@ import { MdUpload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
 
+import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
+import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
+import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
+import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
+import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
+
+async function sourceToFile(
+  source: string,
+  filename: string,
+  mimeType?: string
+): Promise<File | null> {
+  try {
+    const response = await fetch(source);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch image: ${response.status} ${response.statusText}`
+      );
+    }
+    const blob = await response.blob();
+    const type = mimeType || blob.type || "image/png";
+    return new File([blob], filename, { type });
+  } catch (error) {
+    console.error("Error converting source to File:", error);
+    return null;
+  }
+}
+
 const CreateDiaryPage = () => {
   const navigate = useNavigate();
   const [diaryTitle, setDiaryTitle] = useState("");
@@ -24,6 +51,18 @@ const CreateDiaryPage = () => {
   >(null);
   const [uploadedCoverFile, setUploadedCoverFile] = useState<File | null>(null);
 
+  const presetImageSources = [
+    CoverExampleImg1,
+    CoverExampleImg2,
+    CoverExampleImg3,
+    CoverExampleImg4,
+    CoverExampleImg5,
+  ];
+
+  const [finalCoverSource, setFinalCoverSource] = useState<File | string>(
+    presetImageSources[0]
+  );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,46 +70,49 @@ const CreateDiaryPage = () => {
   }, [diaryTitle]);
 
   const handlePresetSelect = (index: number | string) => {
-    // 캐러셀에서 업로드된 이미지를 선택했을 때 'uploaded' 문자열을 반환
     if (index === "uploaded") {
-      setSelectedPresetIndex(null); // 프리셋 선택 해제 (업로드된 이미지가 선택됨)
-      console.log("Uploaded cover selected");
-    } else if (typeof index === "number") {
+      setSelectedPresetIndex(null);
+      if (uploadedCoverFile) {
+        setFinalCoverSource(uploadedCoverFile); // 업로드된 File 객체 사용
+      }
+    } else if (
+      typeof index === "number" &&
+      index >= 0 &&
+      index < presetImageSources.length
+    ) {
       setSelectedPresetIndex(index);
-      setUploadedCoverFile(null); // 프리셋 선택 시 업로드된 파일 초기화
-      console.log("Preset cover selected:", index);
+      setUploadedCoverFile(null);
+      setUploadedCoverImageUrl(null);
+      setFinalCoverSource(presetImageSources[index]); // 프리셋 이미지 경로(string) 사용
+    } else {
+      // 예외 처리 (기본 0번)
+      setSelectedPresetIndex(0);
+      setFinalCoverSource(presetImageSources[0]);
     }
   };
 
-  // 파일 선택 처리 핸들러
+  // --- 파일 업로드 핸들러 ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
       const file = files[0];
-      // 파일 타입 검사 (예: 이미지 파일만 허용)
       if (!file.type.startsWith("image/")) {
         alert("이미지 파일만 업로드할 수 있습니다.");
         return;
       }
-
-      setUploadedCoverFile(file); // 파일 객체 저장 (나중에 서버 전송용)
-
+      setUploadedCoverFile(file); // File 객체 저장
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedCoverImageUrl(reader.result as string);
-        // 업로드된 이미지를 기본 선택으로 설정
-        setSelectedPresetIndex(null); // 프리셋 선택 해제
+        setSelectedPresetIndex(null);
+        setFinalCoverSource(file); // 업로드된 File 객체 사용
       };
       reader.readAsDataURL(file);
     }
-    if (event.target) {
-      event.target.value = "";
-    }
+    if (event.target) event.target.value = "";
   };
 
-  const handleUploadButtonClick = () => {
-    fileInputRef.current?.click(); // 숨겨진 파일 입력 클릭 트리거
-  };
+  const handleUploadButtonClick = () => fileInputRef.current?.click();
 
   /* Server Side */
   const {
@@ -78,48 +120,43 @@ const CreateDiaryPage = () => {
     isPending,
     error,
   } = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const formData = new FormData();
       formData.append("title", diaryTitle);
 
-      // 선택된 커버 유형에 따라 데이터 추가
-      if (uploadedCoverFile && selectedPresetIndex === null) {
-        // 업로드된 이미지가 선택되었을 경우
-        formData.append("coverImage", uploadedCoverFile);
-        formData.append("coverType", "uploaded");
-      } else if (selectedPresetIndex !== null) {
-        // 프리셋 커버가 선택되었을 경우
-        formData.append("presetIndex", selectedPresetIndex.toString());
-        formData.append("coverType", "preset");
+      let coverFile: File | null = null;
+
+      // finalCoverSource를 File 객체로 변환 (필요시)
+      if (finalCoverSource instanceof File) {
+        coverFile = finalCoverSource;
+      } else if (typeof finalCoverSource === "string") {
+        const filename = `cover_${selectedPresetIndex ?? "uploaded"}.${finalCoverSource.split(".").pop() || "png"}`;
+        coverFile = await sourceToFile(finalCoverSource, filename);
+        if (!coverFile)
+          throw new Error("선택된 커버 이미지를 처리 중 오류 발생");
       } else {
-        // 아무것도 선택되지 않은 경우 (기본값 또는 에러 처리)
-        console.warn("No cover selected");
-        // 기본 프리셋 0번을 사용
-        formData.append("presetIndex", "0");
-        formData.append("coverType", "preset");
+        throw new Error("커버 이미지가 올바르게 선택되지 않음");
       }
 
-      // API 함수 호출 (FormData 객체 전달)
+      // 최종 File 객체를 FormData에 추가
+      if (coverFile) {
+        formData.append("coverImage", coverFile);
+      } else {
+        throw new Error("커버 이미지를 준비할 수 없음");
+      }
+
       return api.diaryBook.createDiaryBook(formData);
     },
-    onSuccess: (data) => {
-      console.log("Diary created successfully", data);
-      navigate("/main");
-    },
-    onError: (err) => {
-      console.error("Failed to create diary:", err);
-      // 사용자에게 에러 알림 표시
-      alert(`일기장 생성에 실패했습니다: ${err.message || "서버 오류"}`);
-    },
+    onSuccess: () => navigate("/main"),
+    onError: (err) =>
+      alert(
+        `일기장 생성 실패: ${err instanceof Error ? err.message : "서버 오류"}`
+      ),
   });
 
-  /* Handlers */
   const handleSubmit = () => {
-    if (diaryTitle.length > 0) {
-      tryCreateDiaryBook();
-    } else {
-      alert("일기장 제목을 입력해주세요.");
-    }
+    if (diaryTitle.length > 0) tryCreateDiaryBook();
+    else alert("일기장 제목을 입력해주세요.");
   };
 
   return (
@@ -130,72 +167,58 @@ const CreateDiaryPage = () => {
         isCreating={isPending}
       />
       <Page.Content className={"overflow-x-hidden pb-20"}>
-        {/* 숨겨진 파일 입력 요소 */}
         <input
           type={"file"}
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept={"image/*"} // 이미지 파일만 받도록 설정
-          style={{ display: "none" }} // 화면에 보이지 않도록 숨김
+          accept={"image/*"}
+          style={{ display: "none" }}
         />
-
         <div className={"mt-4"}>
-          <p className={"text-base font-normal"}>
-            새 일기장의 제목을 입력해주세요.
-          </p>
+          <p>새 일기장의 제목을 입력해주세요.</p>
           <Input
-            className={"w-full mt-2 text-base"}
+            className={"w-full mt-2"}
             placeholder={"ex) 메모리아 일기장"}
             value={diaryTitle}
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-
         <div className={"mt-8"}>
-          <p className={"text-base font-normal mb-4"}>
-            일기장 커버를 자유롭게 꾸며보세요!
-          </p>
-          {/* DiaryCoverCarousel에 업로드된 이미지 URL 전달 */}
+          <p>일기장 커버를 자유롭게 꾸며보세요!</p>
           <DiaryCoverCarousel
             className={"w-fit py-8"}
+            uploadedCoverUrl={uploadedCoverImageUrl}
             onSelect={handlePresetSelect}
-            uploadedCoverUrl={uploadedCoverImageUrl} // 업로드된 이미지 URL 전달
           />
         </div>
-
         <div className={"grid grid-cols-2 justify-items-center mt-5"}>
           <CreateCoverImageDrawer
             open={createCoverDrawerOpen}
             onOpenChange={setCreateCoverDrawerOpen}
           >
             <Button
+              variant={"secondary"}
               className={
                 "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
               }
-              variant={"secondary"}
             >
-              <FaMagic />
-              AI로 커버 만들기
+              <FaMagic /> AI로 커버 만들기
             </Button>
           </CreateCoverImageDrawer>
-
-          {/* 사진 업로드 버튼에 onClick 핸들러 연결 */}
           <Button
             size={"sm"}
+            variant={"secondary"}
+            onClick={handleUploadButtonClick}
             className={
               "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
             }
-            variant={"secondary"}
-            onClick={handleUploadButtonClick}
           >
-            <MdUpload className={"text-base"} />
-            사진 업로드
+            <MdUpload className={"text-base"} /> 사진 업로드
           </Button>
         </div>
-        {/* 에러 메시지 표시 (선택적) */}
         {error && (
           <p className={"text-red-500 text-sm mt-4 text-center"}>
-            일기장 생성 중 오류 발생: {error.message || "알 수 없는 오류"}
+            오류: {error instanceof Error ? error.message : "알 수 없는 오류"}
           </p>
         )}
       </Page.Content>

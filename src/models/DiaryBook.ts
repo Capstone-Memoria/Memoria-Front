@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { AttachedFile } from "./AttachedFile";
 import { User } from "./User";
 
 export interface DiaryBook {
@@ -11,5 +12,5 @@ export interface DiaryBook {
   createdBy: User;
   lastModifiedBy: User;
   owner: User;
-  coverImage?: string;
+  coverImage?: AttachedFile;
 }

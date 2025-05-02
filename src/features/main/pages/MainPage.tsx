@@ -1,10 +1,12 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
-import DiaryBook from "@/components/diary/DiaryBook";
+import DiaryBookComponent from "@/components/diary/DiaryBook";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
+import { DiaryBook } from "@/models/DiaryBook";
+import { Page as PageType } from "@/models/Pagination";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useQuery } from "@tanstack/react-query";
 import { BookPlus } from "lucide-react";
@@ -16,7 +18,7 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   /* Server-State */
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<PageType<DiaryBook>>({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
@@ -103,7 +105,7 @@ const MainPage = () => {
                       />
                     ))
                   : (data?.content ?? []).map((diaryBook) => (
-                      <DiaryBook
+                      <DiaryBookComponent
                         onClick={() => navigate(`/diary/${diaryBook.id}`)}
                         key={diaryBook.id}
                         title={diaryBook.title}
@@ -133,13 +135,14 @@ const MainPage = () => {
                   : (data?.content ?? [])
                       .filter((book) => book.isPinned)
                       .map((diaryBook) => (
-                        <DiaryBook
+                        <DiaryBookComponent
                           onClick={() => navigate(`/diary/${diaryBook.id}`)}
                           key={diaryBook.id}
                           title={diaryBook.title}
                           memberCount={1}
                           pinned={diaryBook.isPinned ?? false}
                           notificationCount={1}
+                          coverImage={diaryBook.coverImage}
                         />
                       ))}
                 {(data?.content ?? []).filter((book) => book.isPinned)
