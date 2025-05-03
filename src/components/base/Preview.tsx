@@ -2,7 +2,7 @@ import api from "@/api";
 import { cn } from "@/lib/utils";
 import { useImageStore } from "@/stores/ImageStore";
 import { useMutation } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Spinner from "./Spinner";
