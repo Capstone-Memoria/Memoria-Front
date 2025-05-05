@@ -112,7 +112,10 @@ const BottomBar: React.FC<BottomBarProps> = ({
   return (
     <div
       {...props}
-      className={cn("relative", props.className)}
+      className={cn(
+        "fixed bottom-0 left-1/2 -translate-x-1/2 w-full",
+        props.className
+      )}
       style={{
         transform: open
           ? `translate(${handleCalcBarPosition().x}px, ${handleCalcBarPosition().y}px)`
@@ -129,7 +132,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
       />
       <div
         className={cn(
-          "h-14 flex items-center px-3 gap-4 font-light border m-4 rounded-xl shadow-lg relative touch-none transition-all",
+          "h-14 flex items-center px-3 gap-4 font-light border m-4 rounded-xl shadow-lg relative touch-none transition-all bg-white",
           {
             "scale-95": open,
           }

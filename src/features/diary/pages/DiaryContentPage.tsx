@@ -150,7 +150,7 @@ const DiaryContentPage = () => {
           </div>
         ) : (
           diary && (
-            <div className={"space-y-2"}>
+            <div className={"space-y-2 pb-14"}>
               {/* 사진 넣기 */}
               {diary.images && diary.images.length > 0 && (
                 <Carousel className={"w-full"} setApi={setCarouselApi}>
