@@ -82,7 +82,7 @@ export const createInviteCode = async (diaryBookId: number) => {
 
 export const acceptInvitationCode = async (code: string) => {
   const response = await server.post<DiaryBookMemer>(
-    "/api/invitaion/accept/by-codee",
+    "/api/invitation/accept/by-code",
     {
       code: code,
     }
@@ -147,26 +147,24 @@ export const fetchDiaryMembers = async (diaryBookId: number) => {
   return responcse.data;
 };
 
-// 초대 코드 상세 정보 조회 API (가정)
-// 실제 API 엔드포인트 및 응답 구조에 맞게 수정 필요
-export interface InviteDetails {
-  diaryId: number;
-  diaryName: string;
-  inviterName: string;
-}
+// export interface InviteDetails {
+//   diaryId: number;
+//   diaryName: string;
+//   inviterName: string;
+// }
 
-export const fetchInviteDetailsByCode = async (code: string) => {
-  // TODO: 실제 API 엔드포인트로 변경 필요
-  // 예시: const response = await server.get<InviteDetails>(`/api/invitation/details/by-code/${code}`);
-  // 임시 반환 데이터 (시뮬레이션)
-  await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-  if (code === "valid-code") {
-    return {
-      diaryId: 123,
-      diaryName: "샘플 다이어리",
-      inviterName: "초대자 이름",
-    } as InviteDetails;
-  } else {
-    throw new Error("유효하지 않거나 만료된 초대 코드입니다.");
-  }
-};
+// export const fetchInviteDetailsByCode = async (code: string) => {
+//   // TODO: 실제 API 엔드포인트로 변경 필요
+//   // 예시: const response = await server.get<InviteDetails>(`/api/invitation/details/by-code/${code}`);
+//   // 임시 반환 데이터 (시뮬레이션)
+//   await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
+//   if (code === "valid-code") {
+//     return {
+//       diaryId: 123,
+//       diaryName: "샘플 다이어리",
+//       inviterName: "초대자 이름",
+//     } as InviteDetails;
+//   } else {
+//     throw new Error("유효하지 않거나 만료된 초대 코드입니다.");
+//   }
+// };

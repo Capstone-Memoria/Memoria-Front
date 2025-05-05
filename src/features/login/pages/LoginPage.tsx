@@ -1,17 +1,31 @@
-import { useState } from "react";
+import { useAuthStore } from "@/stores/AuthenticationStore"; // ⬅️ 추가
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom"; // ⬅️ 추가
 import LoginPanel from "../panels/LoginPanel";
 import WelcomePanel from "../panels/WelcomePanel";
 
 const LoginPage = () => {
   const [step, setStep] = useState(0);
 
-  const handleNext = () => {
-    setStep((prev) => prev + 1);
-  };
+  /* 1️⃣  라우터 훅 */
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handlePrev = () => {
-    setStep((prev) => prev - 1);
-  };
+  /* 2️⃣  로그인 여부 감시 */
+  const { context } = useAuthStore();
+  const user = context?.user;
+
+  /* 3️⃣  로그인 완료 시 자동 복귀 */
+  useEffect(() => {
+    if (user) {
+      const from = (location.state as { from?: string })?.from || "/main";
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, location.state]);
+
+  /* 기존 코드 그대로 ↓↓↓ */
+  const handleNext = () => setStep((prev) => prev + 1);
+  const handlePrev = () => setStep((prev) => prev - 1);
 
   return (
     <div className={"h-full py-6 overflow-x-hidden"}>
@@ -19,9 +33,7 @@ const LoginPage = () => {
         className={
           "flex overflow-hidden w-fit h-full transition-transform duration-500 ease-expo-out"
         }
-        style={{
-          transform: `translateX(-${step * 100}vw)`,
-        }}
+        style={{ transform: `translateX(-${step * 100}vw)` }}
       >
         <WelcomePanel className={"w-screen h-full"} onNext={handleNext} />
         <LoginPanel

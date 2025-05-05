@@ -1,165 +1,96 @@
-import api from "@/api"; // Corrected import path
-import { InviteDetails } from "@/api/diary-book"; // Import InviteDetails type
-import Button from "@/components/base/Button"; // Corrected import path
-import DefaultHeader from "@/components/layout/DefaultHeader"; // Corrected import path
-import Page from "@/components/page/Page"; // Corrected import path
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import api from "@/api";
+import Button from "@/components/base/Button";
+import DefaultHeader from "@/components/layout/DefaultHeader";
+import Page from "@/components/page/Page";
+import { useAuthStore } from "@/stores/AuthenticationStore";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 const InviteAcceptPage = () => {
-  const navigate = useNavigate();
+  /* ──────────────────────────────── 라우터 훅 */
   const { inviteCode } = useParams<{ inviteCode: string }>();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch invite details query
-  const {
-    data: inviteInfo,
-    isLoading: isLoadingInvite,
-    error: inviteError,
-  } = useQuery<InviteDetails, Error>({
-    queryKey: ["fetchInviteDetails", inviteCode],
-    queryFn: () => {
-      if (!inviteCode) {
-        // Throw an error or return a rejected promise if inviteCode is missing
-        return Promise.reject(new Error("초대 코드가 없습니다."));
-      }
-      return api.diaryBook.fetchInviteDetailsByCode(inviteCode);
-    },
-    enabled: !!inviteCode, // Only run query if inviteCode exists
-    retry: false, // Do not retry on error (e.g., invalid code)
-  });
+  /* ──────────────────────────────── 로그인 확인 */
+  const { context } = useAuthStore();
+  const user = context?.user;
 
-  // Accept invitation mutation
+  useEffect(() => {
+    /* 로그인 안 돼 있으면 /login 으로 보내고, 로그인 후 다시 돌아오게 함 */
+    if (!user) {
+      navigate("/login", {
+        replace: true,
+        state: { from: location.pathname + location.search },
+      });
+    }
+  }, [user, navigate, location]);
+
+  /* ──────────────────────────────── 링크에 실어둔 정보 */
+  const diaryName = params.get("diaryName") ?? "다이어리";
+  const inviter = params.get("inviter") ?? "누군가";
+
+  /* ──────────────────────────────── 초대 수락 API */
   const acceptMutation = useMutation({
-    mutationFn: (code: string) => api.diaryBook.acceptInvitationCode(code),
-    onSuccess: (data) => {
-      // data likely contains DiaryBookMemer info
-      alert("초대를 수락했습니다!");
-      // Navigate to the diary page using the diaryId from inviteInfo
-      // Ensure inviteInfo is available before navigating
-      if (inviteInfo?.diaryId) {
-        navigate(`/diary/${inviteInfo.diaryId}`);
-      } else {
-        // Fallback navigation if diaryId is somehow missing
-        navigate("/main");
-      }
+    mutationFn: () => api.diaryBook.acceptInvitationCode(inviteCode!),
+    onSuccess: (res) => {
+      // DiaryBookMemer 타입에는 diaryBookId 숫자만 있음
+      navigate(`/diary/${res.diaryBookId}`);
     },
-    onError: (error) => {
-      console.error("초대 수락 실패:", error);
-      alert(`초대 수락 중 오류가 발생했습니다: ${error.message}`);
-    },
+    onError: (e: Error) => alert(`초대 수락 실패: ${e.message}`),
   });
 
-  // --- Event Handlers ---
-
-  const handleAccept = () => {
-    if (!inviteCode || acceptMutation.isPending) return;
-    acceptMutation.mutate(inviteCode);
-  };
-
-  // Decline simply navigates away
-  const handleDecline = () => {
-    if (acceptMutation.isPending) return; // Prevent navigation during accept processing
-    alert("초대를 거절했습니다.");
-    navigate("/main"); // Navigate to the main page
-  };
-
-  // --- Render Logic ---
-
-  const renderContent = () => {
-    if (isLoadingInvite) {
-      return (
-        <div className={"flex flex-col items-center justify-center py-10"}>
-          <p className={"mt-2 text-gray-500"}>초대 정보를 확인하는 중...</p>
-        </div>
-      );
-    }
-
-    // Handle specific error for missing code (though enabled should prevent this)
-    if (!inviteCode) {
-      return (
-        <div className={"text-center py-6"}>
-          <p className={"text-red-500 font-medium mb-4"}>오류 발생</p>
-          <p className={"text-gray-600 mb-6"}>
-            유효하지 않은 접근입니다. 초대 코드가 없습니다.
-          </p>
-          <Button onClick={() => navigate("/main")} variant={"secondary"}>
-            메인으로 돌아가기
-          </Button>
-        </div>
-      );
-    }
-
-    // Handle API errors (invalid code, network issues, etc.)
-    if (inviteError) {
-      return (
-        <div className={"text-center py-6"}>
-          <p className={"text-red-500 font-medium mb-4"}>오류 발생</p>
-          <p className={"text-gray-600 mb-6"}>
-            {inviteError.message ||
-              "초대 정보를 불러오는데 실패했습니다. 코드가 만료되었거나 유효하지 않을 수 있습니다."}
-          </p>
-          <Button onClick={() => navigate("/main")} variant={"secondary"}>
-            메인으로 돌아가기
-          </Button>
-        </div>
-      );
-    }
-
-    // Display invite details and action buttons
-    if (inviteInfo) {
-      return (
-        <div className={"text-center"}>
-          <h2 className={"text-lg font-medium mb-2"}>다이어리 초대</h2>
-          <p className={"text-gray-600 mb-4"}>
-            <span className={"font-semibold"}>{inviteInfo.inviterName}</span>
-            님이
-            <br />
-            <span className={"font-semibold text-blue-600"}>
-              "{inviteInfo.diaryName}"
-            </span>{" "}
-            다이어리에 초대했습니다.
-          </p>
-          <p className={"text-sm text-gray-500 mb-6"}>
-            초대를 수락하면 해당 다이어리의 멤버가 되어 함께 기록하고 열람할 수
-            있습니다.
-          </p>
-          <div className={"flex justify-center gap-3"}>
-            <Button
-              onClick={handleAccept}
-              disabled={acceptMutation.isPending} // Disable while processing
-              className={"w-24"}
-            >
-              {acceptMutation.isPending ? "처리중..." : "수락"}
-            </Button>
-            <Button
-              variant={"secondary"}
-              onClick={handleDecline}
-              disabled={acceptMutation.isPending} // Disable while processing accept
-              className={"w-24"}
-            >
-              거절
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    // Fallback if no data, no error, no loading (should not happen ideally)
-    return (
-      <p className={"text-center text-gray-500 py-10"}>
-        초대 정보를 표시할 수 없습니다.
-      </p>
-    );
-  };
-
+  /* ──────────────────────────────── 렌더 */
   return (
     <Page.Container>
       <DefaultHeader logoType={"default"} />
       <Page.Content className={"px-6 py-8 flex justify-center items-center"}>
-        <div className={"w-full max-w-md p-6 bg-white rounded-lg shadow-md"}>
-          {" "}
-          {/* Added card styling */}
-          {renderContent()}
+        <div
+          className={
+            "w-full max-w-md p-6 bg-white rounded-lg shadow-md text-center"
+          }
+        >
+          <h2 className={"text-lg font-medium mb-2"}>다이어리 초대</h2>
+
+          {!user ? (
+            <p className={"text-gray-500 py-10"}>로그인 페이지로 이동 중...</p>
+          ) : (
+            <>
+              <p className={"text-gray-600 mb-6"}>
+                <span className={"font-semibold"}>{inviter}</span> 님이
+                <br />
+                <span className={"font-semibold text-blue-600"}>
+                  “{diaryName}”
+                </span>{" "}
+                다이어리에 초대했습니다.
+              </p>
+
+              <div className={"flex justify-center gap-3"}>
+                <Button
+                  onClick={() => acceptMutation.mutate()}
+                  disabled={acceptMutation.isPending}
+                  className={"w-24"}
+                >
+                  {acceptMutation.isPending ? "처리중..." : "수락"}
+                </Button>
+                <Button
+                  variant={"secondary"}
+                  onClick={() => navigate("/main")}
+                  disabled={acceptMutation.isPending}
+                  className={"w-24"}
+                >
+                  거절
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </Page.Content>
     </Page.Container>

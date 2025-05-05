@@ -96,18 +96,21 @@ const DiaryMemberPage = () => {
   });
 
   // Generate invite link mutation
+  // ✅ 수정 부분만 발췌
   const generateInviteMutation = useMutation({
     mutationFn: () => api.diaryBook.createInviteCode(diaryBookId),
     onSuccess: (data) => {
-      // InvitationCode 타입에 따라 inviteCode 사용 및 경로 수정
-      const fullInviteLink = `${window.location.origin}/code-invite/${data.inviteCode}`; // Construct full link using inviteCode and updated path
+      const { inviteCode, diaryBook } = data;
+      const inviter = authStore.context!.user!.nickName;
+
+      const fullInviteLink =
+        `${window.location.origin}/code-invite/${inviteCode}` +
+        `?diaryName=${encodeURIComponent(diaryBook.title)}` +
+        `&inviter=${encodeURIComponent(inviter)}`;
+
       setInviteLink(fullInviteLink);
-      setIsGeneratingInvite(true); // Show the link section
-      setIsLinkCopied(false); // Reset copied status
-    },
-    onError: (error) => {
-      console.error("Failed to generate invite link:", error);
-      alert(`초대 링크 생성 실패: ${error.message}`);
+      setIsGeneratingInvite(true);
+      setIsLinkCopied(false);
     },
   });
 
