@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from "motion/react";
+
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   open: boolean;
   onClose: () => void;
@@ -15,29 +17,43 @@ const Modal: React.FC<ModalProps> = ({
   ...props
 }) => {
   return (
-    <div
-      {...props}
-      className={`fixed inset-0 flex items-center justify-center z-50 ${open ? "block" : "hidden"}`}
-      onClick={onClose}
-    >
-      {/* 배경 오버레이 */}
-      <div className={"absolute inset-0 bg-black opacity-50"} />
-      {/* 모달 창 */}
-      <div
-        className={
-          "relative text-center rounded-xl pt-10 pb-8 px-12 w-4/5 bg-white"
-        }
-        onClick={(e) => e.stopPropagation()}
-      >
-        {title && <h2 className={"text-xl font-bold"}>{title}</h2>}
-        {description && (
-          <p className={"text-gray-600"} style={{ whiteSpace: "pre-wrap" }}>
-            {description}
-          </p>
-        )}
-        <div className={""}>{children}</div>
-      </div>
-    </div>
+    <AnimatePresence>
+      {open && (
+        <div
+          {...props}
+          className={"fixed inset-0 flex items-center justify-center z-50"}
+          onClick={onClose}
+        >
+          {/* 배경 오버레이 */}
+          <motion.div
+            className={"absolute inset-0 bg-black opacity-50"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          />
+          {/* 모달 창 */}
+          <motion.div
+            className={
+              "relative text-center rounded-xl pt-10 pb-8 px-12 w-4/5 bg-white"
+            }
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {title && <h2 className={"text-xl font-bold"}>{title}</h2>}
+            {description && (
+              <p className={"text-gray-600"} style={{ whiteSpace: "pre-wrap" }}>
+                {description}
+              </p>
+            )}
+            <div className={""}>{children}</div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
 
