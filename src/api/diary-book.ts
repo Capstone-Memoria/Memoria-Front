@@ -13,11 +13,16 @@ export const fetchMyDiaryBook = async (PageParam: PageParam) => {
   return response.data;
 };
 
-// interface DiaryBookCreateRequest {
-//   title: string;
-// }
+interface DiaryBookCreateRequest {
+  title: string;
+  coverImage: File;
+}
 
-export const createDiaryBook = async (formData: FormData) => {
+export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
+  const formData = new FormData();
+  formData.append("title", request.title);
+  formData.append("coverImage", request.coverImage);
+
   const response = await server.post<DiaryBook>("api/diary-book", formData);
 
   return response.data;
@@ -31,15 +36,24 @@ export const fetchDiaryBookById = async (diaryBookId: number) => {
   return response.data;
 };
 
-// interface DiaryBookUpdateRequest {
-//   title?: string;
-//   isPinned?: boolean;
-//   coverImage?: string;
-// }
+interface DiaryBookUpdateRequest {
+  title?: string;
+  isPinned?: boolean;
+  coverImage?: File;
+}
 
-export const updateDiaryBook = async (formData: FormData) => {
+export const updateDiaryBook = async (
+  diaryBookId: number,
+  request: DiaryBookUpdateRequest
+) => {
+  const formData = new FormData();
+  if (request.title) formData.append("title", request.title);
+  if (request.isPinned)
+    formData.append("isPinned", request.isPinned.toString());
+  if (request.coverImage) formData.append("coverImage", request.coverImage);
+
   const response = await server.patch<DiaryBook>(
-    `/api/diary-book/${formData.get("diaryBookId")}`,
+    `/api/diary-book/${diaryBookId}`,
     formData
   );
   return response.data;

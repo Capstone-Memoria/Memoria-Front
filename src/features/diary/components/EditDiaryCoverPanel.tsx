@@ -14,13 +14,18 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
   isSaving = false,
   ...props
 }) => {
+  //TODO: 일기장 커버 스타일 목록 가져오기
   return (
     <div {...props}>
       <div className={"mt-2 px-6"}>
         <p className={"text-sm font-normal"}>
           일기장 커버 스타일을 다시 선택해주세요.
         </p>
-        <DiaryCoverCarousel className={"w-fit h-full py-8"} />
+        <DiaryCoverCarousel
+          items={[]}
+          className={"w-fit h-full py-8"}
+          onSelectChange={() => {}}
+        />
       </div>
       <div className={"flex gap-8 justify-center mt-5"}>
         <Button

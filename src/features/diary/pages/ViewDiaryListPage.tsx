@@ -69,7 +69,12 @@ const ViewDiaryListPage = () => {
             diaryBookId: updateFormData.get("diaryBookId"),
             isPinned: updateFormData.get("isPinned"),
           });
-          await api.diaryBook.updateDiaryBook(updateFormData); // isPinned 업데이트 요청
+          await api.diaryBook.updateDiaryBook(
+            Number(diaryBookId),
+            {
+              isPinned: !isPinned,
+            }
+          );
           setIsPinned(!isPinned);
         } catch (e) {
           console.error("즐겨찾기 업데이트 실패", e);

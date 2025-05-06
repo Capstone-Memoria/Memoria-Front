@@ -33,33 +33,34 @@ const ManageDiaryPage = () => {
   });
 
   const { mutate: tryUpdateDiaryBook, isPending: isSaving } = useMutation({
-    // mutationFn은 FormData를 인자로 받도록 수정
-    mutationFn: (formData: FormData) => api.diaryBook.updateDiaryBook(formData),
+    mutationFn: (request: {
+      title?: string;
+      isPinned?: boolean;
+      coverImage?: File;
+    }) => {
+      if (!diaryId) throw new Error("Diary ID is missing!");
+      return api.diaryBook.updateDiaryBook(Number(diaryId), request);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["fetchDiaryBookById", diaryId], // diaryId를 포함한 queryKey 무효화
+        queryKey: ["fetchDiaryBookById", diaryId],
       });
-      // 필요하다면 성공 알림 표시
       setOpenedPanel(""); // 성공 시 패널 닫기
     },
     onError: (error) => {
       console.error("일기장 업데이트 실패:", error);
-      // 필요하다면 에러 알림 표시
     },
   });
 
   const { mutate: tryDelete, isPending: isDeleting } = useMutation({
-    // isPending 변수명 변경 (isSaving과 충돌 방지)
     mutationFn: () => api.diaryBook.deleteDiaryBook(Number(diaryId)),
     onSuccess: () => {
-      // 삭제 성공 시 캐시 무효화보다는 제거가 더 적절할 수 있음
       queryClient.removeQueries({ queryKey: ["fetchDiaryBookById", diaryId] });
-      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] }); // 목록 캐시 무효화 (선택 사항)
-      navigate("/main"); // 또는 다른 적절한 경로로 이동
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
+      navigate("/main");
     },
     onError: (error) => {
       console.error("일기장 삭제 실패:", error);
-      // 필요하다면 에러 알림 표시
     },
   });
 
@@ -67,7 +68,7 @@ const ManageDiaryPage = () => {
   const [openedPanel, setOpenedPanel] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null); // 커버 이미지 파일 상태 추가
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -85,11 +86,10 @@ const ManageDiaryPage = () => {
       console.error("Diary ID is missing!");
       return;
     }
-    const formData = new FormData();
-    formData.append("diaryBookId", diaryId);
-    formData.append("title", title);
 
-    tryUpdateDiaryBook(formData);
+    tryUpdateDiaryBook({
+      title,
+    });
   };
 
   const handleCoverSave = () => {
@@ -98,12 +98,10 @@ const ManageDiaryPage = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("diaryBookId", diaryId);
-    formData.append("coverImage", coverImageFile);
-
-    tryUpdateDiaryBook(formData);
-    setCoverImageFile(null); // 커버 이미지 파일 초기화
+    tryUpdateDiaryBook({
+      coverImage: coverImageFile,
+    });
+    setCoverImageFile(null);
   };
 
   return (

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/className";
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import Image from "../base/Image";
 
@@ -10,6 +10,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   coverColor?: string;
   imageSrc?: string;
   imageId?: string;
+  imageFile?: File;
   title?: string;
 }
 
@@ -20,9 +21,25 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
   notificationCount,
   imageSrc,
   imageId,
+  imageFile,
   title = "Diary Cover",
   ...props
 }) => {
+  const [fileObjectUrl, setFileObjectUrl] = useState<string | null>(null);
+
+  // File 객체가 주어졌을 때 URL 생성
+  useEffect(() => {
+    if (imageFile) {
+      const objectUrl = URL.createObjectURL(imageFile);
+      setFileObjectUrl(objectUrl);
+
+      // 컴포넌트 언마운트 시 URL 해제
+      return () => {
+        URL.revokeObjectURL(objectUrl);
+      };
+    }
+  }, [imageFile]);
+
   const handleImageLoad = () => {
     // 이미지 로드 성공 시 동작
     console.log("Image loaded successfully");
@@ -49,7 +66,15 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
             coverColor
           )}
         />
-        {imageSrc || imageId ? ( // imageSrc 또는 imageId 둘 중 하나라도 있다면
+        {fileObjectUrl ? ( // File 객체로부터 생성된 URL이 있을 경우
+          <img
+            src={fileObjectUrl}
+            className={"flex-1 h-full object-cover"}
+            alt={`${title} cover image`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
+        ) : imageSrc || imageId ? ( // imageSrc 또는 imageId 둘 중 하나라도 있다면
           imageSrc ? ( // imageSrc가 있다면 표준 img 태그 사용
             <img
               src={imageSrc}
@@ -70,7 +95,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
             />
           )
         ) : (
-          // imageSrc도 imageId도 둘 다 없다면 기본 배경 div 사용
+          // 어떤 이미지 소스도 없다면 기본 배경 div 사용
           <div className={"size-full bg-green-200"}></div>
         )}
       </div>
