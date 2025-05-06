@@ -39,6 +39,18 @@ const MainPage = () => {
     return [];
   }, [tab, data]);
 
+  /* coverColor 랜덤한 색상으로 하나의 아이템마다 다르게 바꾸기 */
+  const randomColor = useMemo(() => {
+    const colors = [
+      "bg-red-200",
+      "bg-blue-200",
+      "bg-green-200",
+      "bg-yellow-200",
+      "bg-purple-200",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }, []);
+
   return (
     <Page.Container>
       <DefaultHeader />
@@ -113,6 +125,7 @@ const MainPage = () => {
                         pinned={diaryBook.isPinned ?? false}
                         notificationCount={120}
                         coverImage={diaryBook.coverImage}
+                        coverColor={randomColor}
                       />
                     ))}
               </div>
@@ -141,8 +154,9 @@ const MainPage = () => {
                           title={diaryBook.title}
                           memberCount={1}
                           pinned={diaryBook.isPinned ?? false}
-                          notificationCount={1}
+                          notificationCount={120}
                           coverImage={diaryBook.coverImage}
+                          coverColor={randomColor}
                         />
                       ))}
                 {(data?.content ?? []).filter((book) => book.isPinned)

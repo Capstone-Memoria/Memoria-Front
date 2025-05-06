@@ -1,13 +1,16 @@
 import { cn } from "@/lib/utils/className";
 import { HTMLAttributes } from "react";
 import { FaStar } from "react-icons/fa";
+import Image from "../base/Image";
 
 interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   pinned?: boolean;
   showPin?: boolean;
   notificationCount?: number;
   coverColor?: string;
-  imageSrc?: string | null;
+  imageSrc?: string;
+  imageId?: string;
+  title?: string;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
@@ -16,8 +19,20 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
   coverColor = "bg-green-500",
   notificationCount,
   imageSrc,
+  imageId,
+  title = "Diary Cover",
   ...props
 }) => {
+  const handleImageLoad = () => {
+    // 이미지 로드 성공 시 동작
+    console.log("Image loaded successfully");
+  };
+
+  const handleImageError = () => {
+    // 이미지 로드 실패 시 동작
+    console.error("Failed to load image");
+  };
+
   return (
     // 1. 바깥쪽 div: 크기(w, h)와 상대 위치(relative)만 담당
     <div {...props} className={cn("w-22 h-32 relative", props.className)}>
@@ -34,18 +49,32 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
             coverColor
           )}
         />
-
-        {/* 이미지가 있을 경우에만 렌더링 */}
-        {imageSrc && (
-          <img
-            src={imageSrc}
-            className={"flex-1 h-full object-cover"} // 이미지 스타일 유지
-            alt={"Diary cover"}
-          />
+        {imageSrc || imageId ? ( // imageSrc 또는 imageId 둘 중 하나라도 있다면
+          imageSrc ? ( // imageSrc가 있다면 표준 img 태그 사용
+            <img
+              src={imageSrc}
+              className={"flex-1 h-full object-cover"}
+              alt={`${title} cover image`}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          ) : (
+            // imageSrc는 없고 imageId만 있다면 custom Image 컴포넌트 사용
+            <Image
+              className={"flex-1 h-full"}
+              imageId={imageId}
+              imageClassName={"object-cover"}
+              alt={`${title} cover image`}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          )
+        ) : (
+          // imageSrc도 imageId도 둘 다 없다면 기본 배경 div 사용
+          <div className={"size-full bg-green-200"}></div>
         )}
-      </div>{" "}
-      {/* 내부 래퍼 div 끝 */}
-      {/* 3. Absolute 위치 요소들: 바깥쪽 div 기준으로 위치하여 잘리지 않음 */}
+      </div>
+
       {showPin && pinned ? (
         <div
           className={

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/className";
 import { AttachedFile } from "@/models/AttachedFile";
 import { HTMLAttributes } from "react";
-import DiaryCover from "./DiaryCover"; // DiaryCover 컴포넌트 import 확인
+import DiaryCover from "./DiaryCover";
 
 interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -9,6 +9,7 @@ interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   pinned: boolean;
   notificationCount: number;
   coverImage?: AttachedFile | null;
+  coverColor?: string;
 }
 
 const DiaryBook: React.FC<DiaryBookProps> = ({
@@ -17,15 +18,10 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
   pinned,
   notificationCount,
   coverImage,
+  coverColor,
   ...props
 }) => {
-  let imageUrl: string;
-
-  if (coverImage && coverImage.id) {
-    imageUrl = `/api/files/image/${coverImage.id}`;
-  } else {
-    imageUrl = "/images/default-diary-cover.png";
-  }
+  const imageIdToPass = coverImage?.id;
 
   return (
     <div
@@ -40,7 +36,9 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
         pinned={pinned}
         notificationCount={notificationCount}
         // DiaryCover에는 최종적으로 생성된 이미지 URL(문자열)을 전달
-        imageSrc={imageUrl}
+        imageId={imageIdToPass}
+        title={title}
+        coverColor={coverColor}
       />
       <p className={"text-[13px] font-medium"}>{title}</p>
       <p className={"text-[11px] font-light text-gray-1"}>
