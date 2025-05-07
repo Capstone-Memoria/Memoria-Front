@@ -1,4 +1,5 @@
 import api from "@/api";
+import { StickerItem } from "@/api/diary-book";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import DiaryCoverCarousel, {
@@ -14,6 +15,7 @@ import { FaMagic } from "react-icons/fa";
 import { MdUpload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
+import { DiaryDecorateDialog } from "../components/DiaryDecorateDialog";
 
 import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
 import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
@@ -57,9 +59,11 @@ const CreateDiaryPage = () => {
     0
   );
   const [createCoverDrawerOpen, setCreateCoverDrawerOpen] = useState(false);
+  const [decorateDialogOpen, setDecorateDialogOpen] = useState(false);
   const [selectedCover, setSelectedCover] = useState<DiaryCoverItem | null>(
     DIARY_COVER_PRESETS[0]
   );
+  const [stickers, setStickers] = useState<StickerItem[]>([]);
 
   const [diaryCoverItems, setDiaryCoverItems] =
     useState<DiaryCoverItem[]>(DIARY_COVER_PRESETS);
@@ -91,6 +95,12 @@ const CreateDiaryPage = () => {
   };
 
   const handleUploadButtonClick = () => fileInputRef.current?.click();
+
+  // 스티커 저장 핸들러
+  const handleSaveStickers = (newStickers: StickerItem[]) => {
+    setStickers(newStickers);
+    console.log("저장된 스티커:", newStickers);
+  };
 
   /* Server Side */
   const {
@@ -127,6 +137,7 @@ const CreateDiaryPage = () => {
       return api.diaryBook.createDiaryBook({
         title: diaryTitle,
         coverImage: coverImageFile,
+        stickers: stickers.length > 0 ? stickers : undefined,
       });
     },
     onSuccess: () => navigate("/main"),
@@ -198,11 +209,31 @@ const CreateDiaryPage = () => {
             <MdUpload className={"text-base"} /> 사진 업로드
           </Button>
         </div>
+
+        {/* 꾸미기 버튼 추가 */}
+        {selectedCover && (
+          <Button
+            className={"w-full mt-4"}
+            onClick={() => setDecorateDialogOpen(true)}
+            variant={"primary"}
+          >
+            스티커로 꾸미기
+          </Button>
+        )}
+
         {error && (
           <p className={"text-red-500 text-sm mt-4 text-center"}>
             오류: {error instanceof Error ? error.message : "알 수 없는 오류"}
           </p>
         )}
+
+        {/* 일기장 꾸미기 다이얼로그 */}
+        <DiaryDecorateDialog
+          open={decorateDialogOpen}
+          onOpenChange={setDecorateDialogOpen}
+          selectedCover={selectedCover}
+          onSave={handleSaveStickers}
+        />
       </Page.Content>
     </Page.Container>
   );
