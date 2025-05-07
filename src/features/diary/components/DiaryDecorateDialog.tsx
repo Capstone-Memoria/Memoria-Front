@@ -5,7 +5,12 @@ import {
   PresetDiaryCoverItem,
   UploadedDiaryCoverItem,
 } from "@/components/diary/DiaryCoverCarousel";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -139,17 +144,42 @@ export const DiaryDecorateDialog = ({
     const updateContainerSize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        setContainerSize({ width, height });
+        if (width > 1 && height > 1) {
+          console.log(
+            "Container size updated (useEffect - open/resize):",
+            width,
+            height
+          );
+          setContainerSize({ width, height });
+        }
       }
     };
 
-    updateContainerSize();
-    window.addEventListener("resize", updateContainerSize);
+    if (open) {
+      // 다이얼로그가 열린 후 크기 측정 (애니메이션 시간 고려)
+      const timer = setTimeout(() => {
+        updateContainerSize();
+      }, 150); // 다이얼로그 애니메이션 시간과 유사하게 설정
+      return () => clearTimeout(timer);
+    }
+  }, [open]); // open 상태가 변경될 때마다 실행
 
-    return () => {
-      window.removeEventListener("resize", updateContainerSize);
+  // 창 크기 변경 시 컨테이너 크기 업데이트
+  useEffect(() => {
+    const updateContainerSizeOnResize = () => {
+      if (open && containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        if (width > 1 && height > 1) {
+          console.log("Container size updated (window resize):", width, height);
+          setContainerSize({ width, height });
+        }
+      }
     };
-  }, []);
+    window.addEventListener("resize", updateContainerSizeOnResize);
+    return () => {
+      window.removeEventListener("resize", updateContainerSizeOnResize);
+    };
+  }, [open]);
 
   // 최근 사용한 스티커 로드
   useEffect(() => {
@@ -206,31 +236,73 @@ export const DiaryDecorateDialog = ({
   };
 
   // 스티커 위치 제한 함수
-  const constrainPosition = (
-    x: number,
-    y: number,
-    scale: number = 1
-  ): { x: number; y: number } => {
-    // 스티커의 실제 크기 계산 (기본 크기 64px에 scale 적용)
-    const stickerWidth = 64 * scale;
-    const stickerHeight = 64 * scale;
+  const constrainPosition = useCallback(
+    (x: number, y: number, scale: number = 1): { x: number; y: number } => {
+      console.log("constrainPosition 입력값:", { x, y, scale });
+      console.log("constrainPosition 현재 containerSize:", containerSize);
 
-    // 컨테이너 크기 대비 스티커 크기의 비율 계산
-    const stickerWidthPercent = (stickerWidth / containerSize.width) * 100;
-    const stickerHeightPercent = (stickerHeight / containerSize.height) * 100;
+      // 무한대 값 확인
+      if (!isFinite(x) || !isFinite(y)) {
+        console.log("constrainPosition: 무한대 값 감지됨, 기본값으로 설정");
+        return { x: 50, y: 50 }; // 기본값으로 중앙 위치 반환
+      }
 
-    // 스티커의 중심점이 이동할 수 있는 최소/최대 범위 계산
-    const minX = stickerWidthPercent / 2;
-    const maxX = 100 - stickerWidthPercent / 2;
-    const minY = stickerHeightPercent / 2;
-    const maxY = 100 - stickerHeightPercent / 2;
+      // 컨테이너 크기가 유효한지 확인
+      const currentContainerWidth = containerSize.width;
+      const currentContainerHeight = containerSize.height;
 
-    // 위치 제한 적용
-    return {
-      x: Math.max(minX, Math.min(maxX, x)),
-      y: Math.max(minY, Math.min(maxY, y)),
-    };
-  };
+      if (currentContainerWidth <= 1 || currentContainerHeight <= 1) {
+        console.log(
+          "constrainPosition: 컨테이너 크기가 유효하지 않음, 기본값 반환",
+          currentContainerWidth,
+          currentContainerHeight
+        );
+        return { x: 50, y: 50 };
+      }
+
+      // 스티커의 실제 크기 계산 (기본 크기 64px에 scale 적용)
+      const stickerWidth = 64 * scale;
+      const stickerHeight = 64 * scale;
+      console.log("스티커 크기:", stickerWidth, stickerHeight);
+
+      // 컨테이너 크기 대비 스티커 크기의 비율 계산
+      const stickerWidthPercent = (stickerWidth / currentContainerWidth) * 100;
+      const stickerHeightPercent =
+        (stickerHeight / currentContainerHeight) * 100;
+      console.log(
+        "스티커 크기 (%):",
+        stickerWidthPercent,
+        stickerHeightPercent
+      );
+
+      if (!isFinite(stickerWidthPercent) || !isFinite(stickerHeightPercent)) {
+        console.log("스티커 크기 백분율이 무한대, 기본값으로 설정");
+        return { x: 50, y: 50 };
+      }
+
+      // 스티커의 중심점이 이동할 수 있는 최소/최대 범위 계산
+      const minX = stickerWidthPercent / 2;
+      const maxX = 100 - stickerWidthPercent / 2;
+      const minY = stickerHeightPercent / 2;
+      const maxY = 100 - stickerHeightPercent / 2;
+      console.log("위치 제한 (min/max):");
+      console.log("minX:", minX, "maxX:", maxX);
+      console.log("minY:", minY, "maxY:", maxY);
+
+      // 위치 제한 적용
+      const constrainedX = Math.max(minX, Math.min(maxX, x));
+      const constrainedY = Math.max(minY, Math.min(maxY, y));
+      console.log("제한된 위치 (계산됨):", constrainedX, constrainedY);
+
+      // 무한대 값 다시 확인
+      const finalX = isFinite(constrainedX) ? constrainedX : 50;
+      const finalY = isFinite(constrainedY) ? constrainedY : 50;
+      console.log("최종 반환 위치:", { x: finalX, y: finalY });
+
+      return { x: finalX, y: finalY };
+    },
+    [containerSize] // containerSize가 변경될 때마다 이 함수도 새로 생성되도록 의존성 추가
+  );
 
   // 스티커 선택 함수
   const handleStickerSelect = (
@@ -239,21 +311,30 @@ export const DiaryDecorateDialog = ({
   ) => {
     e.stopPropagation();
     setSelectedStickerId(id);
+    console.log("스티커 선택됨:", id);
+
     // 선택된 스티커의 z-index를 최상위로 변경
-    setStickers(
-      stickers.map((sticker) =>
+    setStickers((prevStickers) => {
+      const maxZIndex =
+        Math.max(...prevStickers.map((s) => s.zIndex || 0), 0) + 1;
+      console.log("새 z-index:", maxZIndex);
+
+      return prevStickers.map((sticker) =>
         sticker.id === id
           ? {
               ...sticker,
-              zIndex: Math.max(...stickers.map((s) => s.zIndex), 0) + 1,
+              zIndex: maxZIndex,
             }
           : sticker
-      )
-    );
+      );
+    });
   };
 
   // 스티커 삭제 함수
-  const handleDeleteSticker = (id: string, e: React.MouseEvent) => {
+  const handleDeleteSticker = (
+    id: string,
+    e: React.MouseEvent | React.TouchEvent
+  ) => {
     e.stopPropagation();
     const newStickers = stickers.filter((sticker) => sticker.id !== id);
 
@@ -274,21 +355,21 @@ export const DiaryDecorateDialog = ({
       stickerId: string,
       mode: StickerMode
     ) => {
-      if ("touches" in e) {
-        // 터치 이벤트의 경우 preventDefault 호출하지 않음
-        e.stopPropagation();
-      } else {
-        // 마우스 이벤트의 경우에만 preventDefault 호출
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      console.log(`드래그 시작: mode=${mode}, stickerId=${stickerId}`);
 
-      setIsDragging(true);
+      // 모바일에서는 preventDefault 호출 안함
+      if (!("touches" in e)) {
+        e.preventDefault();
+      }
+      e.stopPropagation();
+
+      // 드래그 시작 시 해당 스티커 선택
       setSelectedStickerId(stickerId);
       setDragMode(mode);
 
       const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
       const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      console.log("시작 좌표:", clientX, clientY);
 
       dragStartRef.current = { x: clientX, y: clientY };
 
@@ -301,56 +382,107 @@ export const DiaryDecorateDialog = ({
           rotation: sticker.rotation,
           scale: sticker.scale,
         };
+        console.log("초기 스티커 상태:", stickerInitialStateRef.current);
+
+        // z-index 최상위로 설정
+        setStickers((prevStickers) => {
+          const maxZIndex =
+            Math.max(...prevStickers.map((s) => s.zIndex || 0), 0) + 1;
+          return prevStickers.map((s) =>
+            s.id === stickerId ? { ...s, zIndex: maxZIndex } : s
+          );
+        });
       }
+
+      // 이벤트 핸들러 등록 전에 isDragging 상태 설정
+      setIsDragging(true);
     },
     [stickers]
   );
 
   // 드래그 이동 핸들러
   const handleDragMove = useCallback(
-    (e: React.MouseEvent | React.TouchEvent | TouchEvent | MouseEvent) => {
-      if (
-        !isDragging ||
-        !selectedStickerId ||
-        !dragMode ||
-        !stickerInitialStateRef.current
-      )
+    (e: TouchEvent | MouseEvent) => {
+      if (!selectedStickerId || !dragMode || !stickerInitialStateRef.current) {
+        console.log("드래그 이동 조건 불충족:", {
+          selectedStickerId,
+          dragMode,
+        });
         return;
-
-      if ("stopPropagation" in e) {
-        e.stopPropagation();
       }
 
-      const clientX =
-        "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-      const clientY =
-        "touches" in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+      // 클라이언트 좌표 가져오기
+      let clientX, clientY;
+      if ("touches" in e) {
+        if (e.touches.length === 0) return; // 터치 이벤트가 없으면 리턴
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      if (!dragStartRef.current) {
+        console.log("dragStartRef.current is null in handleDragMove");
+        return;
+      }
 
       const deltaX = clientX - dragStartRef.current.x;
       const deltaY = clientY - dragStartRef.current.y;
+      console.log(`드래그 이동: deltaX=${deltaX}, deltaY=${deltaY}`);
 
       const containerElement = containerRef.current;
-      if (!containerElement) return;
+      if (!containerElement) {
+        console.log("컨테이너 요소가 없음");
+        return;
+      }
 
       const containerRect = containerElement.getBoundingClientRect();
+      console.log(
+        "컨테이너 크기 (handleDragMove):",
+        containerRect.width,
+        containerRect.height
+      );
 
-      const moveFactorX = 100 / containerRect.width;
-      const moveFactorY = 100 / containerRect.height;
+      if (containerRect.width <= 1 || containerRect.height <= 1) {
+        console.log("컨테이너 크기가 너무 작습니다 (handleDragMove)");
+        return;
+      }
 
-      setStickers(
-        stickers.map((sticker) => {
+      // 안전한 이동 계수 계산
+      const moveFactorX = 100 / Math.max(1, containerRect.width);
+      const moveFactorY = 100 / Math.max(1, containerRect.height);
+      console.log("이동 계수:", moveFactorX, moveFactorY);
+
+      // 스티커 업데이트
+      setStickers((prevStickers) => {
+        const updatedStickers = prevStickers.map((sticker) => {
           if (sticker.id !== selectedStickerId) return sticker;
 
+          let updatedSticker;
           switch (dragMode) {
             case "move": {
+              // 안전하게 새 위치 계산
               const newX =
                 stickerInitialStateRef.current!.x + deltaX * moveFactorX;
               const newY =
                 stickerInitialStateRef.current!.y + deltaY * moveFactorY;
 
+              // 무한대 값 확인
+              const safeX = isFinite(newX)
+                ? newX
+                : stickerInitialStateRef.current!.x;
+              const safeY = isFinite(newY)
+                ? newY
+                : stickerInitialStateRef.current!.y;
+
+              console.log("새 위치 (제한 전):", safeX, safeY);
+
               // 스티커가 컨테이너를 벗어나지 않도록 제한
-              const { x, y } = constrainPosition(newX, newY, sticker.scale);
-              return { ...sticker, x, y };
+              const { x, y } = constrainPosition(safeX, safeY, sticker.scale);
+              console.log("제한된 위치:", x, y);
+              updatedSticker = { ...sticker, x, y };
+              break;
             }
 
             case "rotate": {
@@ -367,11 +499,13 @@ export const DiaryDecorateDialog = ({
               );
 
               const angleDelta = (currentAngle - startAngle) * (180 / Math.PI);
+              console.log("회전 각도:", angleDelta);
 
-              return {
+              updatedSticker = {
                 ...sticker,
                 rotation: stickerInitialStateRef.current!.rotation + angleDelta,
               };
+              break;
             }
 
             case "resize": {
@@ -407,6 +541,7 @@ export const DiaryDecorateDialog = ({
                 0.5,
                 Math.min(3, stickerInitialStateRef.current!.scale * scaleFactor)
               );
+              console.log("새 크기:", newScale);
 
               // 크기 변경 시에도 위치 제한 적용
               const { x, y } = constrainPosition(
@@ -414,68 +549,77 @@ export const DiaryDecorateDialog = ({
                 sticker.y,
                 newScale
               );
-              return { ...sticker, scale: newScale, x, y };
+              updatedSticker = { ...sticker, scale: newScale, x, y };
+              break;
             }
 
             default:
-              return sticker;
+              updatedSticker = sticker;
           }
-        })
-      );
+          return updatedSticker;
+        });
+        return updatedStickers;
+      });
     },
-    [isDragging, selectedStickerId, dragMode, stickers]
+    [selectedStickerId, dragMode, constrainPosition]
   );
 
   // 드래그 종료 핸들러
   const handleDragEnd = useCallback(
-    (e: React.MouseEvent | React.TouchEvent | TouchEvent | MouseEvent) => {
-      if ("stopPropagation" in e) {
-        e.stopPropagation();
+    (e: TouchEvent | MouseEvent) => {
+      console.log("드래그 종료");
+
+      if (!selectedStickerId) {
+        console.log("드래그 종료: 선택된 스티커 없음");
+        setIsDragging(false);
+        setDragMode(null);
+        return;
       }
 
-      if (isDragging && selectedStickerId) {
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push([...stickers]);
-        setHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
-      }
+      // 히스토리에 현재 상태 추가
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push([...stickers]);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
 
+      // 상태 초기화
       setIsDragging(false);
       setDragMode(null);
-      stickerInitialStateRef.current = null;
     },
-    [stickers, history, historyIndex]
+    [stickers, history, historyIndex, selectedStickerId]
   );
 
-  // 전역 이벤트 리스너
+  // 전역 이벤트 리스너 등록
   useEffect(() => {
-    if (isDragging) {
-      const handleGlobalMove = (e: TouchEvent | MouseEvent) => {
+    if (isDragging && selectedStickerId) {
+      console.log("이벤트 리스너 등록 (useEffect)");
+
+      const handleTouchMove = (e: TouchEvent) => {
+        e.preventDefault(); // 스크롤 방지
         handleDragMove(e);
       };
 
-      const handleGlobalEnd = (e: TouchEvent | MouseEvent) => {
-        handleDragEnd(e);
-      };
-
       // 터치 이벤트
-      document.addEventListener("touchmove", handleGlobalMove, {
-        passive: true,
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
       });
-      document.addEventListener("touchend", handleGlobalEnd);
+      document.addEventListener("touchend", handleDragEnd);
+      document.addEventListener("touchcancel", handleDragEnd);
 
       // 마우스 이벤트
-      document.addEventListener("mousemove", handleGlobalMove);
-      document.addEventListener("mouseup", handleGlobalEnd);
+      document.addEventListener("mousemove", handleDragMove);
+      document.addEventListener("mouseup", handleDragEnd);
 
       return () => {
-        document.removeEventListener("touchmove", handleGlobalMove);
-        document.removeEventListener("touchend", handleGlobalEnd);
-        document.removeEventListener("mousemove", handleGlobalMove);
-        document.removeEventListener("mouseup", handleGlobalEnd);
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleDragEnd);
+        document.removeEventListener("touchcancel", handleDragEnd);
+        document.removeEventListener("mousemove", handleDragMove);
+        document.removeEventListener("mouseup", handleDragEnd);
+        console.log("이벤트 리스너 제거 (useEffect)");
       };
     }
-  }, [isDragging, handleDragMove, handleDragEnd]);
+  }, [isDragging, selectedStickerId, handleDragMove, handleDragEnd]);
 
   // 변경사항 저장 함수
   const handleSave = () => {
@@ -513,7 +657,18 @@ export const DiaryDecorateDialog = ({
         className={
           "w-full h-full max-w-none p-0 m-0 rounded-none flex flex-col"
         }
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        aria-labelledby={"dialog-title"}
+        aria-describedby={"dialog-description"}
       >
+        {/* <VisuallyHidden> */}
+        {/* <DialogTitle id={"dialog-title"}>일기장 꾸미기</DialogTitle>
+        <DialogDescription id={"dialog-description"}>
+          다이어리 커버를 스티커로 꾸며보세요.
+        </DialogDescription> */}
+        {/* </VisuallyHidden> */}
+
         {/* 헤더 - 고정 */}
         <div className={"bg-white z-50"}>
           <div className={"flex justify-between items-center p-4"}>
@@ -538,7 +693,9 @@ export const DiaryDecorateDialog = ({
           <div className={"flex items-center justify-center p-10"}>
             <div
               ref={containerRef}
-              className={"relative w-full max-w-[min(60vh,400px)] aspect-[3/4]"}
+              className={
+                "relative w-full max-w-[min(60vh,400px)] aspect-[3/4] bg-gray-200"
+              }
               onClick={() => setSelectedStickerId(null)}
             >
               <DiaryCover
@@ -567,7 +724,9 @@ export const DiaryDecorateDialog = ({
                     left: `${sticker.x}%`,
                     top: `${sticker.y}%`,
                     transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg) scale(${sticker.scale})`,
-                    zIndex: sticker.zIndex,
+                    zIndex: sticker.zIndex || 1,
+                    touchAction: "none",
+                    pointerEvents: "auto",
                   }}
                   onClick={(e) => handleStickerSelect(sticker.id, e)}
                 >
@@ -576,8 +735,6 @@ export const DiaryDecorateDialog = ({
                     className={"relative touch-none"}
                     onMouseDown={(e) => handleDragStart(e, sticker.id, "move")}
                     onTouchStart={(e) => handleDragStart(e, sticker.id, "move")}
-                    onTouchMove={handleDragMove}
-                    onTouchEnd={handleDragEnd}
                   >
                     <img
                       src={sticker.imageUrl}
@@ -592,9 +749,19 @@ export const DiaryDecorateDialog = ({
                         {/* 삭제 버튼 */}
                         <div
                           className={
-                            "absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full shadow flex items-center justify-center hover:bg-red-500 hover:text-white text-red-500 z-20 transform-none"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center hover:bg-red-500 hover:text-white text-red-500 z-20"
                           }
-                          onClick={(e) => handleDeleteSticker(sticker.id, e)}
+                          style={{
+                            top: `-8px`,
+                            right: `-8px`,
+                            transform: `scale(${1 / sticker.scale})`,
+                            transformOrigin: "center",
+                            pointerEvents: "auto",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSticker(sticker.id, e);
+                          }}
                         >
                           <FaTimes size={12} />
                         </div>
@@ -602,16 +769,23 @@ export const DiaryDecorateDialog = ({
                         {/* 회전 컨트롤 */}
                         <div
                           className={
-                            "absolute -top-8 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10 scale-100"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10"
                           }
-                          onMouseDown={(e) =>
-                            handleDragStart(e, sticker.id, "rotate")
-                          }
-                          onTouchStart={(e) =>
-                            handleDragStart(e, sticker.id, "rotate")
-                          }
-                          onTouchMove={handleDragMove}
-                          onTouchEnd={handleDragEnd}
+                          style={{
+                            top: `-32px`,
+                            left: `50%`,
+                            transform: `translateX(-50%) scale(${1 / sticker.scale})`,
+                            transformOrigin: "center",
+                            pointerEvents: "auto",
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "rotate");
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "rotate");
+                          }}
                         >
                           <MdRotate90DegreesCcw size={14} />
                         </div>
@@ -619,16 +793,23 @@ export const DiaryDecorateDialog = ({
                         {/* 크기 조절 컨트롤 */}
                         <div
                           className={
-                            "absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10 scale-100"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10"
                           }
-                          onMouseDown={(e) =>
-                            handleDragStart(e, sticker.id, "resize")
-                          }
-                          onTouchStart={(e) =>
-                            handleDragStart(e, sticker.id, "resize")
-                          }
-                          onTouchMove={handleDragMove}
-                          onTouchEnd={handleDragEnd}
+                          style={{
+                            bottom: `-8px`,
+                            right: `-8px`,
+                            transform: `scale(${1 / sticker.scale})`,
+                            transformOrigin: "center",
+                            pointerEvents: "auto",
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "resize");
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "resize");
+                          }}
                         >
                           <RiZoomInLine size={14} />
                         </div>
@@ -674,8 +855,22 @@ export const DiaryDecorateDialog = ({
         </div>
 
         {/* 스티커 선택 Drawer */}
-        <Drawer open={stickerDrawerOpen} onOpenChange={setStickerDrawerOpen}>
-          <DrawerContent className={"min-h-[70vh] px-4 pb-8"}>
+        <Drawer
+          open={stickerDrawerOpen}
+          onOpenChange={setStickerDrawerOpen}
+          shouldScaleBackground={false}
+        >
+          <DrawerContent
+            className={"min-h-[70vh] px-4 pb-8"}
+            aria-labelledby={"drawer-title"}
+            aria-describedby={"drawer-description"}
+          >
+            {/* <VisuallyHidden> */}
+            <DialogTitle id={"drawer-title"}>스티커 선택</DialogTitle>
+            <DialogDescription id={"drawer-description"}>
+              꾸미기에 사용할 스티커를 선택하세요.
+            </DialogDescription>
+            {/* </VisuallyHidden> */}
             {/* 카테고리 선택 */}
             <div
               className={
@@ -712,10 +907,10 @@ export const DiaryDecorateDialog = ({
                     .map((id) => STICKER_DATA.find((s) => s.id === id))
                     .filter(Boolean)
                     .map((sticker) => (
-                      <button
+                      <div
                         key={sticker!.id}
                         className={
-                          "aspect-square p-2 rounded-lg hover:bg-gray-100"
+                          "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
                         }
                         onClick={() => addSticker(sticker!)}
                         aria-label={`${sticker!.category} 스티커 추가`}
@@ -725,15 +920,15 @@ export const DiaryDecorateDialog = ({
                           alt={"스티커"}
                           className={"w-full h-full object-contain"}
                         />
-                      </button>
+                      </div>
                     ))
                 : STICKER_DATA.filter(
                     (s) => s.category === selectedCategory
                   ).map((sticker) => (
-                    <button
+                    <div
                       key={sticker.id}
                       className={
-                        "aspect-square p-2 rounded-lg hover:bg-gray-100"
+                        "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
                       }
                       onClick={() => addSticker(sticker)}
                       aria-label={`${sticker.category} 스티커 추가`}
@@ -743,7 +938,7 @@ export const DiaryDecorateDialog = ({
                         alt={"스티커"}
                         className={"w-full h-full object-contain"}
                       />
-                    </button>
+                    </div>
                   ))}
             </div>
           </DrawerContent>
