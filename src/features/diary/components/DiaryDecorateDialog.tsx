@@ -5,12 +5,7 @@ import {
   PresetDiaryCoverItem,
   UploadedDiaryCoverItem,
 } from "@/components/diary/DiaryCoverCarousel";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -241,13 +236,11 @@ export const DiaryDecorateDialog = ({
       console.log("constrainPosition 입력값:", { x, y, scale });
       console.log("constrainPosition 현재 containerSize:", containerSize);
 
-      // 무한대 값 확인
       if (!isFinite(x) || !isFinite(y)) {
         console.log("constrainPosition: 무한대 값 감지됨, 기본값으로 설정");
-        return { x: 50, y: 50 }; // 기본값으로 중앙 위치 반환
+        return { x: 50, y: 50 };
       }
 
-      // 컨테이너 크기가 유효한지 확인
       const currentContainerWidth = containerSize.width;
       const currentContainerHeight = containerSize.height;
 
@@ -260,48 +253,63 @@ export const DiaryDecorateDialog = ({
         return { x: 50, y: 50 };
       }
 
-      // 스티커의 실제 크기 계산 (기본 크기 64px에 scale 적용)
-      const stickerWidth = 64 * scale;
-      const stickerHeight = 64 * scale;
-      console.log("스티커 크기:", stickerWidth, stickerHeight);
+      const stickerOriginalWidth = 64; // 스티커 이미지 원본 너비 (w-16 Tailwind = 4rem = 64px)
+      const stickerOriginalHeight = 64; // 스티커 이미지 원본 높이 (h-16 Tailwind = 4rem = 64px)
 
-      // 컨테이너 크기 대비 스티커 크기의 비율 계산
-      const stickerWidthPercent = (stickerWidth / currentContainerWidth) * 100;
-      const stickerHeightPercent =
-        (stickerHeight / currentContainerHeight) * 100;
+      const scaledStickerWidth = stickerOriginalWidth * scale;
+      const scaledStickerHeight = stickerOriginalHeight * scale;
       console.log(
-        "스티커 크기 (%):",
-        stickerWidthPercent,
-        stickerHeightPercent
+        "스티커 실제 크기 (scaled):",
+        scaledStickerWidth,
+        scaledStickerHeight
       );
 
-      if (!isFinite(stickerWidthPercent) || !isFinite(stickerHeightPercent)) {
-        console.log("스티커 크기 백분율이 무한대, 기본값으로 설정");
+      // 스티커의 왼쪽/오른쪽/위/아래 가장자리가 컨테이너 내부에 있도록 위치(%) 조정
+      // x, y는 스티커의 중심점 기준 백분율 위치
+
+      // 컨테이너 크기 대비 스티커 절반 크기의 백분율
+      const halfWidthPercent =
+        (scaledStickerWidth / 2 / currentContainerWidth) * 100;
+      const halfHeightPercent =
+        (scaledStickerHeight / 2 / currentContainerHeight) * 100;
+
+      if (!isFinite(halfWidthPercent) || !isFinite(halfHeightPercent)) {
+        console.log("스티커 절반 크기 백분율 계산 오류, 기본값 반환");
         return { x: 50, y: 50 };
       }
 
-      // 스티커의 중심점이 이동할 수 있는 최소/최대 범위 계산
-      const minX = stickerWidthPercent / 2;
-      const maxX = 100 - stickerWidthPercent / 2;
-      const minY = stickerHeightPercent / 2;
-      const maxY = 100 - stickerHeightPercent / 2;
+      console.log("스티커 절반 크기 (%):", halfWidthPercent, halfHeightPercent);
+
+      const minX = halfWidthPercent; // 왼쪽 벽 제한 (스티커 중심의 최소 x%)
+      const maxX = 100 - halfWidthPercent; // 오른쪽 벽 제한 (스티커 중심의 최대 x%)
+      const minY = halfHeightPercent; // 위쪽 벽 제한 (스티커 중심의 최소 y%)
+      const maxY = 100 - halfHeightPercent; // 아래쪽 벽 제한 (스티커 중심의 최대 y%)
+
       console.log("위치 제한 (min/max):");
       console.log("minX:", minX, "maxX:", maxX);
       console.log("minY:", minY, "maxY:", maxY);
 
-      // 위치 제한 적용
-      const constrainedX = Math.max(minX, Math.min(maxX, x));
-      const constrainedY = Math.max(minY, Math.min(maxY, y));
+      let constrainedX = Math.max(minX, Math.min(maxX, x));
+      let constrainedY = Math.max(minY, Math.min(maxY, y));
       console.log("제한된 위치 (계산됨):", constrainedX, constrainedY);
 
-      // 무한대 값 다시 확인
+      // minX > maxX (스티커가 컨테이너보다 큰 경우) 처리
+      if (minX > maxX) {
+        console.log("스티커 너비가 컨테이너 너비보다 큼, 중앙 정렬");
+        constrainedX = 50;
+      }
+      if (minY > maxY) {
+        console.log("스티커 높이가 컨테이너 높이보다 큼, 중앙 정렬");
+        constrainedY = 50;
+      }
+
       const finalX = isFinite(constrainedX) ? constrainedX : 50;
       const finalY = isFinite(constrainedY) ? constrainedY : 50;
       console.log("최종 반환 위치:", { x: finalX, y: finalY });
 
       return { x: finalX, y: finalY };
     },
-    [containerSize] // containerSize가 변경될 때마다 이 함수도 새로 생성되도록 의존성 추가
+    [containerSize]
   );
 
   // 스티커 선택 함수
@@ -694,7 +702,7 @@ export const DiaryDecorateDialog = ({
             <div
               ref={containerRef}
               className={
-                "relative w-full max-w-[min(60vh,400px)] aspect-[3/4] bg-gray-200"
+                "relative w-full max-w-[min(60vh,400px)] aspect-[3/4] bg-gray-200 overflow-hidden"
               }
               onClick={() => setSelectedStickerId(null)}
             >
@@ -866,10 +874,10 @@ export const DiaryDecorateDialog = ({
             aria-describedby={"drawer-description"}
           >
             {/* <VisuallyHidden> */}
-            <DialogTitle id={"drawer-title"}>스티커 선택</DialogTitle>
+            {/* <DialogTitle id={"drawer-title"}>스티커 선택</DialogTitle>
             <DialogDescription id={"drawer-description"}>
               꾸미기에 사용할 스티커를 선택하세요.
-            </DialogDescription>
+            </DialogDescription> */}
             {/* </VisuallyHidden> */}
             {/* 카테고리 선택 */}
             <div
