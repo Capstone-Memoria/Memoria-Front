@@ -1,6 +1,11 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Spinner from "@/components/base/Spinner";
+import {
+  DiaryCoverItem,
+  PresetDiaryCoverItem,
+  UploadedDiaryCoverItem,
+} from "@/components/diary/DiaryCoverCarousel";
 import Page from "@/components/page/Page";
 import {
   Accordion,
@@ -45,6 +50,7 @@ const ManageDiaryPage = () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookById", diaryId],
       });
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
       setOpenedPanel(""); // 성공 시 패널 닫기
     },
     onError: (error) => {
@@ -68,7 +74,6 @@ const ManageDiaryPage = () => {
   const [openedPanel, setOpenedPanel] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -92,16 +97,54 @@ const ManageDiaryPage = () => {
     });
   };
 
-  const handleCoverSave = () => {
-    if (!diaryId || !coverImageFile) {
-      console.error("Diary ID or cover image file is missing!");
+  const handleEditCoverSave = async (selectedCover: DiaryCoverItem | null) => {
+    if (!diaryId) {
+      console.error("Diary ID is missing!");
+      alert("일기장 ID가 없습니다.");
+      return;
+    }
+    if (isSaving) return; // 중복 클릭 방지
+
+    if (!selectedCover) {
+      // 커버가 선택되지 않은 경우 (EditDiaryCoverPanel의 '저장' 버튼 로직에 따라 달라짐)
+      alert("일기장 표지를 선택해주세요.");
       return;
     }
 
+    let coverImageFile: File;
+
+    // 선택된 커버 이미지 타입에 따라 파일 준비
+    if (selectedCover.type === "uploaded") {
+      // 업로드된 이미지인 경우 File 객체 그대로 사용
+      coverImageFile = (selectedCover as UploadedDiaryCoverItem).image;
+    } else if (selectedCover.type === "preset") {
+      // 프리셋 이미지인 경우 URL에서 File 객체로 변환
+      const presetCover = selectedCover as PresetDiaryCoverItem;
+      try {
+        const response = await fetch(presetCover.imageSrc);
+        const blob = await response.blob();
+        // File 객체 생성 (CreateDiaryPage와 유사)
+        coverImageFile = new File([blob], `preset-cover-${Date.now()}.jpg`, {
+          type: blob.type || "image/jpeg", // 타입 명시, 없을 경우 jpeg 폴백
+        });
+      } catch (error) {
+        console.error("프리셋 이미지 변환 중 오류 발생:", error);
+        alert("이미지 처리에 실패했습니다. 다시 시도해주세요.");
+        return; // 변환 실패 시 저장 중단
+      }
+    } else {
+      // 지원되지 않는 타입 에러 처리
+      console.error("지원되지 않는 커버 이미지 타입입니다.");
+      alert("지원되지 않는 커버 이미지 타입입니다.");
+      return; // 저장 중단
+    }
+
+    // 파일이 준비되면 뮤테이션 호출
     tryUpdateDiaryBook({
       coverImage: coverImageFile,
     });
-    setCoverImageFile(null);
+
+    // Note: 패널 닫기는 tryUpdateDiaryBook의 onSuccess에서 처리됨
   };
 
   return (
@@ -159,11 +202,13 @@ const ManageDiaryPage = () => {
                 // selectedFile={coverImageFile}
                 // setSelectedFile={setCoverImageFile}
                 onCancel={() => {
-                  setOpenedPanel("");
-                  setCoverImageFile(null);
+                  // 패널 내부에서 취소 버튼 클릭 시 호출
+                  setOpenedPanel(""); // 아코디언 닫기
+                  // EditDiaryCoverPanel 내부에서 업로드된 파일 상태 등 초기화 로직이 있어야 함
                 }}
-                onMouseLeave={handleCoverSave}
-                isSaving={isSaving}
+                onSave={handleEditCoverSave} // 새로운 커버 저장 핸들러 연결
+                isSaving={isSaving} // 저장 중 상태 전달
+                // onMouseLeave={handleCoverSave} // 이 로직은 제거
               />
             </AccordionContent>
           </AccordionItem>
