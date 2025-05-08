@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { FaMagic } from "react-icons/fa";
 import { MdUpload } from "react-icons/md";
+import { TbSticker2 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
 import { DiaryDecorateDialog } from "../components/DiaryDecorateDialog";
@@ -184,42 +185,46 @@ const CreateDiaryPage = () => {
             onSelectChange={setSelectedCover}
           />
         </div>
-        <div className={"grid grid-cols-2 justify-items-center mt-5"}>
-          <CreateCoverImageDrawer
-            open={createCoverDrawerOpen}
-            onOpenChange={setCreateCoverDrawerOpen}
-          >
+        <div className={"w-full px-4"}>
+          <div className={"flex justify-between items-center mt-5"}>
+            <CreateCoverImageDrawer
+              open={createCoverDrawerOpen}
+              onOpenChange={setCreateCoverDrawerOpen}
+            >
+              <Button
+                variant={"secondary"}
+                className={
+                  "w-36 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                }
+              >
+                <FaMagic /> AI로 만들기
+              </Button>
+            </CreateCoverImageDrawer>
             <Button
+              size={"sm"}
               variant={"secondary"}
+              onClick={handleUploadButtonClick}
               className={
-                "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                "w-36 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
               }
             >
-              <FaMagic /> AI로 커버 만들기
+              <MdUpload className={"text-base"} /> 사진 업로드
             </Button>
-          </CreateCoverImageDrawer>
-          <Button
-            size={"sm"}
-            variant={"secondary"}
-            onClick={handleUploadButtonClick}
-            className={
-              "w-42 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
-            }
-          >
-            <MdUpload className={"text-base"} /> 사진 업로드
-          </Button>
+          </div>
+          {/* 꾸미기 버튼 추가 */}
+          {selectedCover && (
+            <Button
+              className={
+                "w-full mt-4 rounded-md flex items-center justify-center gap-3"
+              }
+              onClick={() => setDecorateDialogOpen(true)}
+              variant={"primary"}
+            >
+              <TbSticker2 />
+              스티커로 꾸미기
+            </Button>
+          )}
         </div>
-
-        {/* 꾸미기 버튼 추가 */}
-        {selectedCover && (
-          <Button
-            className={"w-full mt-4"}
-            onClick={() => setDecorateDialogOpen(true)}
-            variant={"primary"}
-          >
-            스티커로 꾸미기
-          </Button>
-        )}
 
         {error && (
           <p className={"text-red-500 text-sm mt-4 text-center"}>
