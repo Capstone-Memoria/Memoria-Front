@@ -8,15 +8,13 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaSave,
-  FaSmile,
-  FaTimes,
-} from "react-icons/fa";
+import { FaArrowLeft, FaClock, FaSave, FaSmile, FaTimes } from "react-icons/fa";
 import { MdRotate90DegreesCcw } from "react-icons/md";
-import { RiZoomInLine } from "react-icons/ri";
+import {
+  RiArrowGoBackLine,
+  RiArrowGoForwardLine,
+  RiZoomInLine,
+} from "react-icons/ri";
 
 interface DiaryDecorateDialogProps {
   open: boolean;
@@ -26,7 +24,12 @@ interface DiaryDecorateDialogProps {
 }
 
 // 스티커 카테고리 정의
-type StickerCategory = "emoji" | "nature" | "music" | "recent";
+type StickerCategory =
+  | "recent"
+  | "alphabet"
+  | "shape"
+  | "character"
+  | "character2";
 
 interface StickerData {
   id: string;
@@ -34,69 +37,69 @@ interface StickerData {
   category: StickerCategory;
 }
 
-// 기본 스티커 데이터
+// 기본 스티커 데이터 (카테고리 값 수정)
 const STICKER_DATA: StickerData[] = [
   {
-    id: "emoji-smile",
+    id: "alphabet-a",
+    imageUrl: "https://via.placeholder.com/64/FFA07A/000000?text=A",
+    category: "alphabet",
+  },
+  {
+    id: "alphabet-b",
+    imageUrl: "https://via.placeholder.com/64/FFA07A/000000?text=B",
+    category: "alphabet",
+  },
+  {
+    id: "shape-circle",
+    imageUrl: "https://via.placeholder.com/64/ADD8E6/000000?text=●",
+    category: "shape",
+  },
+  {
+    id: "shape-square",
+    imageUrl: "https://via.placeholder.com/64/ADD8E6/000000?text=■",
+    category: "shape",
+  },
+  {
+    id: "character-1",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2017/09/01/00/15/png-2702691_640.png",
+    category: "character",
+  },
+  {
+    id: "character-2",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2016/03/31/19/58/avatar-1295429_640.png",
+    category: "character",
+  },
+  {
+    id: "character2-1",
     imageUrl:
       "https://cdn.pixabay.com/photo/2014/04/03/11/56/smiley-312633_640.png",
-    category: "emoji",
+    category: "character2",
   },
   {
-    id: "emoji-heart",
+    id: "character2-2",
     imageUrl:
       "https://cdn.pixabay.com/photo/2014/04/03/10/32/heart-311372_640.png",
-    category: "emoji",
+    category: "character2",
   },
-  {
-    id: "nature-flower",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/02/10/54/flower-304967_640.png",
-    category: "nature",
-  },
-  {
-    id: "nature-butterfly",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/03/10/31/butterfly-311046_640.png",
-    category: "nature",
-  },
-  {
-    id: "nature-sun",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/03/10/32/sun-311427_640.png",
-    category: "nature",
-  },
-  {
-    id: "music-note",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/03/10/32/music-311376_640.png",
-    category: "music",
-  },
-  {
-    id: "emoji-crown",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2016/03/31/15/41/crown-1293157_640.png",
-    category: "emoji",
-  },
-  {
-    id: "emoji-arrow",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2016/03/31/15/29/arrow-1293162_640.png",
-    category: "emoji",
-  },
-  {
-    id: "nature-bird",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2016/03/31/23/37/bird-1297727_640.png",
-    category: "nature",
-  },
+  // ... 다른 스티커 데이터 추가 가능 ...
 ];
 
-const CATEGORY_LABELS: Record<StickerCategory, string> = {
-  emoji: "이모지",
-  nature: "자연",
-  music: "음악",
-  recent: "최근 사용",
+const CATEGORY_ORDER: StickerCategory[] = [
+  "recent",
+  "alphabet",
+  "shape",
+  "character",
+  "character2",
+];
+
+const CATEGORY_LABELS: Record<StickerCategory, string | React.ReactElement> = {
+  recent: <FaClock size={20} />,
+  alphabet: "알파벳",
+  shape: "도형",
+  character: "캐릭터",
+  character2: "캐릭터2",
 };
 
 // 스티커 조작 모드 타입
@@ -116,7 +119,7 @@ export const DiaryDecorateDialog = ({
   const [history, setHistory] = useState<StickerItem[][]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [selectedCategory, setSelectedCategory] =
-    useState<StickerCategory>("emoji");
+    useState<StickerCategory>("alphabet");
   const [recentStickers, setRecentStickers] = useState<string[]>([]);
 
   // 컨테이너 크기 상태
@@ -253,9 +256,12 @@ export const DiaryDecorateDialog = ({
         return { x: 50, y: 50 };
       }
 
-      const stickerOriginalWidth = 64; // 스티커 이미지 원본 너비 (w-16 Tailwind = 4rem = 64px)
-      const stickerOriginalHeight = 64; // 스티커 이미지 원본 높이 (h-16 Tailwind = 4rem = 64px)
+      // Convert current center (percentage) to pixels
+      const currentX_px = (x / 100) * currentContainerWidth;
+      const currentY_px = (y / 100) * currentContainerHeight;
 
+      const stickerOriginalWidth = 64;
+      const stickerOriginalHeight = 64;
       const scaledStickerWidth = stickerOriginalWidth * scale;
       const scaledStickerHeight = stickerOriginalHeight * scale;
       console.log(
@@ -264,50 +270,41 @@ export const DiaryDecorateDialog = ({
         scaledStickerHeight
       );
 
-      // 스티커의 왼쪽/오른쪽/위/아래 가장자리가 컨테이너 내부에 있도록 위치(%) 조정
-      // x, y는 스티커의 중심점 기준 백분율 위치
+      // Calculate pixel boundaries for the sticker's center based on its edges
+      const minX_px = scaledStickerWidth / 2;
+      const maxX_px = currentContainerWidth - scaledStickerWidth / 2;
+      const minY_px = scaledStickerHeight / 2;
+      const maxY_px = currentContainerHeight - scaledStickerHeight / 2;
+      console.log("중심점 픽셀 제한 (min/max):");
+      console.log("minX_px:", minX_px, "maxX_px:", maxX_px);
+      console.log("minY_px:", minY_px, "maxY_px:", maxY_px);
 
-      // 컨테이너 크기 대비 스티커 절반 크기의 백분율
-      const halfWidthPercent =
-        (scaledStickerWidth / 2 / currentContainerWidth) * 100;
-      const halfHeightPercent =
-        (scaledStickerHeight / 2 / currentContainerHeight) * 100;
+      // Constrain the center pixel coordinates
+      let constrainedX_px = Math.max(minX_px, Math.min(maxX_px, currentX_px));
+      let constrainedY_px = Math.max(minY_px, Math.min(maxY_px, currentY_px));
+      console.log("제한된 중심 픽셀 위치:", constrainedX_px, constrainedY_px);
 
-      if (!isFinite(halfWidthPercent) || !isFinite(halfHeightPercent)) {
-        console.log("스티커 절반 크기 백분율 계산 오류, 기본값 반환");
-        return { x: 50, y: 50 };
-      }
-
-      console.log("스티커 절반 크기 (%):", halfWidthPercent, halfHeightPercent);
-
-      const minX = halfWidthPercent; // 왼쪽 벽 제한 (스티커 중심의 최소 x%)
-      const maxX = 100 - halfWidthPercent; // 오른쪽 벽 제한 (스티커 중심의 최대 x%)
-      const minY = halfHeightPercent; // 위쪽 벽 제한 (스티커 중심의 최소 y%)
-      const maxY = 100 - halfHeightPercent; // 아래쪽 벽 제한 (스티커 중심의 최대 y%)
-
-      console.log("위치 제한 (min/max):");
-      console.log("minX:", minX, "maxX:", maxX);
-      console.log("minY:", minY, "maxY:", maxY);
-
-      let constrainedX = Math.max(minX, Math.min(maxX, x));
-      let constrainedY = Math.max(minY, Math.min(maxY, y));
-      console.log("제한된 위치 (계산됨):", constrainedX, constrainedY);
-
-      // minX > maxX (스티커가 컨테이너보다 큰 경우) 처리
-      if (minX > maxX) {
+      // Handle cases where sticker is larger than container
+      if (minX_px > maxX_px) {
+        // Sticker wider than container
         console.log("스티커 너비가 컨테이너 너비보다 큼, 중앙 정렬");
-        constrainedX = 50;
+        constrainedX_px = currentContainerWidth / 2;
       }
-      if (minY > maxY) {
+      if (minY_px > maxY_px) {
+        // Sticker taller than container
         console.log("스티커 높이가 컨테이너 높이보다 큼, 중앙 정렬");
-        constrainedY = 50;
+        constrainedY_px = currentContainerHeight / 2;
       }
 
-      const finalX = isFinite(constrainedX) ? constrainedX : 50;
-      const finalY = isFinite(constrainedY) ? constrainedY : 50;
-      console.log("최종 반환 위치:", { x: finalX, y: finalY });
+      // Convert constrained pixel coordinates back to percentage
+      const finalX = (constrainedX_px / currentContainerWidth) * 100;
+      const finalY = (constrainedY_px / currentContainerHeight) * 100;
 
-      return { x: finalX, y: finalY };
+      const safeFinalX = isFinite(finalX) ? finalX : 50;
+      const safeFinalY = isFinite(finalY) ? finalY : 50;
+      console.log("최종 반환 위치 (%):", { x: safeFinalX, y: safeFinalY });
+
+      return { x: safeFinalX, y: safeFinalY };
     },
     [containerSize]
   );
@@ -494,16 +491,20 @@ export const DiaryDecorateDialog = ({
             }
 
             case "rotate": {
-              const centerX = containerRect.left + containerRect.width / 2;
-              const centerY = containerRect.top + containerRect.height / 2;
+              // 현재 스티커 위치 픽셀 단위로 계산
+              const stickerCenterX =
+                (sticker.x / 100) * containerRect.width + containerRect.left;
+              const stickerCenterY =
+                (sticker.y / 100) * containerRect.height + containerRect.top;
 
+              // 시작 각도와 현재 각도 계산
               const startAngle = Math.atan2(
-                dragStartRef.current.y - centerY,
-                dragStartRef.current.x - centerX
+                dragStartRef.current.y - stickerCenterY,
+                dragStartRef.current.x - stickerCenterX
               );
               const currentAngle = Math.atan2(
-                clientY - centerY,
-                clientX - centerX
+                clientY - stickerCenterY,
+                clientX - stickerCenterX
               );
 
               const angleDelta = (currentAngle - startAngle) * (180 / Math.PI);
@@ -517,39 +518,42 @@ export const DiaryDecorateDialog = ({
             }
 
             case "resize": {
+              // 스티커 중심점 계산
+              const stickerCenterX =
+                (sticker.x / 100) * containerRect.width + containerRect.left;
+              const stickerCenterY =
+                (sticker.y / 100) * containerRect.height + containerRect.top;
+
+              // 현재 스티커 크기 (픽셀)
+              const currentSize = 64 * stickerInitialStateRef.current!.scale;
+
+              // 드래그 시작점과 끝점의 대각선 거리 계산
+              const startOffsetX = dragStartRef.current.x - stickerCenterX;
+              const startOffsetY = dragStartRef.current.y - stickerCenterY;
               const startDistance = Math.sqrt(
-                Math.pow(
-                  dragStartRef.current.y -
-                    containerRect.top -
-                    containerRect.height / 2,
-                  2
-                ) +
-                  Math.pow(
-                    dragStartRef.current.x -
-                      containerRect.left -
-                      containerRect.width / 2,
-                    2
-                  )
+                startOffsetX * startOffsetX + startOffsetY * startOffsetY
               );
 
+              const currentOffsetX = clientX - stickerCenterX;
+              const currentOffsetY = clientY - stickerCenterY;
               const currentDistance = Math.sqrt(
-                Math.pow(
-                  clientY - containerRect.top - containerRect.height / 2,
-                  2
-                ) +
-                  Math.pow(
-                    clientX - containerRect.left - containerRect.width / 2,
-                    2
-                  )
+                currentOffsetX * currentOffsetX +
+                  currentOffsetY * currentOffsetY
               );
 
-              const scaleFactor =
-                startDistance === 0 ? 1 : currentDistance / startDistance;
+              // 거리 비율로 스케일 계산
+              const scaleFactor = currentDistance / Math.max(1, startDistance);
               const newScale = Math.max(
                 0.5,
                 Math.min(3, stickerInitialStateRef.current!.scale * scaleFactor)
               );
-              console.log("새 크기:", newScale);
+
+              console.log("스케일 정보:", {
+                startDistance,
+                currentDistance,
+                scaleFactor,
+                newScale,
+              });
 
               // 크기 변경 시에도 위치 제한 적용
               const { x, y } = constrainPosition(
@@ -725,46 +729,46 @@ export const DiaryDecorateDialog = ({
               {stickers.map((sticker) => (
                 <div
                   key={sticker.id}
-                  className={`absolute transition-shadow ${
-                    selectedStickerId === sticker.id ? "shadow-lg" : ""
-                  }`}
+                  className={"absolute transition-shadow pointer-events-auto"}
                   style={{
                     left: `${sticker.x}%`,
                     top: `${sticker.y}%`,
-                    transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg) scale(${sticker.scale})`,
+                    transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
                     zIndex: sticker.zIndex || 1,
                     touchAction: "none",
-                    pointerEvents: "auto",
                   }}
                   onClick={(e) => handleStickerSelect(sticker.id, e)}
                 >
-                  {/* 스티커 본체 */}
+                  {/* 내부 컨테이너: 크기 및 중심 정렬 담당 */}
                   <div
                     className={"relative touch-none"}
+                    style={{
+                      width: `${64 * sticker.scale}px`,
+                      height: `${64 * sticker.scale}px`,
+                    }}
                     onMouseDown={(e) => handleDragStart(e, sticker.id, "move")}
                     onTouchStart={(e) => handleDragStart(e, sticker.id, "move")}
                   >
                     <img
                       src={sticker.imageUrl}
                       alt={"스티커"}
-                      className={"w-16 h-16 pointer-events-none"}
+                      className={
+                        "w-full h-full object-contain pointer-events-none"
+                      }
                       draggable={false}
                     />
 
                     {/* 선택된 스티커일 경우에만 컨트롤 표시 */}
                     {selectedStickerId === sticker.id && (
                       <>
-                        {/* 삭제 버튼 */}
+                        {/* 삭제 버튼 - 고정 크기 */}
                         <div
                           className={
-                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center hover:bg-red-500 hover:text-white text-red-500 z-20"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center hover:bg-red-500 hover:text-white text-red-500 z-20 pointer-events-auto cursor-pointer"
                           }
                           style={{
                             top: `-8px`,
                             right: `-8px`,
-                            transform: `scale(${1 / sticker.scale})`,
-                            transformOrigin: "center",
-                            pointerEvents: "auto",
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -774,17 +778,15 @@ export const DiaryDecorateDialog = ({
                           <FaTimes size={12} />
                         </div>
 
-                        {/* 회전 컨트롤 */}
+                        {/* 회전 컨트롤 - 고정 크기 */}
                         <div
                           className={
-                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10 pointer-events-auto"
                           }
                           style={{
-                            top: `-32px`,
+                            top: `-20px`,
                             left: `50%`,
-                            transform: `translateX(-50%) scale(${1 / sticker.scale})`,
-                            transformOrigin: "center",
-                            pointerEvents: "auto",
+                            transform: `translateX(-50%)`,
                           }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
@@ -798,17 +800,14 @@ export const DiaryDecorateDialog = ({
                           <MdRotate90DegreesCcw size={14} />
                         </div>
 
-                        {/* 크기 조절 컨트롤 */}
+                        {/* 크기 조절 컨트롤 - 고정 크기 */}
                         <div
                           className={
-                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10"
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10 pointer-events-auto"
                           }
                           style={{
                             bottom: `-8px`,
                             right: `-8px`,
-                            transform: `scale(${1 / sticker.scale})`,
-                            transformOrigin: "center",
-                            pointerEvents: "auto",
                           }}
                           onMouseDown={(e) => {
                             e.stopPropagation();
@@ -840,8 +839,9 @@ export const DiaryDecorateDialog = ({
                 }
                 onClick={handleUndo}
                 disabled={historyIndex <= 0}
+                aria-label={"뒤로가기"}
               >
-                <FaArrowLeft />
+                <RiArrowGoBackLine size={20} />
               </button>
               <button
                 className={
@@ -849,15 +849,17 @@ export const DiaryDecorateDialog = ({
                 }
                 onClick={handleRedo}
                 disabled={historyIndex >= history.length - 1}
+                aria-label={"앞으로가기"}
               >
-                <FaArrowRight />
+                <RiArrowGoForwardLine size={20} />
               </button>
             </div>
             <button
               className={"p-2 rounded-full hover:bg-gray-100"}
               onClick={() => setStickerDrawerOpen(true)}
+              aria-label={"스티커 목록 열기"}
             >
-              <FaSmile />
+              <FaSmile size={20} />
             </button>
           </div>
         </div>
@@ -869,7 +871,7 @@ export const DiaryDecorateDialog = ({
           shouldScaleBackground={false}
         >
           <DrawerContent
-            className={"min-h-[70vh] px-4 pb-8"}
+            className={"h-[50vh] px-4 pb-8"}
             aria-labelledby={"drawer-title"}
             aria-describedby={"drawer-description"}
           >
@@ -882,25 +884,23 @@ export const DiaryDecorateDialog = ({
             {/* 카테고리 선택 */}
             <div
               className={
-                "flex justify-between border-b mb-4 overflow-x-auto py-2 sticky top-0 bg-white"
+                "flex justify-around items-center border-b mb-4 overflow-x-auto py-2 sticky top-0 bg-white"
               }
               role={"tablist"}
             >
-              {Object.entries(CATEGORY_LABELS).map(([category, label]) => (
+              {CATEGORY_ORDER.map((category) => (
                 <button
                   key={category}
                   role={"tab"}
                   aria-selected={selectedCategory === category}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap ${
+                  className={`px-3 py-2 rounded-full whitespace-nowrap flex items-center justify-center ${
                     selectedCategory === category
                       ? "bg-emerald-100 text-emerald-700"
-                      : "text-gray-600"
+                      : "text-gray-600 hover:bg-gray-100"
                   }`}
-                  onClick={() =>
-                    setSelectedCategory(category as StickerCategory)
-                  }
+                  onClick={() => setSelectedCategory(category)}
                 >
-                  {label}
+                  {CATEGORY_LABELS[category]}
                 </button>
               ))}
             </div>
