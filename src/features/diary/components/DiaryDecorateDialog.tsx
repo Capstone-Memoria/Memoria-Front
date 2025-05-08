@@ -108,26 +108,76 @@ export const DiaryDecorateDialog = ({
   selectedCover,
   onSave,
 }: DiaryDecorateDialogProps) => {
-  // 간단한 페이드 애니메이션
+  const [isClosing, setIsClosing] = useState(false);
+
+  // 애니메이션 스타일 추가
   useEffect(() => {
     const styleEl = document.createElement("style");
     styleEl.innerHTML = `
-      .fullscreen-dialog-enter {
-        opacity: 0;
-        transition: opacity 0.2s ease-in-out;
+      @keyframes dialogEnter {
+        0% {
+          opacity: 0;
+          transform: scale(0.95);
+          pointer-events: none;
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          pointer-events: all;
+        }
       }
       
-      .fullscreen-dialog-enter-active {
-        opacity: 1;
+      @keyframes dialogExit {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.95);
+          pointer-events: none;
+        }
       }
       
-      .fullscreen-dialog-exit {
-        opacity: 1;
-        transition: opacity 0.2s ease-in-out;
+      @keyframes overlayEnter {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 0.4;
+        }
       }
       
-      .fullscreen-dialog-exit-active {
-        opacity: 0;
+      @keyframes overlayExit {
+        0% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      
+      .dialog-animation-enter {
+        animation: dialogEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transform-origin: center;
+        will-change: opacity, transform;
+      }
+      
+      .dialog-animation-exit {
+        animation: dialogExit 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transform-origin: center;
+        will-change: opacity, transform;
+      }
+      
+      .overlay-animation-enter {
+        animation: overlayEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .overlay-animation-exit {
+        animation: overlayExit 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
     `;
 
@@ -665,10 +715,28 @@ export const DiaryDecorateDialog = ({
     }
   }, [isDragging, selectedStickerId, handleDragMove, handleDragEnd]);
 
-  // 변경사항 저장 함수
+  // 다이얼로그 닫기 애니메이션 처리
+  useEffect(() => {
+    if (!open && !isClosing) return;
+
+    if (open) {
+      setIsClosing(false);
+    }
+  }, [open]);
+
+  // 애니메이션이 있는 닫기 함수
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onOpenChange(false);
+      setIsClosing(false);
+    }, 200); // 애니메이션 시간 조정
+  };
+
+  // 저장 함수
   const handleSave = () => {
     onSave?.(stickers);
-    onOpenChange(false);
+    handleClose();
   };
 
   // 뒤로가기 함수
@@ -695,272 +763,280 @@ export const DiaryDecorateDialog = ({
     }
   }, [open, stickers]);
 
-  if (!open) return null;
+  if (!open && !isClosing) return null;
 
   return (
-    <div
-      className={"fixed inset-0 z-50 flex flex-col bg-white overflow-hidden"}
-      style={{ height: "100dvh", width: "100%" }}
-    >
-      {/* 헤더 - 고정 */}
-      <div className={"bg-white shadow-sm"}>
-        <div className={"flex justify-between items-center p-4"}>
-          <button
-            className={"p-2 mr-1 rounded-full hover:bg-gray-100"}
-            onClick={() => onOpenChange(false)}
-          >
-            <HiArrowNarrowLeft className={"text-2xl"} />
-          </button>
-          <h3 className={"text-lg font-medium"}>일기장 꾸미기</h3>
-          <button
-            className={"p-2 rounded-full hover:bg-gray-100"}
-            onClick={handleSave}
-          >
-            저장
-          </button>
-        </div>
-      </div>
+    <>
+      {/* 배경 오버레이 */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/30 ${isClosing ? "overlay-animation-exit" : "overlay-animation-enter"}`}
+      />
 
-      {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
-      <div className={"flex-1 overflow-auto"}>
-        <div className={"flex items-center justify-center p-10"}>
-          <div
-            ref={containerRef}
-            className={
-              "relative w-full max-w-[min(60vh,400px)] aspect-[3/4] bg-gray-200 overflow-hidden"
-            }
-            onClick={() => setSelectedStickerId(null)}
-          >
-            <DiaryCover
-              className={"w-full h-full"}
-              coverColor={selectedCover?.coverColor}
-              imageSrc={
-                selectedCover?.type === "preset"
-                  ? (selectedCover as PresetDiaryCoverItem).imageSrc
-                  : undefined
-              }
-              imageFile={
-                selectedCover?.type === "uploaded"
-                  ? (selectedCover as UploadedDiaryCoverItem).image
-                  : undefined
-              }
-            />
-
-            {/* 스티커 렌더링 */}
-            {stickers.map((sticker) => (
-              <div
-                key={sticker.id}
-                className={"absolute pointer-events-auto"}
-                style={{
-                  left: `${sticker.x}%`,
-                  top: `${sticker.y}%`,
-                  transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
-                  zIndex: sticker.zIndex || 1,
-                  touchAction: "none",
-                }}
-                onClick={(e) => handleStickerSelect(sticker.id, e)}
-              >
-                {/* 선택 테두리 (선택된 경우에만) */}
-                {selectedStickerId === sticker.id && (
-                  <div
-                    className={
-                      "absolute border-2 border-blue-500 border-dashed rounded-md pointer-events-none"
-                    }
-                    style={{
-                      width: `calc(${64 * sticker.scale}px + 8px)`,
-                      height: `calc(${64 * sticker.scale}px + 8px)`,
-                      top: "-4px",
-                      left: "-4px",
-                    }}
-                  ></div>
-                )}
-                {/* 내부 컨테이너: 스티커 이미지 */}
-                <div
-                  className={"relative touch-none"}
-                  style={{
-                    width: `${64 * sticker.scale}px`,
-                    height: `${64 * sticker.scale}px`,
-                  }}
-                  onMouseDown={(e) => handleDragStart(e, sticker.id, "move")}
-                  onTouchStart={(e) => handleDragStart(e, sticker.id, "move")}
-                >
-                  <img
-                    src={sticker.imageUrl}
-                    alt={"스티커"}
-                    className={
-                      "w-full h-full object-contain pointer-events-none"
-                    }
-                    draggable={false}
-                  />
-
-                  {/* 선택된 스티커일 경우에만 컨트롤 표시 */}
-                  {selectedStickerId === sticker.id && (
-                    <>
-                      {/* 삭제 버튼 */}
-                      <div
-                        className={
-                          "absolute w-5 h-5 rounded-full shadow flex items-center justify-center text-white bg-red-500 z-20 pointer-events-auto cursor-pointer"
-                        }
-                        style={{
-                          top: `-15px`,
-                          right: `-15px`,
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteSticker(sticker.id, e);
-                        }}
-                      >
-                        <FaTimes size={12} />
-                      </div>
-
-                      {/* 회전 컨트롤 */}
-                      <div
-                        className={
-                          "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10 pointer-events-auto"
-                        }
-                        style={{
-                          top: `-24px`,
-                          left: `50%`,
-                          transform: `translateX(-50%)`,
-                        }}
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          handleDragStart(e, sticker.id, "rotate");
-                        }}
-                        onTouchStart={(e) => {
-                          e.stopPropagation();
-                          handleDragStart(e, sticker.id, "rotate");
-                        }}
-                      >
-                        <MdRotate90DegreesCcw size={14} />
-                      </div>
-
-                      {/* 크기 조절 컨트롤 - 우측 하단 */}
-                      <div
-                        className={
-                          "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10 pointer-events-auto"
-                        }
-                        style={{
-                          bottom: `-10px`,
-                          right: `-10px`,
-                        }}
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          handleDragStart(e, sticker.id, "resize");
-                        }}
-                        onTouchStart={(e) => {
-                          e.stopPropagation();
-                          handleDragStart(e, sticker.id, "resize");
-                        }}
-                      >
-                        <BsArrowsMove size={14} />
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 하단 바 - 고정 */}
-      <div className={"fixed bottom-0 left-0 right-0 bg-white border-t z-50"}>
-        <div className={"flex justify-between items-center p-4"}>
-          <div className={"flex gap-2"}>
-            <button
-              className={
-                "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
-              }
-              onClick={handleUndo}
-              disabled={historyIndex <= 0}
-              aria-label={"뒤로가기"}
-            >
-              <RiArrowGoBackLine size={20} />
-            </button>
-            <button
-              className={
-                "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
-              }
-              onClick={handleRedo}
-              disabled={historyIndex >= history.length - 1}
-              aria-label={"앞으로가기"}
-            >
-              <RiArrowGoForwardLine size={20} />
-            </button>
-          </div>
-          <button
-            className={"p-2 rounded-full hover:bg-gray-100"}
-            onClick={() => setStickerDrawerOpen(true)}
-            aria-label={"스티커 목록 열기"}
-          >
-            <FaSmile size={20} />
-          </button>
-        </div>
-      </div>
-
-      {/* 스티커 선택 Drawer */}
-      <Drawer
-        open={stickerDrawerOpen}
-        onOpenChange={setStickerDrawerOpen}
-        shouldScaleBackground={false}
+      {/* 메인 다이얼로그 컨텐츠 */}
+      <div
+        className={`fixed inset-0 z-50 flex flex-col bg-white overflow-hidden ${isClosing ? "dialog-animation-exit" : "dialog-animation-enter"}`}
+        style={{ height: "100dvh", width: "100%" }}
       >
-        <DrawerContent
-          className={"h-[50vh] px-4 pb-8"}
-          aria-labelledby={"drawer-title"}
-          aria-describedby={"drawer-description"}
-        >
-          {/* 카테고리 선택 */}
-          <div
-            className={
-              "flex justify-around items-center border-b mb-4 overflow-x-auto py-2 sticky top-0 bg-white"
-            }
-            role={"tablist"}
-          >
-            {CATEGORY_ORDER.map((category) => (
-              <button
-                key={category}
-                role={"tab"}
-                aria-selected={selectedCategory === category}
-                className={`px-3 py-2 rounded-full whitespace-nowrap flex items-center justify-center ${
-                  selectedCategory === category
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {CATEGORY_LABELS[category]}
-              </button>
-            ))}
+        {/* 헤더 - 고정 */}
+        <div className={"bg-white shadow-sm"}>
+          <div className={"flex justify-between items-center p-4"}>
+            <button
+              className={"p-2 mr-1 rounded-full hover:bg-gray-100"}
+              onClick={handleClose}
+            >
+              <HiArrowNarrowLeft className={"text-2xl"} />
+            </button>
+            <h3 className={"text-lg font-medium"}>일기장 꾸미기</h3>
+            <button
+              className={"p-2 rounded-full hover:bg-gray-100"}
+              onClick={handleSave}
+            >
+              저장
+            </button>
           </div>
+        </div>
 
-          {/* 스티커 그리드 */}
-          <div
-            className={"grid grid-cols-5 gap-4 overflow-y-auto"}
-            role={"tabpanel"}
-          >
-            {selectedCategory === "recent"
-              ? recentStickers
-                  .map((id) => STICKER_DATA.find((s) => s.id === id))
-                  .filter(Boolean)
-                  .map((sticker) => (
+        {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
+        <div className={"flex-1 overflow-auto"}>
+          <div className={"flex items-center justify-center p-10"}>
+            <div
+              ref={containerRef}
+              className={
+                "relative w-full max-w-[min(60vh,400px)] aspect-[3/4] bg-gray-200 overflow-hidden"
+              }
+              onClick={() => setSelectedStickerId(null)}
+            >
+              <DiaryCover
+                className={"w-full h-full"}
+                coverColor={selectedCover?.coverColor}
+                imageSrc={
+                  selectedCover?.type === "preset"
+                    ? (selectedCover as PresetDiaryCoverItem).imageSrc
+                    : undefined
+                }
+                imageFile={
+                  selectedCover?.type === "uploaded"
+                    ? (selectedCover as UploadedDiaryCoverItem).image
+                    : undefined
+                }
+              />
+
+              {/* 스티커 렌더링 */}
+              {stickers.map((sticker) => (
+                <div
+                  key={sticker.id}
+                  className={"absolute pointer-events-auto"}
+                  style={{
+                    left: `${sticker.x}%`,
+                    top: `${sticker.y}%`,
+                    transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
+                    zIndex: sticker.zIndex || 1,
+                    touchAction: "none",
+                  }}
+                  onClick={(e) => handleStickerSelect(sticker.id, e)}
+                >
+                  {/* 선택 테두리 (선택된 경우에만) */}
+                  {selectedStickerId === sticker.id && (
                     <div
-                      key={sticker!.id}
                       className={
-                        "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+                        "absolute border-2 border-blue-500 border-dashed rounded-md pointer-events-none"
                       }
-                      onClick={() => addSticker(sticker!)}
-                      aria-label={`${sticker!.category} 스티커 추가`}
-                    >
-                      <img
-                        src={sticker!.imageUrl}
-                        alt={"스티커"}
-                        className={"w-full h-full object-contain"}
-                      />
-                    </div>
-                  ))
-              : STICKER_DATA.filter((s) => s.category === selectedCategory).map(
-                  (sticker) => (
+                      style={{
+                        width: `calc(${64 * sticker.scale}px + 8px)`,
+                        height: `calc(${64 * sticker.scale}px + 8px)`,
+                        top: "-4px",
+                        left: "-4px",
+                      }}
+                    ></div>
+                  )}
+                  {/* 내부 컨테이너: 스티커 이미지 */}
+                  <div
+                    className={"relative touch-none"}
+                    style={{
+                      width: `${64 * sticker.scale}px`,
+                      height: `${64 * sticker.scale}px`,
+                    }}
+                    onMouseDown={(e) => handleDragStart(e, sticker.id, "move")}
+                    onTouchStart={(e) => handleDragStart(e, sticker.id, "move")}
+                  >
+                    <img
+                      src={sticker.imageUrl}
+                      alt={"스티커"}
+                      className={
+                        "w-full h-full object-contain pointer-events-none"
+                      }
+                      draggable={false}
+                    />
+
+                    {/* 선택된 스티커일 경우에만 컨트롤 표시 */}
+                    {selectedStickerId === sticker.id && (
+                      <>
+                        {/* 삭제 버튼 */}
+                        <div
+                          className={
+                            "absolute w-5 h-5 rounded-full shadow flex items-center justify-center text-white bg-red-500 z-20 pointer-events-auto cursor-pointer"
+                          }
+                          style={{
+                            top: `-15px`,
+                            right: `-15px`,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSticker(sticker.id, e);
+                          }}
+                        >
+                          <FaTimes size={12} />
+                        </div>
+
+                        {/* 회전 컨트롤 */}
+                        <div
+                          className={
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-grab touch-none z-10 pointer-events-auto"
+                          }
+                          style={{
+                            top: `-24px`,
+                            left: `50%`,
+                            transform: `translateX(-50%)`,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "rotate");
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "rotate");
+                          }}
+                        >
+                          <MdRotate90DegreesCcw size={14} />
+                        </div>
+
+                        {/* 크기 조절 컨트롤 - 우측 하단 */}
+                        <div
+                          className={
+                            "absolute w-6 h-6 bg-white rounded-full shadow flex items-center justify-center cursor-nwse-resize touch-none z-10 pointer-events-auto"
+                          }
+                          style={{
+                            bottom: `-10px`,
+                            right: `-10px`,
+                          }}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "resize");
+                          }}
+                          onTouchStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(e, sticker.id, "resize");
+                          }}
+                        >
+                          <BsArrowsMove size={14} />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 하단 바 - 고정 */}
+        <div className={"fixed bottom-0 left-0 right-0 bg-white border-t z-50"}>
+          <div className={"flex justify-between items-center p-4"}>
+            <div className={"flex gap-2"}>
+              <button
+                className={
+                  "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                }
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                aria-label={"뒤로가기"}
+              >
+                <RiArrowGoBackLine size={20} />
+              </button>
+              <button
+                className={
+                  "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                }
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                aria-label={"앞으로가기"}
+              >
+                <RiArrowGoForwardLine size={20} />
+              </button>
+            </div>
+            <button
+              className={"p-2 rounded-full hover:bg-gray-100"}
+              onClick={() => setStickerDrawerOpen(true)}
+              aria-label={"스티커 목록 열기"}
+            >
+              <FaSmile size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* 스티커 선택 Drawer */}
+        <Drawer
+          open={stickerDrawerOpen}
+          onOpenChange={setStickerDrawerOpen}
+          shouldScaleBackground={false}
+        >
+          <DrawerContent
+            className={"h-[50vh] px-4 pb-8"}
+            aria-labelledby={"drawer-title"}
+            aria-describedby={"drawer-description"}
+          >
+            {/* 카테고리 선택 */}
+            <div
+              className={
+                "flex justify-around items-center border-b mb-4 overflow-x-auto py-2 sticky top-0 bg-white"
+              }
+              role={"tablist"}
+            >
+              {CATEGORY_ORDER.map((category) => (
+                <button
+                  key={category}
+                  role={"tab"}
+                  aria-selected={selectedCategory === category}
+                  className={`px-3 py-2 rounded-full whitespace-nowrap flex items-center justify-center ${
+                    selectedCategory === category
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {CATEGORY_LABELS[category]}
+                </button>
+              ))}
+            </div>
+
+            {/* 스티커 그리드 */}
+            <div
+              className={"grid grid-cols-5 gap-4 overflow-y-auto"}
+              role={"tabpanel"}
+            >
+              {selectedCategory === "recent"
+                ? recentStickers
+                    .map((id) => STICKER_DATA.find((s) => s.id === id))
+                    .filter(Boolean)
+                    .map((sticker) => (
+                      <div
+                        key={sticker!.id}
+                        className={
+                          "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+                        }
+                        onClick={() => addSticker(sticker!)}
+                        aria-label={`${sticker!.category} 스티커 추가`}
+                      >
+                        <img
+                          src={sticker!.imageUrl}
+                          alt={"스티커"}
+                          className={"w-full h-full object-contain"}
+                        />
+                      </div>
+                    ))
+                : STICKER_DATA.filter(
+                    (s) => s.category === selectedCategory
+                  ).map((sticker) => (
                     <div
                       key={sticker.id}
                       className={
@@ -975,11 +1051,11 @@ export const DiaryDecorateDialog = ({
                         className={"w-full h-full object-contain"}
                       />
                     </div>
-                  )
-                )}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </div>
+                  ))}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </>
   );
 };
