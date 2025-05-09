@@ -39,7 +39,7 @@ const InviteAcceptPage = () => {
 
   /* ──────────────────────────────── 초대 수락 API */
   const acceptMutation = useMutation({
-    mutationFn: () => api.diaryBook.acceptInvitationCode(inviteCode!),
+    mutationFn: () => api.invitation.acceptInvitationCode(inviteCode!),
     onSuccess: (res) => {
       // DiaryBookMemer 타입에는 diaryBookId 숫자만 있음
       navigate(`/diary/${res.diaryBookId}`);
