@@ -98,7 +98,7 @@ const DiaryMemberPage = () => {
   // Generate invite link mutation
   // ✅ 수정 부분만 발췌
   const generateInviteMutation = useMutation({
-    mutationFn: () => api.diaryBook.createInviteCode(diaryBookId),
+    mutationFn: () => api.invitation.createInviteCode(diaryBookId),
     onSuccess: (data) => {
       const { inviteCode, diaryBook } = data;
       const inviter = authStore.context!.user!.nickName;
@@ -117,7 +117,7 @@ const DiaryMemberPage = () => {
   // Direct invite mutation
   const directInviteMutation = useMutation({
     mutationFn: (email: string) =>
-      api.diaryBook.directInvite(diaryBookId, email),
+      api.invitation.directInvite(diaryBookId, email),
     onSuccess: (data, email) => {
       setInviteSuccessMessage(`'${email}'님에게 초대 요청을 보냈습니다.`);
       setDirectInviteEmail(""); // Clear input field

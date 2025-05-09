@@ -4,6 +4,7 @@ import * as comment from "./comment";
 import * as diary from "./diary";
 import * as diaryBook from "./diary-book";
 import * as image from "./image";
+import * as invitation from "./invitation";
 import * as reaction from "./reation";
 import * as user from "./user";
 
@@ -16,4 +17,5 @@ export default {
   image,
   reaction,
   comment,
+  invitation,
 };

@@ -18,10 +18,6 @@ export const fetchMyDiaryBook = async (PageParam: PageParam) => {
   return response.data;
 };
 
-// interface DiaryBookCreateRequest {
-//   title: string;
-// }
-
 export const createDiaryBook = async (formData: FormData) => {
   const response = await server.post<DiaryBook>("api/diary-book", formData);
 
@@ -35,12 +31,6 @@ export const fetchDiaryBookById = async (diaryBookId: number) => {
 
   return response.data;
 };
-
-// interface DiaryBookUpdateRequest {
-//   title?: string;
-//   isPinned?: boolean;
-//   coverImage?: string;
-// }
 
 export const updateDiaryBook = async (formData: FormData) => {
   const response = await server.patch<DiaryBook>(
@@ -67,53 +57,6 @@ export const fetchMyDiaries = async (
     }
   );
   return response.data;
-};
-
-export const createInviteCode = async (diaryBookId: number) => {
-  const response = await server.post<InvitationCode>(
-    `/api/diaries/${diaryBookId}/invitation/by-code`,
-    {
-      hours: 24,
-    }
-  );
-
-  return response.data;
-};
-
-export const acceptInvitationCode = async (code: string) => {
-  const response = await server.post<DiaryBookMemer>(
-    "/api/invitation/accept/by-code",
-    {
-      code: code,
-    }
-  );
-
-  return response.data;
-};
-
-export const directInvite = async (
-  diaryBookId: number,
-  targetEmail: string
-) => {
-  const response = await server.post<DirectInvaitation>(
-    `/api/diaries/${diaryBookId}/invitation/by-direct`,
-    {
-      targetEmail: targetEmail,
-    }
-  );
-
-  return response.data;
-};
-
-export const directInviteAccept = async (id: number) => {
-  const responcse = await server.post<DiaryBookMemer>(
-    "/api/invitation/accept/by-direct",
-    {
-      id: id,
-    }
-  );
-
-  return responcse.data;
 };
 
 export const diaryMemberDelete = async (
@@ -146,25 +89,3 @@ export const fetchDiaryMembers = async (diaryBookId: number) => {
 
   return responcse.data;
 };
-
-// export interface InviteDetails {
-//   diaryId: number;
-//   diaryName: string;
-//   inviterName: string;
-// }
-
-// export const fetchInviteDetailsByCode = async (code: string) => {
-//   // TODO: 실제 API 엔드포인트로 변경 필요
-//   // 예시: const response = await server.get<InviteDetails>(`/api/invitation/details/by-code/${code}`);
-//   // 임시 반환 데이터 (시뮬레이션)
-//   await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-//   if (code === "valid-code") {
-//     return {
-//       diaryId: 123,
-//       diaryName: "샘플 다이어리",
-//       inviterName: "초대자 이름",
-//     } as InviteDetails;
-//   } else {
-//     throw new Error("유효하지 않거나 만료된 초대 코드입니다.");
-//   }
-// };

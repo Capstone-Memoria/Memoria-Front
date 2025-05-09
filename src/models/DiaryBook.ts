@@ -32,6 +32,5 @@ export interface DirectInvaitation {
   id: number;
   diaryBook: DiaryBook;
   inviteBy: User;
-  inviteTo: User;
+  inviteTo?: User;
 }
-
