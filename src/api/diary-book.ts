@@ -1,5 +1,10 @@
 import { Diary } from "@/models/Diary";
-import { DiaryBook } from "@/models/DiaryBook";
+import {
+  DiaryBook,
+  DiaryBookMemer,
+  DirectInvaitation,
+  InvitationCode,
+} from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
 import server from "./axios";
 
@@ -12,10 +17,6 @@ export const fetchMyDiaryBook = async (PageParam: PageParam) => {
 
   return response.data;
 };
-
-// interface DiaryBookCreateRequest {
-//   title: string;
-// }
 
 export const createDiaryBook = async (formData: FormData) => {
   const response = await server.post<DiaryBook>("api/diary-book", formData);
@@ -30,12 +31,6 @@ export const fetchDiaryBookById = async (diaryBookId: number) => {
 
   return response.data;
 };
-
-// interface DiaryBookUpdateRequest {
-//   title?: string;
-//   isPinned?: boolean;
-//   coverImage?: string;
-// }
 
 export const updateDiaryBook = async (formData: FormData) => {
   const response = await server.patch<DiaryBook>(
@@ -62,4 +57,35 @@ export const fetchMyDiaries = async (
     }
   );
   return response.data;
+};
+
+export const diaryMemberDelete = async (
+  diaryBookId: number,
+  memberId: number
+) => {
+  await server.delete(`/api/diary-book/${diaryBookId}/members/${memberId}`);
+};
+
+export const updateDiaryMemberPermission = async ({
+  diaryBookId,
+  memberId,
+  permission,
+}: {
+  diaryBookId: number;
+  memberId: number;
+  permission: "ADMIN" | "MEMBER";
+}) => {
+  const response = await server.patch<DiaryBookMemer>(
+    `/api/diary-book/${diaryBookId}/members/${memberId}`,
+    { permission }
+  );
+  return response.data;
+};
+
+export const fetchDiaryMembers = async (diaryBookId: number) => {
+  const responcse = await server.get<DiaryBookMemer[]>(
+    `/api/diary-book/${diaryBookId}/members`
+  );
+
+  return responcse.data;
 };
