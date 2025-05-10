@@ -73,7 +73,7 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
                 exit={{ opacity: 0, filter: "blur(10px)" }}
                 className={"flex-1 flex flex-col justify-between"}
               >
-                <motion.div className={"font-medium text-gray-900"}>
+                <motion.div className={"text-sm font-medium text-gray-900"}>
                   {aiComment?.title}
                 </motion.div>
                 <motion.div className={"text-xs text-gray-500"}>
