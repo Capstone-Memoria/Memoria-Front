@@ -23,7 +23,6 @@ const LoginPage = () => {
     }
   }, [user, navigate, location.state]);
 
-  /* 기존 코드 그대로 ↓↓↓ */
   const handleNext = () => setStep((prev) => prev + 1);
   const handlePrev = () => setStep((prev) => prev - 1);
 
