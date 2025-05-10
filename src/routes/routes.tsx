@@ -6,6 +6,7 @@ import ManageDiaryPage from "@/features/diary/pages/ManageDiaryPage";
 import ViewDiaryListPage from "@/features/diary/pages/ViewDiaryListPage";
 import WriteDiaryPage from "@/features/diary/pages/WriteDiaryPage";
 import ErrorPage from "@/features/error/pages/ErrorPage";
+import InviteAcceptPage from "@/features/invite/InviteAcceptPage";
 import LoginPage from "@/features/login/pages/LoginPage";
 import RegisterPage from "@/features/login/pages/RegisterPage";
 import MainPage from "@/features/main/pages/MainPage";
@@ -68,6 +69,10 @@ export const routes: ContextRoutes = {
     {
       path: "/diary/:diaryBookId/diary/:diaryId/edit",
       element: <EditDiaryPage />,
+    },
+    {
+      path: "/code-invite/:inviteCode",
+      element: <InviteAcceptPage />, // 초대 수락 페이지
     },
     {
       path: "/*",

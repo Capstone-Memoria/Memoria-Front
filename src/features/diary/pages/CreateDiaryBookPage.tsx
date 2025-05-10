@@ -1,4 +1,4 @@
-import api from "@/api";
+import api from "@/api"
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";

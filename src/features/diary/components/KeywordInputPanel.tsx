@@ -5,7 +5,8 @@ import {
   LayoutGroup,
   motion,
   usePresence,
-} from "motion/react";
+} from "framer-motion";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ImFileEmpty } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";

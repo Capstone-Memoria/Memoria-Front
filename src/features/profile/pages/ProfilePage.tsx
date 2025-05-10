@@ -1,4 +1,5 @@
 import api from "@/api";
+import { directInviteAccept, fetchInvitations } from "@/api/invitation";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Modal from "@/components/base/Modal";
@@ -13,8 +14,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { DirectInvaitation } from "@/models/DiaryBook";
 import { useAuthStore } from "@/stores/AuthenticationStore";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +31,7 @@ interface UpdateUserVariables {
 const ProfilePage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [nickName, setNickName] = useState(
@@ -116,6 +119,49 @@ const ProfilePage = () => {
     setOpenedPanel("");
     setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
     setPasswordError(""); // 이전 에러 메시지 초기화
+  };
+
+  const {
+    data: invitations,
+    isLoading: isLoadingInvitations,
+    error: invitationsError,
+  } = useQuery<DirectInvaitation[], Error>({
+    queryKey: ["invitations"],
+    queryFn: fetchInvitations,
+    enabled: !!authStore.context?.user, // 사용자가 로그인했을 때만 실행
+  });
+
+  const { mutate: acceptInvite } = useMutation({
+    mutationFn: (invitationId: number) => directInviteAccept(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
+      // Optionally, show a success message
+    },
+    onError: (error) => {
+      // Optionally, show an error message
+      console.error("Failed to accept invitation:", error);
+    },
+  });
+
+  const { mutate: declineInvite, isPending: isRejecting } = useMutation({
+    mutationFn: (invitationId: number) =>
+      api.invitation.declineDirectInvite(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
+      // Optionally, show a success message
+    },
+    onError: (error) => {
+      // Optionally, show an error message
+      console.error("Failed to decline invitation:", error);
+    },
+  });
+
+  const handleAcceptInvitation = (invitationId: number) => {
+    acceptInvite(invitationId);
+  };
+
+  const handleRejectInvitation = (invitationId: number) => {
+    declineInvite(invitationId);
   };
 
   return (
@@ -292,6 +338,71 @@ const ProfilePage = () => {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+          {/* 구분선 */}
+          <div
+            className={
+              "my-2 border-x-0 border-b-0 flex items-center border border-solid border-gray-4"
+            }
+          />
+          {/* 받은 초대 목록 */}
+          <div className={"pt-7 text-base"}>
+            <div className={"flex gap-3 items-center mb-5"}>
+              <h2 className={"text-black text-lg font-medium"}>
+                받은 초대 목록
+              </h2>
+              <Spinner className={cn("", { hidden: !isLoadingInvitations })} />
+            </div>
+            {isLoadingInvitations && <div>초대 목록을 불러오는 중...</div>}
+            {invitationsError && (
+              <SectionMessage variant={"error"} title={"오류 발생"}>
+                초대 목록을 불러오는데 실패했습니다: {invitationsError.message}
+              </SectionMessage>
+            )}
+            {!isLoadingInvitations &&
+              !invitationsError &&
+              invitations &&
+              invitations.length > 0 && (
+                <div className={"flex flex-col gap-3"}>
+                  {invitations.map((invitation) => (
+                    <div
+                      key={invitation.id}
+                      className={
+                        "p-4 border border-gray-300 rounded-md flex justify-between items-center"
+                      }
+                    >
+                      <div>
+                        <p className={"font-medium"}>
+                          {invitation.diaryBook.title}
+                        </p>
+                        <p className={"text-sm text-gray-600"}>
+                          {invitation.inviteBy.nickName}님의 초대
+                        </p>
+                      </div>
+                      <div className={"flex gap-2"}>
+                        <Button
+                          size={"sm"}
+                          onClick={() => handleAcceptInvitation(invitation.id)}
+                        >
+                          수락
+                        </Button>
+                        <Button
+                          size={"sm"}
+                          onClick={() => handleRejectInvitation(invitation.id)}
+                          variant={"secondary"}
+                        >
+                          거절
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            {!isLoadingInvitations &&
+              !invitationsError &&
+              (!invitations || invitations.length === 0) && (
+                <div>받은 초대가 없습니다.</div>
+              )}
+          </div>
           {/* 구분선 */}
           <div
             className={
