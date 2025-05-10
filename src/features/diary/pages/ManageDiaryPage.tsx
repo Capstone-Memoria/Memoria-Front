@@ -16,6 +16,7 @@ import {
   MdOutlineModeEditOutline,
 } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
+import CharacterManagePanel from "../components/CharacterManagePanel";
 import EditDiaryCoverPanel from "../components/EditDiaryCoverPanel";
 import EditDiaryTitlePanel from "../components/EditDiaryTitlePanel";
 
@@ -167,6 +168,14 @@ const ManageDiaryPage = () => {
                 onMouseLeave={handleCoverSave}
                 isSaving={isSaving}
               />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value={"manage-character"}>
+            <AccordionTrigger className={"flex justify-between items-center"}>
+              <div className={"text-base"}>일기장 캐릭터 관리</div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <CharacterManagePanel diaryId={Number(diaryId)} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
