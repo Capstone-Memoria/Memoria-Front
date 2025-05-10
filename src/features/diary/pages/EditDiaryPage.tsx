@@ -69,7 +69,9 @@ const EditDiaryPage = () => {
         toDeleteImageIds: toDeleteImageIds, // 삭제될 이미지 ID
       }),
     onSuccess: () => {
-      navigate(`/diary/${diaryBookId}/diary/${diaryId}`, { replace: true });
+      navigate(`/diary-book/${diaryBookId}/diary/${diaryId}`, {
+        replace: true,
+      });
     },
   });
 

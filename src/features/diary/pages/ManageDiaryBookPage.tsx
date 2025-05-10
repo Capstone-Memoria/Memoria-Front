@@ -20,17 +20,17 @@ import CharacterManagePanel from "../components/CharacterManagePanel";
 import EditDiaryCoverPanel from "../components/EditDiaryCoverPanel";
 import EditDiaryTitlePanel from "../components/EditDiaryTitlePanel";
 
-const ManageDiaryPage = () => {
+const ManageDiaryBookPage = () => {
   const navigate = useNavigate();
-  const { diaryId } = useParams<{ diaryId: string }>();
+  const { diaryBookId } = useParams<{ diaryBookId: string }>();
 
   const queryClient = useQueryClient();
 
   // server side
   const { data, isFetching: isDiaryBookFetching } = useQuery({
-    queryKey: ["fetchDiaryBookById", diaryId],
-    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryId)),
-    enabled: !!diaryId,
+    queryKey: ["fetchDiaryBookById", diaryBookId],
+    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
+    enabled: !!diaryBookId,
   });
 
   const { mutate: tryUpdateDiaryBook, isPending: isSaving } = useMutation({
@@ -38,7 +38,7 @@ const ManageDiaryPage = () => {
     mutationFn: (formData: FormData) => api.diaryBook.updateDiaryBook(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["fetchDiaryBookById", diaryId], // diaryId를 포함한 queryKey 무효화
+        queryKey: ["fetchDiaryBookById", diaryBookId], // diaryId를 포함한 queryKey 무효화
       });
       // 필요하다면 성공 알림 표시
       setOpenedPanel(""); // 성공 시 패널 닫기
@@ -51,10 +51,12 @@ const ManageDiaryPage = () => {
 
   const { mutate: tryDelete, isPending: isDeleting } = useMutation({
     // isPending 변수명 변경 (isSaving과 충돌 방지)
-    mutationFn: () => api.diaryBook.deleteDiaryBook(Number(diaryId)),
+    mutationFn: () => api.diaryBook.deleteDiaryBook(Number(diaryBookId)),
     onSuccess: () => {
       // 삭제 성공 시 캐시 무효화보다는 제거가 더 적절할 수 있음
-      queryClient.removeQueries({ queryKey: ["fetchDiaryBookById", diaryId] });
+      queryClient.removeQueries({
+        queryKey: ["fetchDiaryBookById", diaryBookId],
+      });
       queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] }); // 목록 캐시 무효화 (선택 사항)
       navigate("/main", { replace: true }); // 또는 다른 적절한 경로로 이동
     },
@@ -82,25 +84,25 @@ const ManageDiaryPage = () => {
   };
 
   const handleTitleSave = () => {
-    if (!diaryId) {
+    if (!diaryBookId) {
       console.error("Diary ID is missing!");
       return;
     }
     const formData = new FormData();
-    formData.append("diaryBookId", diaryId);
+    formData.append("diaryBookId", diaryBookId);
     formData.append("title", title);
 
     tryUpdateDiaryBook(formData);
   };
 
   const handleCoverSave = () => {
-    if (!diaryId || !coverImageFile) {
+    if (!diaryBookId || !coverImageFile) {
       console.error("Diary ID or cover image file is missing!");
       return;
     }
 
     const formData = new FormData();
-    formData.append("diaryBookId", diaryId);
+    formData.append("diaryBookId", diaryBookId);
     formData.append("coverImage", coverImageFile);
 
     tryUpdateDiaryBook(formData);
@@ -175,7 +177,7 @@ const ManageDiaryPage = () => {
               <div className={"text-base"}>일기장 캐릭터 관리</div>
             </AccordionTrigger>
             <AccordionContent>
-              <CharacterManagePanel diaryId={Number(diaryId)} />
+              <CharacterManagePanel diaryBookId={Number(diaryBookId)} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -219,4 +221,4 @@ const ManageDiaryPage = () => {
   );
 };
 
-export default ManageDiaryPage;
+export default ManageDiaryBookPage;

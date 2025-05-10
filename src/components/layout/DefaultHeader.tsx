@@ -1,18 +1,27 @@
 import BellIcon from "@/assets/images/BellIcon.svg";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
 import ProflieIcon from "@/assets/images/ProfileIcon.svg";
-import { HTMLAttributes } from "react";
+import NotificationOverlay from "@/features/main/components/NotificationOverlay";
+import { HTMLAttributes, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Page from "../page/Page";
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
   logoType?: "default" | "back";
+  onNotificationClick?: () => void;
 }
 
-const DefaultHeader: React.FC<HeaderProps> = ({ logoType, ...props }) => {
+const DefaultHeader: React.FC<HeaderProps> = ({
+  logoType,
+  onNotificationClick,
+  ...props
+}) => {
   /* Properties */
   const navigate = useNavigate();
+
+  /* States */
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   /* Handlers */
   const handleBack = () => {
@@ -37,7 +46,14 @@ const DefaultHeader: React.FC<HeaderProps> = ({ logoType, ...props }) => {
         }}
       />
       <div className={"flex gap-6"}>
-        <img src={BellIcon} alt={"Notification Bell"} className={""} />
+        <img
+          src={BellIcon}
+          alt={"Notification Bell"}
+          className={""}
+          onClick={() => {
+            setIsNotificationOpen(true);
+          }}
+        />
         <img
           src={ProflieIcon}
           alt={"Profile Icon"}
@@ -47,6 +63,10 @@ const DefaultHeader: React.FC<HeaderProps> = ({ logoType, ...props }) => {
           }}
         />
       </div>
+      <NotificationOverlay
+        isOpen={isNotificationOpen}
+        setIsOpen={setIsNotificationOpen}
+      />
     </Page.Header>
   );
 };

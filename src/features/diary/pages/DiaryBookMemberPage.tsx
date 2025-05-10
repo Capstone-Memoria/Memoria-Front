@@ -12,11 +12,10 @@ import { FaCrown } from "react-icons/fa";
 import { IoMdAdd, IoMdClose, IoMdCopy } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 
-const DiaryMemberPage = () => {
+const DiaryBookMemberPage = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
-  const { diaryId } = useParams();
-  const diaryBookId = Number(diaryId); // Ensure diaryId is a number
+  const { diaryBookId } = useParams();
   const queryClient = useQueryClient();
 
   // State for invite link generation
@@ -38,7 +37,7 @@ const DiaryMemberPage = () => {
   } = useQuery<DiaryBookMemer[], Error>({
     // Specify types for useQuery
     queryKey: ["fetchDiaryBookMembers", diaryBookId], // Include diaryBookId in queryKey
-    queryFn: () => api.diaryBook.fetchDiaryMembers(diaryBookId),
+    queryFn: () => api.diaryBook.fetchDiaryMembers(Number(diaryBookId)),
     enabled: !!diaryBookId, // Only run query if diaryBookId is valid
   });
 
@@ -98,7 +97,7 @@ const DiaryMemberPage = () => {
   // Generate invite link mutation
   // ✅ 수정 부분만 발췌
   const generateInviteMutation = useMutation({
-    mutationFn: () => api.invitation.createInviteCode(diaryBookId),
+    mutationFn: () => api.invitation.createInviteCode(Number(diaryBookId)),
     onSuccess: (data) => {
       const { inviteCode, diaryBook } = data;
       const inviter = authStore.context!.user!.nickName;
@@ -117,7 +116,7 @@ const DiaryMemberPage = () => {
   // Direct invite mutation
   const directInviteMutation = useMutation({
     mutationFn: (email: string) =>
-      api.invitation.directInvite(diaryBookId, email),
+      api.invitation.directInvite(Number(diaryBookId), email),
     onSuccess: (data, email) => {
       setInviteSuccessMessage(`'${email}'님에게 초대 요청을 보냈습니다.`);
       setDirectInviteEmail(""); // Clear input field
@@ -136,7 +135,7 @@ const DiaryMemberPage = () => {
     if (!amIAdmin) return;
     const newPermission = currentPermission === "ADMIN" ? "MEMBER" : "ADMIN";
     updatePermissionMutation.mutate({
-      diaryBookId,
+      diaryBookId: Number(diaryBookId),
       memberId,
       permission: newPermission,
     });
@@ -145,7 +144,10 @@ const DiaryMemberPage = () => {
   const handleRemoveMember = (memberId: number) => {
     if (!amIAdmin) return;
     if (window.confirm("정말로 이 멤버를 내보내시겠습니까?")) {
-      removeMemberMutation.mutate({ diaryBookId, memberId });
+      removeMemberMutation.mutate({
+        diaryBookId: Number(diaryBookId),
+        memberId,
+      });
     }
   };
 
@@ -437,4 +439,4 @@ const DiaryMemberPage = () => {
   );
 };
 
-export default DiaryMemberPage;
+export default DiaryBookMemberPage;

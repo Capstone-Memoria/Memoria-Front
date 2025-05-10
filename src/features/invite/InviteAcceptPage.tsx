@@ -42,7 +42,7 @@ const InviteAcceptPage = () => {
     mutationFn: () => api.invitation.acceptInvitationCode(inviteCode!),
     onSuccess: (res) => {
       // DiaryBookMemer 타입에는 diaryBookId 숫자만 있음
-      navigate(`/diary/${res.diaryBookId}`);
+      navigate(`/diary-book/${res.diaryBookId}`);
     },
     onError: (e: Error) => alert(`초대 수락 실패: ${e.message}`),
   });
