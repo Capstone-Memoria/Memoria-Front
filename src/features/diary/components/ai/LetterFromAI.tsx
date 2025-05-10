@@ -1,8 +1,15 @@
+import Image from "@/components/base/Image";
 import { cn } from "@/lib/utils";
+import { AIComment } from "@/models/AIComment";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { useState } from "react";
 import { GiEnvelope } from "react-icons/gi";
-const LetterFromAI = () => {
+import Markdown from "react-markdown";
+interface LetterFromAIProps {
+  aiComment?: AIComment;
+}
+
+const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -24,7 +31,17 @@ const LetterFromAI = () => {
           exit={{ opacity: 0 }}
           className={"flex items-center px-4 h-16 gap-4"}
         >
-          <motion.div layout className={"size-9 rounded-full bg-gray-200"} />
+          <motion.div
+            layout
+            className={
+              "size-9 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+            }
+          >
+            <Image
+              className={"size-full"}
+              imageId={aiComment?.createdBy.profileImage?.id}
+            />
+          </motion.div>
           <AnimatePresence mode={"popLayout"}>
             {!isOpen ? (
               <motion.div
@@ -37,7 +54,7 @@ const LetterFromAI = () => {
               >
                 <div>
                   <motion.div className={"text-sm font-medium text-gray-900"}>
-                    농담곰으로부터 편지가 왔어요!
+                    {aiComment?.createdBy.name}으로부터 편지가 왔어요!
                   </motion.div>
                   <motion.div className={"text-xs text-gray-500"}>
                     펼쳐서 확인하기
@@ -54,13 +71,13 @@ const LetterFromAI = () => {
                 initial={{ opacity: 0, filter: "blur(10px)" }}
                 animate={{ opacity: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, filter: "blur(10px)" }}
-                className={"flex-1 flex items-center justify-between"}
+                className={"flex-1 flex flex-col justify-between"}
               >
-                <motion.div className={"text-lg font-medium text-gray-900"}>
-                  농담곰의 편지
+                <motion.div className={"font-medium text-gray-900"}>
+                  {aiComment?.title}
                 </motion.div>
                 <motion.div className={"text-xs text-gray-500"}>
-                  농담곰
+                  {aiComment?.createdBy.name}
                 </motion.div>
               </motion.div>
             )}
@@ -69,15 +86,17 @@ const LetterFromAI = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className={cn("flex-1 p-4 pt-0 h-32")}
+              className={cn("flex-1 p-4 pt-0 min-h-32")}
               initial={{ opacity: 0, y: -10, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
             >
-              <div className={"text-sm font-medium text-gray-900"}>
-                네 일기 잘 읽어봤어! 일기를 통해 네 마음이 어떤지 조금이나마
-                느낄 수 있었어. 혼자 힘들어하지 않았으면 좋겠어. 언제든 네
-                옆에는 내가 있다는 것을 잊지마! 농담곰이 너에게.
+              <div
+                className={
+                  "text-sm font-medium text-gray-900 whitespace-pre-wrap"
+                }
+              >
+                <Markdown>{aiComment?.content}</Markdown>
               </div>
             </motion.div>
           )}

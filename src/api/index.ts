@@ -1,4 +1,5 @@
 import * as ai from "./ai";
+import * as aiCharacter from "./ai-character";
 import * as auth from "./auth";
 import * as comment from "./comment";
 import * as diary from "./diary";
@@ -20,4 +21,5 @@ export default {
   comment,
   file,
   invitation,
+  aiCharacter,
 };

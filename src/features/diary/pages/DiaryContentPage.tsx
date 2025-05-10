@@ -45,6 +45,12 @@ const DiaryContentPage = () => {
     queryFn: () => api.diary.fetchDiary(Number(diaryBookId), Number(diaryId)),
   });
 
+  const { data: aiComments, isLoading: isLoadingAiComments } = useQuery({
+    queryKey: ["fetchAiComments", diaryId],
+    queryFn: () => api.aiCharacter.fetchAiComments(Number(diaryId)),
+    enabled: !!diaryId, // only fetch if diaryId is available
+  });
+
   /* Mutations */
   const deleteMutation = useMutation({
     mutationFn: () =>
@@ -240,7 +246,9 @@ const DiaryContentPage = () => {
                 <MusicPlayer musicFileId={diary.musicFile?.id} />
 
                 {/* AI 캐릭터 댓글 컨텐츠 */}
-                <LetterFromAI />
+                {aiComments?.map((comment) => (
+                  <LetterFromAI key={comment.id} aiComment={comment} />
+                ))}
 
                 {/* 일기 내용 */}
                 <motion.div
