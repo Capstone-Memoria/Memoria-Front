@@ -56,7 +56,7 @@ const DiaryContentPage = () => {
     mutationFn: () =>
       api.diary.deleteDiary(Number(diaryBookId), Number(diaryId)),
     onSuccess: () => {
-      navigate(`/diary/${diaryBookId}`, { replace: true });
+      navigate(`/diary-book/${diaryBookId}`, { replace: true });
     },
     onError: (error) => {
       console.error("일기 삭제 실패", error);
@@ -68,7 +68,8 @@ const DiaryContentPage = () => {
   const menuItems = [
     {
       label: "일기 수정",
-      onClick: () => navigate(`/diary/${diaryBookId}/diary/${diaryId}/edit`),
+      onClick: () =>
+        navigate(`/diary-book/${diaryBookId}/diary/${diaryId}/edit`),
     },
     {
       label: "일기 삭제",

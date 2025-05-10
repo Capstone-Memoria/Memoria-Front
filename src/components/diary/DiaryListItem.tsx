@@ -24,7 +24,7 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
   }, [item.content]);
 
   const handleDiaryClick = () => {
-    navigate(`/diary/${item.diaryBookId}/diary/${item.id}`);
+    navigate(`/diary-book/${item.diaryBookId}/diary/${item.id}`);
   };
 
   return (

@@ -12,7 +12,7 @@ import ProfileImageUpload from "./ProfileImageUpload";
 interface CharacterCreateDrawerProps {
   open: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  diaryId: number;
+  diaryBookId: number;
 }
 
 interface CreateForm {
@@ -25,7 +25,7 @@ interface CreateForm {
 const CharacterCreateDrawer = ({
   open,
   setIsOpen,
-  diaryId,
+  diaryBookId,
 }: CharacterCreateDrawerProps) => {
   const [overwrittenImage, setOverwrittenImage] = useState<File>();
   const [createForm, setCreateForm] = useState<CreateForm>({
@@ -42,7 +42,7 @@ const CharacterCreateDrawer = ({
     // console.log("Creating character with data:", createForm);
     // setIsOpen(false); // Close drawer for now
     mutate({
-      diaryBookId: diaryId,
+      diaryBookId: diaryBookId,
       request: {
         name: createForm.name,
         feature: createForm.feature,

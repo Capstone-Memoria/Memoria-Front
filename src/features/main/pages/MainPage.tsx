@@ -114,7 +114,7 @@ const MainPage = () => {
                 ) : (
                   (data?.content ?? []).map((diaryBook) => (
                     <DiaryBook
-                      onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                      onClick={() => navigate(`/diary-book/${diaryBook.id}`)}
                       key={diaryBook.id}
                       title={diaryBook.title}
                       memberCount={diaryBook.memberCount}
@@ -144,7 +144,9 @@ const MainPage = () => {
                       .filter((book) => book.isPinned)
                       .map((diaryBook) => (
                         <DiaryBook
-                          onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                          onClick={() =>
+                            navigate(`/diary-book/${diaryBook.id}`)
+                          }
                           key={diaryBook.id}
                           title={diaryBook.title}
                           memberCount={1}

@@ -10,10 +10,10 @@ import CharacterCreateDrawer from "./CharacterCreateDrawer";
 import CharacterEditDrawer from "./CharacterEditDrawer";
 
 interface CharacterManagePanelProps {
-  diaryId: number;
+  diaryBookId: number;
 }
 
-const CharacterManagePanel = ({ diaryId }: CharacterManagePanelProps) => {
+const CharacterManagePanel = ({ diaryBookId }: CharacterManagePanelProps) => {
   const [isCharacterEditDrawerOpen, setIsCharacterEditDrawerOpen] =
     useState(false);
   const [selectedCharacter, setSelectedCharacter] =
@@ -22,8 +22,8 @@ const CharacterManagePanel = ({ diaryId }: CharacterManagePanelProps) => {
     useState(false);
 
   const { data } = useQuery({
-    queryKey: ["fetchAiCharactersByDiaryBookId", diaryId],
-    queryFn: () => api.aiCharacter.fethAiCharactersByDiaryBookId(diaryId),
+    queryKey: ["fetchAiCharactersByDiaryBookId", diaryBookId],
+    queryFn: () => api.aiCharacter.fethAiCharactersByDiaryBookId(diaryBookId),
   });
 
   return (
@@ -83,7 +83,7 @@ const CharacterManagePanel = ({ diaryId }: CharacterManagePanelProps) => {
       <CharacterCreateDrawer
         open={isCharacterCreateDrawerOpen}
         setIsOpen={setIsCharacterCreateDrawerOpen}
-        diaryId={diaryId}
+        diaryBookId={diaryBookId}
       />
     </div>
   );

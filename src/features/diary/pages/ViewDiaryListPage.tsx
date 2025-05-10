@@ -16,7 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const ViewDiaryListPage = () => {
   /* Properties */
   const navigate = useNavigate();
-  const { diaryId: diaryBookId } = useParams();
+  const { diaryBookId } = useParams();
 
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,11 +43,11 @@ const ViewDiaryListPage = () => {
   const menuItems = [
     {
       label: "일기장 관리",
-      onClick: () => navigate(`/diary/${diaryBookId}/manage`),
+      onClick: () => navigate(`/diary-book/${diaryBookId}/manage`),
     },
     {
       label: "일기장 멤버 관리",
-      onClick: () => navigate(`/diary/${diaryBookId}/members`),
+      onClick: () => navigate(`/diary-book/${diaryBookId}/members`),
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
