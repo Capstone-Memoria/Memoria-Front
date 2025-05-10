@@ -3,6 +3,7 @@ import Button from "@/components/base/Button";
 import Image from "@/components/base/Image";
 import Modal from "@/components/base/Modal";
 import Preview from "@/components/base/Preview";
+import MusicPlayer from "@/components/music/MusicPlayer";
 import Page from "@/components/page/Page";
 import {
   Carousel,
@@ -236,6 +237,8 @@ const DiaryContentPage = () => {
               </div>
 
               <LayoutGroup>
+                <MusicPlayer musicFileId={diary.musicFile?.id} />
+
                 {/* AI 캐릭터 댓글 컨텐츠 */}
                 <LetterFromAI />
 
