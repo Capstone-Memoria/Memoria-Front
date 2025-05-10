@@ -96,9 +96,9 @@ const CharacterCreateDrawer = ({
         }
       }}
     >
-      <DrawerContent className={"min-h-[90vh]"}>
-        <div className={"flex flex-col gap-4 p-6 h-[90vh]"}>
-          <div className={"flex flex-col gap-4 overflow-y-auto flex-1"}>
+      <DrawerContent className={"h-[80%]"}>
+        <div className={"flex flex-col gap-4 p-6 overflow-y-auto"}>
+          <div className={"flex flex-col gap-4 flex-1"}>
             <div className={"flex flex-col gap-2"}>
               <Input
                 label={"캐릭터 이름"}
