@@ -16,6 +16,7 @@ export interface Diary {
   commentCount?: number;
   images?: AttachedFile[];
   reactions?: Reaction[];
+  musicFile?: AttachedFile;
 }
 
 interface ReactionId {

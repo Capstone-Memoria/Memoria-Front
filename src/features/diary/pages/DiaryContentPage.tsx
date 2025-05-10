@@ -237,7 +237,7 @@ const DiaryContentPage = () => {
               </div>
 
               <LayoutGroup>
-                <MusicPlayer />
+                <MusicPlayer musicFileId={diary.musicFile?.id} />
 
                 {/* AI 캐릭터 댓글 컨텐츠 */}
                 <LetterFromAI />
