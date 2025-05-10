@@ -64,7 +64,9 @@ const WriteDiaryPage = () => {
         images: uploadedImages,
       }),
     onSuccess: () => {
-      navigate(`/diary/${diaryBookId}`);
+      navigate(`/diary/${diaryBookId}`, {
+        replace: true,
+      });
     },
   });
 

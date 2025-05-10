@@ -119,7 +119,7 @@ const MainPage = () => {
                       title={diaryBook.title}
                       memberCount={diaryBook.memberCount}
                       pinned={diaryBook.isPinned ?? false}
-                      notificationCount={120}
+                      // notificationCount={120}
                     />
                   ))
                 )}
@@ -149,7 +149,7 @@ const MainPage = () => {
                           title={diaryBook.title}
                           memberCount={1}
                           pinned={diaryBook.isPinned ?? false}
-                          notificationCount={1}
+                          // notificationCount={1}
                         />
                       ))}
                 {(data?.content ?? []).filter((book) => book.isPinned)

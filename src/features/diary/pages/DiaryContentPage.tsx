@@ -268,35 +268,34 @@ const DiaryContentPage = () => {
             </div>
           )
         )}
-        {isDeleteModalOpen && (
-          <Modal
-            open={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            description={`일기를 삭제하시겠어요?\n삭제한 일기는 복구할 수 없습니다.`}
-          >
-            <div className={"mt-8 flex justify-between font-medium"}>
-              <Button
-                variant={"text"}
-                size={"md"}
-                className={"p-0 text-red-500"}
-                onClick={async () => {
-                  deleteMutation.mutate();
-                  setIsDeleteModalOpen(false);
-                }}
-              >
-                일기 삭제
-              </Button>
-              <Button
-                variant={"text"}
-                className={"p-0"}
-                size={"md"}
-                onClick={() => setIsDeleteModalOpen(false)}
-              >
-                취소
-              </Button>
-            </div>
-          </Modal>
-        )}
+
+        <Modal
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          description={`일기를 삭제하시겠어요?\n삭제한 일기는 복구할 수 없습니다.`}
+        >
+          <div className={"mt-8 flex justify-between font-medium"}>
+            <Button
+              variant={"text"}
+              size={"md"}
+              className={"p-0 text-red-500"}
+              onClick={async () => {
+                deleteMutation.mutate();
+                setIsDeleteModalOpen(false);
+              }}
+            >
+              일기 삭제
+            </Button>
+            <Button
+              variant={"text"}
+              className={"p-0"}
+              size={"md"}
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              취소
+            </Button>
+          </div>
+        </Modal>
       </Page.Content>
       <BottomBar
         onCommentClick={() => setIsCommentDrawerOpen(true)}

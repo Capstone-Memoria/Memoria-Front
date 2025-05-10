@@ -6,7 +6,7 @@ interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   memberCount: number;
   pinned: boolean;
-  notificationCount: number;
+  notificationCount?: number;
 }
 
 const DiaryBook: React.FC<DiaryBookProps> = ({

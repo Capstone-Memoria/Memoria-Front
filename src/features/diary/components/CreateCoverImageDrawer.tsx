@@ -44,10 +44,10 @@ export const CreateCoverImageDrawer = ({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className={"min-h-[70%]"}>
+      <DrawerContent className={"h-[70%]"}>
         <div
           className={
-            "flex overflow-hidden w-fit flex-1 transition-transform duration-500 ease-expo-out"
+            "flex overflow-y-scroll w-fit flex-1 transition-transform duration-500 ease-expo-out"
           }
           style={{
             transform: `translateX(-${currentPanel === "keyword" ? 0 : 100}vw)`,
