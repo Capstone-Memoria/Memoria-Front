@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
+import SettingsBar, { Settings } from "../components/write-diary/SettingsBar";
 
 const WriteDiaryPage = () => {
   const navigate = useNavigate();
@@ -29,6 +30,12 @@ const WriteDiaryPage = () => {
   const [content, setContent] = useState("");
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
 
+  // 설정 상태 관리
+  const [settings, setSettings] = useState<Settings>({
+    aiCharacter: "random",
+    musicCreationEnabled: true,
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
@@ -36,6 +43,16 @@ const WriteDiaryPage = () => {
         size: 10,
         page: 1, // TODO: pagination
       }),
+  });
+
+  // AI 캐릭터 목록 조회
+  const { data: aiCharacters = [], isLoading: isLoadingCharacters } = useQuery({
+    queryKey: ["fetchAiCharacters", diaryBookId],
+    queryFn: () => {
+      if (!diaryBookId) return Promise.resolve([]);
+      return api.aiCharacter.fethAiCharactersByDiaryBookId(Number(diaryBookId));
+    },
+    enabled: !!diaryBookId,
   });
 
   const canSubmit = useMemo(() => {
@@ -80,6 +97,11 @@ const WriteDiaryPage = () => {
     setUploadedImages(addedImages);
   };
 
+  // 설정 변경 핸들러
+  const handleSettingsChange = (newSettings: Settings) => {
+    setSettings(newSettings);
+  };
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <WriteDiaryPageHeader
@@ -122,6 +144,12 @@ const WriteDiaryPage = () => {
                     onChange={(e) => setDiaryTitle(e.target.value)}
                   />
                 </div>
+                <SettingsBar
+                  settings={settings}
+                  onChange={handleSettingsChange}
+                  aiCharacters={aiCharacters}
+                  isLoadingCharacters={isLoadingCharacters}
+                />
                 <div className={"flex items-center text-gray-500"}>
                   <div>{DateTime.now().toLocaleString(DateTime.DATE_MED)}</div>
                   <Dot />
