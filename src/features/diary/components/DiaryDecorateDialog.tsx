@@ -898,7 +898,7 @@ export const DiaryDecorateDialog = ({
         style={{ height: "100dvh", width: "100%" }}
       >
         {/* 헤더 - 고정 */}
-        <div className={"bg-white shadow-sm"}>
+        <div className={"bg-white"}>
           <div className={"flex justify-between items-center p-4"}>
             <button
               className={"p-2 mr-1 rounded-full hover:bg-gray-100"}
@@ -1108,7 +1108,7 @@ export const DiaryDecorateDialog = ({
             {/* 카테고리 선택 */}
             <div
               className={
-                "flex justify-around items-center border-b mb-4 overflow-x-auto py-2 sticky top-0 bg-white"
+                "flex justify-around items-center leading-none border-b mb-4 overflow-x-auto overflow-y-hidden py-4 sticky top-0 bg-white"
               }
               role={"tablist"}
             >
@@ -1142,7 +1142,7 @@ export const DiaryDecorateDialog = ({
                       <div
                         key={sticker!.id}
                         className={
-                          "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+                          "aspect-square p-2 rounded-lg cursor-pointer"
                         }
                         onClick={() => addSticker(sticker!)}
                         aria-label={`${sticker!.category} 스티커 추가`}
@@ -1159,9 +1159,7 @@ export const DiaryDecorateDialog = ({
                   ).map((sticker) => (
                     <div
                       key={sticker.id}
-                      className={
-                        "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
-                      }
+                      className={"aspect-square p-2 rounded-lg cursor-pointer"}
                       onClick={() => addSticker(sticker)}
                       aria-label={`${sticker.category} 스티커 추가`}
                     >
