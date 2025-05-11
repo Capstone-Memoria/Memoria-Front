@@ -19,6 +19,16 @@ export const createDiary = async (
   const formData = new FormData();
   formData.append("title", request.title);
   formData.append("content", request.content);
+  formData.append("isAICommentEnabled", request.isAICommentEnabled.toString());
+  formData.append("isAIMusicEnabled", request.isAIMusicEnabled.toString());
+
+  if (request.desiredCharacterId) {
+    formData.append(
+      "desiredCharacterId",
+      request.desiredCharacterId.toString()
+    );
+  }
+
   if (request.images) {
     request.images.forEach((image) => {
       formData.append("images", image);
