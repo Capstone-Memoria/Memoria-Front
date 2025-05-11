@@ -1101,75 +1101,82 @@ export const DiaryDecorateDialog = ({
           shouldScaleBackground={false}
         >
           <DrawerContent
-            className={"h-[50vh] px-4 pb-8"}
+            className={"h-[55vh]"}
             aria-labelledby={"drawer-title"}
             aria-describedby={"drawer-description"}
           >
-            {/* 카테고리 선택 */}
-            <div
-              className={
-                "flex justify-around items-center leading-none border-b mb-4 overflow-x-auto overflow-y-hidden py-4 sticky top-0 bg-white"
-              }
-              role={"tablist"}
-            >
-              {CATEGORY_ORDER.map((category) => (
-                <button
-                  key={category}
-                  role={"tab"}
-                  aria-selected={selectedCategory === category}
-                  className={`px-3 py-2 rounded-full whitespace-nowrap flex items-center justify-center ${
-                    selectedCategory === category
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setSelectedCategory(category)}
+            <div className={"flex flex-col h-full"}>
+              {/* 카테고리 선택 - 고정 영역 */}
+              <div className={"px-4 pt-4 pb-2 bg-white border-b"}>
+                <div
+                  className={"flex justify-between items-center"}
+                  role={"tablist"}
                 >
-                  {CATEGORY_LABELS[category]}
-                </button>
-              ))}
-            </div>
-
-            {/* 스티커 그리드 */}
-            <div
-              className={"grid grid-cols-5 gap-4 overflow-y-auto"}
-              role={"tabpanel"}
-            >
-              {selectedCategory === "recent"
-                ? recentStickers
-                    .map((id) => STICKER_DATA.find((s) => s.id === id))
-                    .filter(Boolean)
-                    .map((sticker) => (
-                      <div
-                        key={sticker!.id}
-                        className={
-                          "aspect-square p-2 rounded-lg cursor-pointer"
-                        }
-                        onClick={() => addSticker(sticker!)}
-                        aria-label={`${sticker!.category} 스티커 추가`}
-                      >
-                        <img
-                          src={sticker!.imageUrl}
-                          alt={"스티커"}
-                          className={"w-full h-full object-contain"}
-                        />
-                      </div>
-                    ))
-                : STICKER_DATA.filter(
-                    (s) => s.category === selectedCategory
-                  ).map((sticker) => (
-                    <div
-                      key={sticker.id}
-                      className={"aspect-square p-2 rounded-lg cursor-pointer"}
-                      onClick={() => addSticker(sticker)}
-                      aria-label={`${sticker.category} 스티커 추가`}
+                  {CATEGORY_ORDER.map((category) => (
+                    <button
+                      key={category}
+                      role={"tab"}
+                      aria-selected={selectedCategory === category}
+                      className={`px-3 py-2 rounded-full whitespace-nowrap flex items-center justify-center flex-1 mx-1 transition-all duration-200 ${
+                        selectedCategory === category
+                          ? "bg-emerald-100 text-emerald-700 font-medium"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setSelectedCategory(category)}
                     >
-                      <img
-                        src={sticker.imageUrl}
-                        alt={"스티커"}
-                        className={"w-full h-full object-contain"}
-                      />
-                    </div>
+                      {CATEGORY_LABELS[category]}
+                    </button>
                   ))}
+                </div>
+              </div>
+
+              {/* 스티커 그리드 - 스크롤 영역 */}
+              <div className={"flex-1 overflow-y-auto"}>
+                <div className={"px-4 py-4 pb-10"}>
+                  <div className={"grid grid-cols-5 gap-4"} role={"tabpanel"}>
+                    {selectedCategory === "recent"
+                      ? recentStickers
+                          .map((id) => STICKER_DATA.find((s) => s.id === id))
+                          .filter(Boolean)
+                          .map((sticker) => (
+                            <div
+                              key={sticker!.id}
+                              className={
+                                "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200 bg-white shadow-sm"
+                              }
+                              onClick={() => addSticker(sticker!)}
+                              aria-label={`${sticker!.category} 스티커 추가`}
+                            >
+                              <img
+                                src={sticker!.imageUrl}
+                                alt={"스티커"}
+                                className={"w-full h-full object-contain"}
+                                draggable={false}
+                              />
+                            </div>
+                          ))
+                      : STICKER_DATA.filter(
+                          (s) => s.category === selectedCategory
+                        ).map((sticker) => (
+                          <div
+                            key={sticker.id}
+                            className={
+                              "aspect-square p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200 bg-white shadow-sm"
+                            }
+                            onClick={() => addSticker(sticker)}
+                            aria-label={`${sticker.category} 스티커 추가`}
+                          >
+                            <img
+                              src={sticker.imageUrl}
+                              alt={"스티커"}
+                              className={"w-full h-full object-contain"}
+                              draggable={false}
+                            />
+                          </div>
+                        ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </DrawerContent>
         </Drawer>
