@@ -38,9 +38,6 @@ const CharacterCreateDrawer = ({
   const queryClient = useQueryClient();
 
   const handleSave = () => {
-    // TODO: Implement character creation API call
-    // console.log("Creating character with data:", createForm);
-    // setIsOpen(false); // Close drawer for now
     mutate({
       diaryBookId: diaryBookId,
       request: {
@@ -96,8 +93,8 @@ const CharacterCreateDrawer = ({
         }
       }}
     >
-      <DrawerContent className={"h-[80%]"}>
-        <div className={"flex flex-col gap-4 p-6 overflow-y-auto"}>
+      <DrawerContent className={"h-[70%]"}>
+        <div className={"flex flex-col gap-4 p-6 overflow-y-auto flex-1"}>
           <div className={"flex flex-col gap-4 flex-1"}>
             <div className={"flex flex-col gap-2"}>
               <Input

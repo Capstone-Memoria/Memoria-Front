@@ -19,8 +19,14 @@ export const createDiary = async (
   const formData = new FormData();
   formData.append("title", request.title);
   formData.append("content", request.content);
-  formData.append("isAICommentEnabled", request.isAICommentEnabled.toString());
-  formData.append("isAIMusicEnabled", request.isAIMusicEnabled.toString());
+  formData.append(
+    "isAICommentEnabled",
+    request.isAICommentEnabled ? "true" : "false"
+  );
+  formData.append(
+    "isAIMusicEnabled",
+    request.isAIMusicEnabled ? "true" : "false"
+  );
 
   if (request.desiredCharacterId) {
     formData.append(
