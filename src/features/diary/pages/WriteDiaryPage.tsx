@@ -32,7 +32,8 @@ const WriteDiaryPage = () => {
 
   // 설정 상태 관리
   const [settings, setSettings] = useState<Settings>({
-    aiCharacter: "random",
+    aiCharacter: null,
+    useRandomAICharacter: true,
     musicCreationEnabled: true,
   });
 
@@ -79,6 +80,12 @@ const WriteDiaryPage = () => {
         title: diaryTitle,
         content: content,
         images: uploadedImages,
+        desiredCharacterId: settings.useRandomAICharacter
+          ? undefined
+          : settings.aiCharacter?.id,
+        isAICommentEnabled:
+          settings.useRandomAICharacter || settings.aiCharacter !== null,
+        isAIMusicEnabled: settings.musicCreationEnabled,
       }),
     onSuccess: () => {
       navigate(`/diary-book/${diaryBookId}`, {

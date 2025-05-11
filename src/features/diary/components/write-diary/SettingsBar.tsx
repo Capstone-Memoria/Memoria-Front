@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import { MdSettings } from "react-icons/md";
 
 export interface Settings {
-  aiCharacter: AICharacter | "random" | null;
+  aiCharacter: AICharacter | null;
+  useRandomAICharacter: boolean;
   musicCreationEnabled: boolean;
 }
 
@@ -23,14 +24,14 @@ const SettingsBar = ({
   isLoadingCharacters = false,
 }: SettingsProps) => {
   const aiCharacterLabel = useMemo(() => {
-    if (settings.aiCharacter === "random") {
+    if (settings.useRandomAICharacter) {
       return "아무나";
     }
     if (settings.aiCharacter === null) {
       return "답장 받지 않기";
     }
     return settings.aiCharacter?.name;
-  }, [settings.aiCharacter]);
+  }, [settings.aiCharacter, settings.useRandomAICharacter]);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -51,10 +52,12 @@ const SettingsBar = ({
               <div
                 className={cn({
                   "text-blue-500":
-                    settings.aiCharacter !== null &&
-                    settings.aiCharacter !== "random",
-                  "text-green-500": settings.aiCharacter === "random",
-                  "text-gray-500": settings.aiCharacter === null,
+                    !settings.useRandomAICharacter &&
+                    settings.aiCharacter !== null,
+                  "text-green-500": settings.useRandomAICharacter,
+                  "text-gray-500":
+                    settings.aiCharacter === null &&
+                    !settings.useRandomAICharacter,
                 })}
               >
                 {aiCharacterLabel}
@@ -83,22 +86,35 @@ const SettingsBar = ({
               <button
                 className={cn(
                   "px-3 py-1 border rounded-full text-sm transition-colors duration-200",
-                  settings.aiCharacter === "random"
+                  settings.useRandomAICharacter
                     ? "bg-green-500 text-white"
                     : "bg-gray-100 text-gray-700"
                 )}
-                onClick={() => onChange({ ...settings, aiCharacter: "random" })}
+                onClick={() =>
+                  onChange({
+                    ...settings,
+                    useRandomAICharacter: true,
+                    aiCharacter: null,
+                  })
+                }
               >
                 아무나
               </button>
               <button
                 className={cn(
                   "px-3 py-1 border rounded-full text-sm transition-colors duration-200",
-                  settings.aiCharacter === null
+                  settings.aiCharacter === null &&
+                    !settings.useRandomAICharacter
                     ? "bg-gray-500 text-white"
                     : "bg-gray-100 text-gray-700"
                 )}
-                onClick={() => onChange({ ...settings, aiCharacter: null })}
+                onClick={() =>
+                  onChange({
+                    ...settings,
+                    useRandomAICharacter: false,
+                    aiCharacter: null,
+                  })
+                }
               >
                 답장 받지 않기
               </button>
@@ -112,14 +128,18 @@ const SettingsBar = ({
                     key={character.id}
                     className={cn(
                       "px-3 py-1 border rounded-full text-sm transition-colors duration-200",
-                      settings.aiCharacter !== null &&
-                        settings.aiCharacter !== "random" &&
+                      !settings.useRandomAICharacter &&
+                        settings.aiCharacter !== null &&
                         settings.aiCharacter.id === character.id
                         ? "bg-blue-500 text-white"
                         : "bg-gray-100 text-gray-700"
                     )}
                     onClick={() =>
-                      onChange({ ...settings, aiCharacter: character })
+                      onChange({
+                        ...settings,
+                        aiCharacter: character,
+                        useRandomAICharacter: false,
+                      })
                     }
                   >
                     {character.name}

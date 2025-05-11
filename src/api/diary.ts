@@ -7,6 +7,9 @@ interface CreateDiaryRequest {
   title: string;
   content: string;
   images?: File[];
+  desiredCharacterId?: number;
+  isAICommentEnabled: boolean;
+  isAIMusicEnabled: boolean;
 }
 
 export const createDiary = async (
