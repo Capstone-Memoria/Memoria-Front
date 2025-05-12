@@ -1,8 +1,4 @@
 import api from "@/api";
-import Banner from "@/components/base/Banner";
-import Input from "@/components/base/Input";
-import DiaryListItem from "@/components/diary/DiaryListItem";
-import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +8,8 @@ import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
+import DiaryCalendarPanel from "../components/DiaryCalendarPanel";
+import DiaryListPanel from "../components/DiaryListPanel";
 
 const ViewDiaryListPage = () => {
   /* Properties */
@@ -22,21 +20,15 @@ const ViewDiaryListPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false); // diary의 즐겨찾기 상태
   const [isSearching, setIsSearching] = useState(false); // 검색 입력 필드 표시 상태 추가
-  const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 추가
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list"); // 뷰 모드 상태 추가
 
   /* Refs */
-  const searchInputRef = useRef<HTMLInputElement>(null); // Ref for search input
   const headerContentRef = useRef<HTMLDivElement>(null); // Ref for header content
 
   /* Server Side */
   const { data, isLoading } = useQuery({
     queryKey: ["fetchDiaryBookById", diaryBookId],
     queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
-  });
-
-  const { data: diaryList, isLoading: isDiaryListLoading } = useQuery({
-    queryKey: ["fetchDiaryList", diaryBookId],
-    queryFn: () => api.diary.fetchDiaryList(Number(diaryBookId)),
   });
 
   /* UI */
@@ -90,6 +82,17 @@ const ViewDiaryListPage = () => {
     navigate(`/diary/write/?diaryBookId=${diaryBookId}`);
   };
 
+  const handleSearchToggle = (searching: boolean) => {
+    setIsSearching(searching);
+    if (searching) {
+      setViewMode("list"); // 검색할 때는 리스트 모드로 전환
+    }
+  };
+
+  const handleNavigateBack = () => {
+    navigate(-1);
+  };
+
   return (
     <Page.Container>
       <Page.Header>
@@ -98,7 +101,6 @@ const ViewDiaryListPage = () => {
             <MdOutlineKeyboardBackspace
               onClick={() => {
                 setIsSearching(false);
-                setSearchQuery("");
               }}
             />
           ) : (
@@ -106,25 +108,7 @@ const ViewDiaryListPage = () => {
           )}
         </div>
         <AnimatePresence mode={"wait"}>
-          {isSearching ? (
-            <motion.div
-              key={"search"}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
-              className={"flex flex-grow items-center justify-between"}
-            >
-              <Input
-                ref={searchInputRef}
-                icon={<IoSearch className={"text-base"} />}
-                placeholder={"작성자, 제목, 내용 검색"}
-                className={"text-sm w-full"}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </motion.div>
-          ) : (
+          {!isSearching && (
             <motion.div
               key={"view"}
               initial={{ opacity: 0, x: -20 }}
@@ -145,10 +129,15 @@ const ViewDiaryListPage = () => {
                 <div className={"p-2 flex items-center justify-center"}>
                   <IoSearch
                     className={"text-xl"}
-                    onClick={() => setIsSearching(true)}
+                    onClick={() => handleSearchToggle(true)}
                   />
                 </div>
-                <div className={"p-2 flex items-center justify-center"}>
+                <div
+                  className={`p-2 flex items-center justify-center ${viewMode === "calendar" ? "text-primary bg-gray-200 rounded-md" : ""}`}
+                  onClick={() =>
+                    setViewMode(viewMode === "list" ? "calendar" : "list")
+                  }
+                >
                   <IoCalendarOutline className={"text-xl"} />
                 </div>
                 <div className={"py-2 pl-2"}>
@@ -189,45 +178,35 @@ const ViewDiaryListPage = () => {
         </AnimatePresence>
       </Page.Header>
       <Page.Content>
-        <Banner
-          variant={"green"}
-          title={"우리 일기장은 어떤 일기장일까?"}
-          className={"mt-2"}
-        >
-          메모리아에게 일기장 분석받기
-        </Banner>
-
-        <div className={"flex flex-col gap-4 mt-5"}>
-          {isLoading ? (
-            Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className={"animate-pulse bg-gray-200 h-24 rounded-md p-4"}
-              >
-                <div className={"h-3 bg-gray-300 rounded w-3/4 mb-3"} />
-                <div className={"h-2 bg-gray-300 rounded w-1/2 mb-2"} />
-                <div className={"h-2 bg-gray-300 rounded w-full mb-2"} />
-                <div className={"h-2 bg-gray-300 rounded w-5/6"} />
-              </div>
-            ))
+        <AnimatePresence mode={"wait"}>
+          {viewMode === "list" ? (
+            <motion.div
+              key={"list"}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <DiaryListPanel
+                diaryBookId={Number(diaryBookId)}
+                onNavigateBack={handleNavigateBack}
+                onOpenWritePage={openWritePage}
+                onSearchToggle={handleSearchToggle}
+                isSearching={isSearching}
+              />
+            </motion.div>
           ) : (
-            <>
-              {diaryList?.content && diaryList.content.length > 0 ? (
-                diaryList.content.map((diary) => (
-                  <DiaryListItem key={diary.id} item={diary} />
-                ))
-              ) : (
-                <div className={"text-center text-gray-500 mt-10"}>
-                  아직 작성된 일기가 없어요. 첫 일기를 작성해보세요!
-                </div>
-              )}
-            </>
+            <motion.div
+              key={"calendar"}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <DiaryCalendarPanel diaryBookId={Number(diaryBookId)} />
+            </motion.div>
           )}
-        </div>
-        <DiaryWriteButton
-          className={"fixed bottom-20 right-5"}
-          onClick={openWritePage}
-        />
+        </AnimatePresence>
       </Page.Content>
     </Page.Container>
   );

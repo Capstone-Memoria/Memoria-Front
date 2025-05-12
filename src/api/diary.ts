@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Diary } from "../models/Diary";
 import { Page, PageParam } from "../models/Pagination";
 import server from "./axios";
@@ -116,4 +117,21 @@ export const deleteDiary = async (
 ): Promise<void> => {
   await server.delete(`/api/diary-book/${diaryBookId}/diary/${diaryId}`);
   // DELETE request with 204 No Content typically doesn't return a body
+};
+
+export const fetchDiaryByDateRange = async (
+  diaryBookId: number,
+  startDate: DateTime,
+  endDate: DateTime
+): Promise<Diary[]> => {
+  const response = await server.get(
+    `/api/diary-book/${diaryBookId}/diary/by-date`,
+    {
+      params: {
+        startDate: startDate.toFormat("yyyy-MM-dd"),
+        endDate: endDate.toFormat("yyyy-MM-dd"),
+      },
+    }
+  );
+  return response.data;
 };
