@@ -12,7 +12,7 @@ export interface Diary {
   createdBy?: User;
   lastModifiedAt?: DateTime;
   lastModifiedBy?: User;
-  likeCount?: number;
+  reactionCount?: number;
   commentCount?: number;
   images?: AttachedFile[];
   reactions?: Reaction[];

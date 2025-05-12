@@ -51,7 +51,7 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
           <div className={"flex gap-2 text-gray-600"}>
             <div className={"flex items-center gap-1 text-xs"}>
               <IoMdHeart className={"text-xs"} />
-              <div>{item.likeCount ?? 0}</div>
+              <div>{item.reactionCount ?? 0}</div>
             </div>
             <div className={"flex justify-center items-center gap-1 text-xs"}>
               <CommentIcon className={"size-xs"} />
