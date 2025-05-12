@@ -407,13 +407,13 @@ const DiaryBookMemberPage = () => {
             상대방에게 초대 알림이 전송됩니다.
           </p>
           <div className={"flex flex-col gap-3"}>
-            <div className={"flex items-center gap-2"}>
+            <div className={"flex flex-col  gap-4"}>
               <Input
                 type={"email"}
                 placeholder={"초대할 멤버의 이메일 주소"}
                 value={directInviteEmail}
                 onChange={(e) => setDirectInviteEmail(e.target.value)}
-                className={"flex-1"}
+                className={""}
                 aria-label={"초대할 멤버 이메일"}
                 disabled={directInviteMutation.isPending}
               />
