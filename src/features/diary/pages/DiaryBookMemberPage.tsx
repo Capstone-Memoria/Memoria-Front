@@ -413,7 +413,7 @@ const DiaryBookMemberPage = () => {
                 placeholder={"초대할 멤버의 이메일 주소"}
                 value={directInviteEmail}
                 onChange={(e) => setDirectInviteEmail(e.target.value)}
-                className={""}
+                className={"w-full"}
                 aria-label={"초대할 멤버 이메일"}
                 disabled={directInviteMutation.isPending}
               />
