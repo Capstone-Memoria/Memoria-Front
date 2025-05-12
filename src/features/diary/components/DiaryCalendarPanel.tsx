@@ -3,6 +3,7 @@ import DiaryListItem from "@/components/diary/DiaryListItem";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 interface DiaryCalendarPanelProps {
@@ -208,17 +209,31 @@ const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
             : "날짜를 선택하면 일기를 볼 수 있어요."}
         </h3>
         <div className={"grid gap-4"}>
-          {selectedDateDiaries.length > 0 ? (
-            selectedDateDiaries.map((diary) => (
-              <DiaryListItem key={diary.id} item={diary} />
-            ))
-          ) : selectedDate ? (
-            <div className={"text-center text-gray-500"}>
-              선택된 날짜에 일기가 없어요.
-            </div>
-          ) : (
-            <div className={"text-center text-gray-500"}></div> // 초기 상태
-          )}
+          <AnimatePresence mode={"sync"}>
+            {selectedDateDiaries.length > 0 ? (
+              selectedDateDiaries.map((diary, index) => (
+                <motion.div
+                  key={diary.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{
+                    duration: 0.225,
+                    ease: [0.16, 1, 0.3, 1],
+                    delay: index * 0.01,
+                  }}
+                >
+                  <DiaryListItem key={diary.id} item={diary} />
+                </motion.div>
+              ))
+            ) : selectedDate ? (
+              <div className={"text-center text-gray-500"}>
+                선택된 날짜에 일기가 없어요.
+              </div>
+            ) : (
+              <div className={"text-center text-gray-500"}></div> // 초기 상태
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

@@ -178,17 +178,35 @@ const ViewDiaryListPage = () => {
         </AnimatePresence>
       </Page.Header>
       <Page.Content>
-        {viewMode === "list" ? (
-          <DiaryListPanel
-            diaryBookId={Number(diaryBookId)}
-            onNavigateBack={handleNavigateBack}
-            onOpenWritePage={openWritePage}
-            onSearchToggle={handleSearchToggle}
-            isSearching={isSearching}
-          />
-        ) : (
-          <DiaryCalendarPanel diaryBookId={Number(diaryBookId)} />
-        )}
+        <AnimatePresence mode={"wait"}>
+          {viewMode === "list" ? (
+            <motion.div
+              key={"list"}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <DiaryListPanel
+                diaryBookId={Number(diaryBookId)}
+                onNavigateBack={handleNavigateBack}
+                onOpenWritePage={openWritePage}
+                onSearchToggle={handleSearchToggle}
+                isSearching={isSearching}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={"calendar"}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <DiaryCalendarPanel diaryBookId={Number(diaryBookId)} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Page.Content>
     </Page.Container>
   );
