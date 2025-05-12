@@ -28,7 +28,6 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "event-source-polyfill": "^1.0.31",
-    "framer-motion": "^12.10.5",
     "heic2any": "^0.0.4",
     "lucide-react": "^0.487.0",
     "luxon": "^3.6.1",
