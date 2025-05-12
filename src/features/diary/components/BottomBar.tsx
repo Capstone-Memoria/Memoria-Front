@@ -4,6 +4,7 @@ import { Reaction, ReactionType } from "@/models/Diary";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HTMLAttributes, useEffect, useState } from "react";
 import { BsChatFill } from "react-icons/bs";
+import { RiMailFill } from "react-icons/ri"; // Changed to Mail icon
 import ReactionAddPanel from "./reactions/ReactionAddPanel";
 import { ReactionIcon } from "./reactions/ReactionIcon";
 
@@ -47,6 +48,12 @@ const BottomBar: React.FC<BottomBarProps> = ({
   const { data: commentCount = 0, isFetching: isFetchingComments } = useQuery({
     queryKey: ["fetchCommentsCount", diaryBookId, diaryId],
     queryFn: () => api.comment.fetchCommentsCount(diaryBookId, diaryId),
+  });
+
+  const { data: aiComments, isLoading: isLoadingAiComments } = useQuery({
+    queryKey: ["fetchAiComments", diaryId],
+    queryFn: () => api.aiCharacter.fetchAiComments(Number(diaryId)),
+    enabled: !!diaryId,
   });
 
   useEffect(() => {
@@ -202,6 +209,16 @@ const BottomBar: React.FC<BottomBarProps> = ({
           className={"flex items-center gap-2 text-gray-700"}
           onClick={onCommentClick}
         >
+          {isLoadingAiComments ? (
+            <div
+              className={"w-5 h-5 bg-gray-200 rounded-full animate-pulse"}
+            ></div>
+          ) : (
+            aiComments &&
+            aiComments.length > 0 && (
+              <RiMailFill className={"text-lg"} />
+            )
+          )}
           <BsChatFill className={""} />
           {isFetchingComments ? (
             <div

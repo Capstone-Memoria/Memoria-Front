@@ -16,6 +16,7 @@ import { BsArrowReturnRight, BsPersonFill } from "react-icons/bs";
 import { IoReturnUpForwardOutline } from "react-icons/io5";
 import { MdArrowUpward, MdClose } from "react-icons/md";
 import CommentItem from "./CommentItem";
+import LetterFromAI from "../ai/LetterFromAI";
 
 interface CommentDrawerProps {
   open: boolean;
@@ -56,6 +57,12 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     queryKey: ["fetchComments", diaryBookId, diaryId],
     queryFn: () => api.comment.fetchComments(diaryBookId, diaryId),
     enabled: open,
+  });
+
+  const { data: aiComments, isLoading: isLoadingAiComments } = useQuery({
+    queryKey: ["fetchAiComments", diaryId],
+    queryFn: () => api.aiCharacter.fetchAiComments(Number(diaryId)),
+    enabled: open && !!diaryId, // only fetch if drawer is open and diaryId is available
   });
 
   const queryClient = useQueryClient();
@@ -185,7 +192,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
               className={"flex flex-col gap-2 flex-[1_1_0] overflow-y-auto"}
               data-vaul-no-drag
             >
-              {isLoading ? (
+              {isLoading || isLoadingAiComments ? (
                 Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={index}
@@ -201,14 +208,23 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     <div className={"h-4 bg-gray-300 rounded w-5/6"} />
                   </div>
                 ))
-              ) : comments && comments.length > 0 ? (
-                comments.map((comment) => (
-                  <CommentItem key={comment.id} comment={comment} />
-                ))
               ) : (
-                <div className={"text-center text-gray-500"}>
-                  아직 댓글이 없습니다.
-                </div>
+                <>
+                  {aiComments?.map((comment) => (
+                    <LetterFromAI key={`ai-${comment.id}`} aiComment={comment} />
+                  ))}
+                  {comments && comments.length > 0 ? (
+                    comments.map((comment) => (
+                      <CommentItem key={comment.id} comment={comment} />
+                    ))
+                  ) : (
+                    (!aiComments || aiComments.length === 0) && (
+                      <div className={"text-center text-gray-500"}>
+                        아직 댓글이 없습니다.
+                      </div>
+                    )
+                  )}
+                </>
               )}
             </div>
           </div>

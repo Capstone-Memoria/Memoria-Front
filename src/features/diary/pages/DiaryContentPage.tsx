@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiImageCircleAiFill, RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
-import LetterFromAI from "../components/ai/LetterFromAI";
 import BottomBar from "../components/BottomBar";
 import CommentDrawer from "../components/comment/CommentDrawer";
 
@@ -43,12 +42,6 @@ const DiaryContentPage = () => {
   const { data: diary, isLoading } = useQuery({
     queryKey: ["fetchDiary", diaryBookId, diaryId],
     queryFn: () => api.diary.fetchDiary(Number(diaryBookId), Number(diaryId)),
-  });
-
-  const { data: aiComments, isLoading: isLoadingAiComments } = useQuery({
-    queryKey: ["fetchAiComments", diaryId],
-    queryFn: () => api.aiCharacter.fetchAiComments(Number(diaryId)),
-    enabled: !!diaryId, // only fetch if diaryId is available
   });
 
   /* Mutations */
@@ -245,11 +238,6 @@ const DiaryContentPage = () => {
 
               <LayoutGroup>
                 <MusicPlayer musicFileId={diary.musicFile?.id} />
-
-                {/* AI 캐릭터 댓글 컨텐츠 */}
-                {aiComments?.map((comment) => (
-                  <LetterFromAI key={comment.id} aiComment={comment} />
-                ))}
 
                 {/* 일기 내용 */}
                 <motion.div
