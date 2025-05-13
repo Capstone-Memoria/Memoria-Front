@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { IoCalendarOutline, IoSearch } from "react-icons/io5";
+import Input from "@/components/base/Input";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +21,7 @@ const ViewDiaryListPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false); // diary의 즐겨찾기 상태
   const [isSearching, setIsSearching] = useState(false); // 검색 입력 필드 표시 상태 추가
+  const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 추가
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list"); // 뷰 모드 상태 추가
 
   /* Refs */
@@ -86,6 +88,8 @@ const ViewDiaryListPage = () => {
     setIsSearching(searching);
     if (searching) {
       setViewMode("list"); // 검색할 때는 리스트 모드로 전환
+    } else {
+      setSearchQuery(""); // 검색 비활성화 시 검색어 초기화
     }
   };
 
@@ -100,7 +104,7 @@ const ViewDiaryListPage = () => {
           {isSearching ? (
             <MdOutlineKeyboardBackspace
               onClick={() => {
-                setIsSearching(false);
+                handleSearchToggle(false);
               }}
             />
           ) : (
@@ -108,7 +112,25 @@ const ViewDiaryListPage = () => {
           )}
         </div>
         <AnimatePresence mode={"wait"}>
-          {!isSearching && (
+          {isSearching ? (
+            <motion.div
+              key={"search-input"}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
+              className={"flex-grow"}
+            >
+              <Input
+                icon={<IoSearch className={"text-base"} />}
+                placeholder={"작성자, 제목, 내용 검색"}
+                className={"text-sm w-full"}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+            </motion.div>
+          ) : (
             <motion.div
               key={"view"}
               initial={{ opacity: 0, x: -20 }}
@@ -193,6 +215,7 @@ const ViewDiaryListPage = () => {
                 onOpenWritePage={openWritePage}
                 onSearchToggle={handleSearchToggle}
                 isSearching={isSearching}
+                searchQuery={searchQuery}
               />
             </motion.div>
           ) : (
@@ -203,7 +226,10 @@ const ViewDiaryListPage = () => {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
             >
-              <DiaryCalendarPanel diaryBookId={Number(diaryBookId)} />
+              <DiaryCalendarPanel
+                diaryBookId={Number(diaryBookId)}
+                searchQuery={searchQuery}
+              />
             </motion.div>
           )}
         </AnimatePresence>

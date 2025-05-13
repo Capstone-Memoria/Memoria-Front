@@ -9,12 +9,16 @@ import { useState } from "react";
 
 interface DiaryCalendarPanelProps {
   diaryBookId: number;
+  searchQuery: string; // searchQuery prop 추가
 }
 
 /**
  * 일기장의 일기들을 캘린더 형식으로 표시하는 컴포넌트입니다.
  */
-const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
+const DiaryCalendarPanel = ({
+  diaryBookId,
+  searchQuery,
+}: DiaryCalendarPanelProps) => {
   // 현재 선택된 년월
   const [currentDate, setCurrentDate] = useState(DateTime.now());
   // 캘린더에서 선택된 날짜
@@ -44,6 +48,18 @@ const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
       ),
     // keepPreviousData: true, // 필요하다면 이전 데이터를 유지하여 부드러운 전환 효과
   });
+
+  // 검색어에 따라 일기 필터링
+  const filteredDiaryList =
+    diaryList?.filter((diary) => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        diary.title.toLowerCase().includes(query) ||
+        diary.content.toLowerCase().includes(query) ||
+        diary.createdBy?.nickName.toLowerCase().includes(query)
+      );
+    }) || [];
 
   // 현재 월의 시작 요일 (1: 월요일, ..., 7: 일요일)
   // luxon에서는 요일이 1(월)~7(일)이므로 일요일을 0으로 맞추기 위해 조정
@@ -107,7 +123,7 @@ const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
 
   // 일기가 있는 날짜인지 확인하는 함수
   const hasDiary = (day: number) => {
-    if (!diaryList) return false;
+    if (!filteredDiaryList) return false; // 필터링된 리스트 사용
     const targetDate = DateTime.fromObject({
       year: currentDate.year,
       month: currentDate.month,
@@ -115,14 +131,14 @@ const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
     });
     // YYYY-MM-DD 형식으로 비교
     const targetDateString = targetDate.toFormat("yyyy-MM-dd");
-    return diaryList.some(
+    return filteredDiaryList.some(
       (diary) => diary.createdAt.toFormat("yyyy-MM-dd") === targetDateString
     );
   };
 
   // 선택된 날짜의 일기 목록 필터링
   const selectedDateDiaries = selectedDate
-    ? diaryList?.filter(
+    ? filteredDiaryList?.filter(
         (diary) =>
           DateTime.fromISO(diary.createdAt.toISO()!).toFormat("yyyy-MM-dd") ===
           selectedDate.toFormat("yyyy-MM-dd")

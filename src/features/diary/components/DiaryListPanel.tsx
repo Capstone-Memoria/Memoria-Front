@@ -1,13 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { IoSearch } from "react-icons/io5";
+import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 
 import api from "@/api";
 import Banner from "@/components/base/Banner";
-import Input from "@/components/base/Input";
 import Spinner from "@/components/base/Spinner";
 import DiaryListItem from "@/components/diary/DiaryListItem";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
@@ -19,19 +16,14 @@ interface DiaryListPanelProps {
   onOpenWritePage: () => void;
   onSearchToggle: (isSearching: boolean) => void;
   isSearching: boolean;
+  searchQuery: string; // searchQuery prop 추가
 }
 
 const DiaryListPanel = ({
   diaryBookId,
   onOpenWritePage,
-  isSearching,
+  searchQuery, // searchQuery prop 사용
 }: DiaryListPanelProps) => {
-  /* States */
-  const [searchQuery, setSearchQuery] = useState("");
-
-  /* Refs */
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
   /* Server Side */
   const PAGE_SIZE = 10; // 한 번에 가져올 일기 개수
 
@@ -69,6 +61,18 @@ const DiaryListPanel = ({
   // 모든 페이지의 content를 하나의 배열로 합침
   const diaryListContent = data?.pages.flatMap((page) => page.content) || [];
 
+  // 검색어에 따라 일기 필터링
+  // TODO: api 레벨에서 검색 기능 추가 필요
+  const filteredDiaryList = diaryListContent.filter((diary) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      diary.title.toLowerCase().includes(query) ||
+      diary.content.toLowerCase().includes(query) ||
+      diary.createdBy?.nickName.toLowerCase().includes(query)
+    );
+  });
+
   // 다이어리를 날짜별로 그룹화하는 함수
   const groupDiariesByDate = (diaries: Diary[]) => {
     if (!diaries) return {};
@@ -87,7 +91,7 @@ const DiaryListPanel = ({
     );
   };
 
-  const groupedDiaries = groupDiariesByDate(diaryListContent);
+  const groupedDiaries = groupDiariesByDate(filteredDiaryList); // 필터링된 리스트 사용
   const sortedDates = Object.keys(groupedDiaries).sort((a, b) => {
     // 날짜 문자열을 DateTime 객체로 변환하여 비교
     const dateA = DateTime.fromFormat(a, "yyyy년 MM월 dd일");
@@ -97,28 +101,6 @@ const DiaryListPanel = ({
 
   return (
     <>
-      <AnimatePresence mode={"wait"}>
-        {isSearching ? (
-          <motion.div
-            key={"search"}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.225, ease: [0.16, 1, 0.3, 1] }}
-            className={"flex flex-grow items-center justify-between"}
-          >
-            <Input
-              ref={searchInputRef}
-              icon={<IoSearch className={"text-base"} />}
-              placeholder={"작성자, 제목, 내용 검색"}
-              className={"text-sm w-full"}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
       <Banner
         variant={"green"}
         title={"우리 일기장은 어떤 일기장일까?"}
@@ -128,7 +110,9 @@ const DiaryListPanel = ({
       </Banner>
 
       <div className={"flex flex-col gap-4 mt-5"}>
-        {isDiaryListLoading && diaryListContent.length === 0 ? ( // 초기 로딩 중이고, 아직 데이터가 없을 때
+        {isDiaryListLoading &&
+        filteredDiaryList.length === 0 &&
+        !searchQuery ? ( // 초기 로딩 중이고, 아직 데이터가 없고, 검색어가 없을 때
           Array.from({ length: 6 }).map((_, index) => (
             <div
               key={index}
@@ -137,31 +121,37 @@ const DiaryListPanel = ({
           ))
         ) : (
           <>
-            {diaryListContent.length > 0
-              ? sortedDates.map((date) => (
-                  <div key={date} className={"flex flex-col gap-2"}>
-                    <div className={"text-sm font-semibold text-gray-700 my-1"}>
-                      {DateTime.fromFormat(date, "yyyy년 MM월 dd일").hasSame(
-                        DateTime.now(),
-                        "day"
-                      )
-                        ? "오늘"
-                        : date}
-                    </div>
-                    {groupedDiaries[date].map((diary) => (
-                      <DiaryListItem key={diary.id} item={diary} />
-                    ))}
+            {filteredDiaryList.length > 0 ? (
+              sortedDates.map((date) => (
+                <div key={date} className={"flex flex-col gap-2"}>
+                  <div className={"text-sm font-semibold text-gray-700 my-1"}>
+                    {DateTime.fromFormat(date, "yyyy년 MM월 dd일").hasSame(
+                      DateTime.now(),
+                      "day"
+                    )
+                      ? "오늘"
+                      : date}
                   </div>
-                ))
-              : // 초기 로딩이 끝났는데도 데이터가 없는 경우
-                !isDiaryListLoading &&
-                !isFetchingNextPage && (
-                  <div className={"text-center text-gray-500 mt-10"}>
-                    아직 작성된 일기가 없어요. 첫 일기를 작성해보세요!
-                  </div>
-                )}
-            {/* 무한 스크롤 트리거 및 로딩 인디케이터 */}
-            {hasNextPage && (
+                  {groupedDiaries[date].map((diary) => (
+                    <DiaryListItem key={diary.id} item={diary} />
+                  ))}
+                </div>
+              ))
+            ) : // 데이터가 없거나, 검색 결과가 없는 경우
+            !isDiaryListLoading &&
+              !isFetchingNextPage &&
+              searchQuery &&
+              filteredDiaryList.length === 0 ? (
+              <div className={"text-center text-gray-500 mt-10"}>
+                검색 결과가 없습니다.
+              </div>
+            ) : (
+              <div className={"text-center text-gray-500 mt-10"}>
+                아직 작성된 일기가 없어요. 첫 일기를 작성해보세요!
+              </div>
+            )}
+            {/* 무한 스크롤 트리거 및 로딩 인디케이터 (검색 중이 아닐 때만) */}
+            {hasNextPage && !searchQuery && (
               <div ref={ref} className={"flex justify-center items-center p-4"}>
                 {isFetchingNextPage ? <Spinner /> : null}
               </div>
