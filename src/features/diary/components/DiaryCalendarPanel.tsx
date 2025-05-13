@@ -2,6 +2,7 @@ import api from "@/api";
 import DiaryListItem from "@/components/diary/DiaryListItem";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -132,15 +133,21 @@ const DiaryCalendarPanel = ({ diaryBookId }: DiaryCalendarPanelProps) => {
     <div className={"mt-4"}>
       {/* 캘린더 헤더 */}
       <div className={"flex justify-between items-center mb-4"}>
-        <button onClick={goToPrevMonth} className={"p-2"}>
-          &lt;
-        </button>
+        <div
+          onClick={goToPrevMonth}
+          className={"p-2 active:scale-95 transition-all"}
+        >
+          <ChevronLeft />
+        </div>
         <h2 className={"text-lg font-medium"}>
           {currentDate.toFormat("yyyy년 MM월")}
         </h2>
-        <button onClick={goToNextMonth} className={"p-2"}>
-          &gt;
-        </button>
+        <div
+          onClick={goToNextMonth}
+          className={"p-2 active:scale-95 transition-all"}
+        >
+          <ChevronRight />
+        </div>
       </div>
 
       {/* 요일 헤더 */}

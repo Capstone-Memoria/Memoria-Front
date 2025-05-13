@@ -21,7 +21,7 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
       {...props}
       className={cn(
         "flex flex-col w-full justify-center items-center",
-        props.className
+        props.className,
       )}
     >
       <DiaryCover
