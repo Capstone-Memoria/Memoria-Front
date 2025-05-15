@@ -1,9 +1,4 @@
 import Button from "@/components/base/Button";
-import DiaryCoverCarousel, {
-  DiaryCoverItem,
-  PresetDiaryCoverItem,
-  UploadedDiaryCoverItem, // UploadedDiaryCoverItem 타입 임포트
-} from "@/components/diary/DiaryCoverCarousel";
 import React, { ChangeEvent, HTMLAttributes, useRef, useState } from "react"; // React 훅 및 이벤트 타입 임포트
 
 // 커버 이미지 예시 임포트
@@ -13,16 +8,19 @@ import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
 import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
 import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
 
+import { DiaryCoverItem } from "@/components/diary/DiaryCover";
+import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import { FaMagic } from "react-icons/fa";
 import { MdUpload } from "react-icons/md";
 
 interface EditDiaryCoverPanelProps extends HTMLAttributes<HTMLDivElement> {
   onCancel?: () => void;
   onSave?: (selectedCover: DiaryCoverItem | null) => void; // selectedCover를 인자로 추가
+
   isSaving?: boolean;
 }
 
-const DIARY_COVER_PRESETS: PresetDiaryCoverItem[] = [
+const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
   {
     type: "preset",
     imageSrc: CoverExampleImg1,
@@ -72,13 +70,11 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    const newCoverItems: UploadedDiaryCoverItem[] = Array.from(files).map(
-      (file) => ({
-        type: "uploaded",
-        image: file,
-        coverColor: "bg-gray-500", // 업로드 이미지 기본 색상
-      })
-    );
+    const newCoverItems: DiaryCoverItem[] = Array.from(files).map((file) => ({
+      type: "file",
+      image: file,
+      coverColor: "bg-gray-500", // 업로드 이미지 기본 색상
+    }));
 
     setDiaryCoverItems((prevItems) => [...prevItems, ...newCoverItems]);
 

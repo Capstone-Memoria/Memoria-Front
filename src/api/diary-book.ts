@@ -1,6 +1,7 @@
 import { Diary } from "@/models/Diary";
 import { DiaryBook } from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
+import { Sticker } from "@/models/Sticker";
 import server from "./axios";
 
 export const fetchMyDiaryBook = async (PageParam: PageParam) => {
@@ -13,21 +14,9 @@ export const fetchMyDiaryBook = async (PageParam: PageParam) => {
   return response.data;
 };
 
-// 스티커 아이템 타입 정의
-export interface StickerItem {
-  id: string;
-  imageUrl: string;
-  x: number;
-  y: number;
-  rotation: number;
-  scale: number;
-  zIndex: number;
-}
-
 interface DiaryBookCreateRequest {
   title: string;
   coverImage: File;
-  stickers?: StickerItem[];
 }
 
 export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
@@ -35,16 +24,25 @@ export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
   formData.append("title", request.title);
   formData.append("coverImage", request.coverImage);
 
-  // 스티커 정보가 있으면 JSON 문자열로 변환하여 추가
-  if (request.stickers && request.stickers.length > 0) {
-    formData.append("stickers", JSON.stringify(request.stickers));
-  }
-
   const response = await server.post<DiaryBook>("api/diary-book", formData);
 
   return response.data;
 };
 
+interface DiaryBookCreateWithStickersRequest extends DiaryBookCreateRequest {
+  stickers: Sticker[];
+}
+
+export const createDiaryBookWithStickers = async (
+  request: DiaryBookCreateWithStickersRequest
+) => {
+  const response = await createDiaryBook(request);
+  const diaryBookId = response.id;
+
+  await updateStickers(diaryBookId, request.stickers);
+
+  return response;
+};
 export const fetchDiaryBookById = async (diaryBookId: number) => {
   const response = await server.get<DiaryBook>(
     `/api/diary-book/${diaryBookId}`
@@ -57,7 +55,6 @@ interface DiaryBookUpdateRequest {
   title?: string;
   isPinned?: boolean;
   coverImage?: File;
-  stickers?: StickerItem[];
 }
 
 export const updateDiaryBook = async (
@@ -69,8 +66,6 @@ export const updateDiaryBook = async (
   if (request.isPinned)
     formData.append("isPinned", request.isPinned.toString());
   if (request.coverImage) formData.append("coverImage", request.coverImage);
-  if (request.stickers)
-    formData.append("stickers", JSON.stringify(request.stickers));
 
   const response = await server.patch<DiaryBook>(
     `/api/diary-book/${diaryBookId}`,
@@ -96,4 +91,13 @@ export const fetchMyDiaries = async (
     }
   );
   return response.data;
+};
+
+export const updateStickers = async (
+  diaryBookId: number,
+  stickers: Sticker[]
+) => {
+  await server.put(`/api/diary-book/${diaryBookId}/stickers`, {
+    stickers,
+  });
 };

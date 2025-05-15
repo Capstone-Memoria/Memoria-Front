@@ -65,16 +65,9 @@ const ViewDiaryListPage = () => {
         }
 
         try {
-          console.log("Updating diary book (pin toggle) with data:", {
-            diaryBookId: updateFormData.get("diaryBookId"),
-            isPinned: updateFormData.get("isPinned"),
+          await api.diaryBook.updateDiaryBook(Number(diaryBookId), {
+            isPinned: !isPinned,
           });
-          await api.diaryBook.updateDiaryBook(
-            Number(diaryBookId),
-            {
-              isPinned: !isPinned,
-            }
-          );
           setIsPinned(!isPinned);
         } catch (e) {
           console.error("즐겨찾기 업데이트 실패", e);
@@ -219,7 +212,7 @@ const ViewDiaryListPage = () => {
             <>
               {diaryList?.content && diaryList.content.length > 0 ? (
                 diaryList.content.map((diary) => (
-                  <DiaryListItem key={diary.id} item={diary}  />
+                  <DiaryListItem key={diary.id} item={diary} />
                 ))
               ) : (
                 <div className={"text-center text-gray-500 mt-10"}>

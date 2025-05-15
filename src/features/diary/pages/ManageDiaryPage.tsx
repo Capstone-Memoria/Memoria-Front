@@ -3,8 +3,8 @@ import Button from "@/components/base/Button";
 import Spinner from "@/components/base/Spinner";
 import {
   DiaryCoverItem,
+  FileDiaryCoverItem,
   PresetDiaryCoverItem,
-  UploadedDiaryCoverItem,
 } from "@/components/diary/DiaryCoverCarousel";
 import Page from "@/components/page/Page";
 import {
@@ -116,7 +116,7 @@ const ManageDiaryPage = () => {
     // 선택된 커버 이미지 타입에 따라 파일 준비
     if (selectedCover.type === "uploaded") {
       // 업로드된 이미지인 경우 File 객체 그대로 사용
-      coverImageFile = (selectedCover as UploadedDiaryCoverItem).image;
+      coverImageFile = (selectedCover as FileDiaryCoverItem).image;
     } else if (selectedCover.type === "preset") {
       // 프리셋 이미지인 경우 URL에서 File 객체로 변환
       const presetCover = selectedCover as PresetDiaryCoverItem;

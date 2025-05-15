@@ -123,7 +123,6 @@ const MainPage = () => {
                         title={diaryBook.title}
                         memberCount={diaryBook.memberCount}
                         pinned={diaryBook.isPinned ?? false}
-                        notificationCount={120}
                         coverImage={diaryBook.coverImage}
                         coverColor={randomColor}
                       />
@@ -154,7 +153,6 @@ const MainPage = () => {
                           title={diaryBook.title}
                           memberCount={1}
                           pinned={diaryBook.isPinned ?? false}
-                          notificationCount={120}
                           coverImage={diaryBook.coverImage}
                           coverColor={randomColor}
                         />

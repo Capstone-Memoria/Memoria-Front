@@ -7,13 +7,11 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
   logoType?: "default" | "back";
   isSubmitable: boolean;
   isCreating?: boolean;
-  onSubmit?: () => void;
 }
 
 const DiaryCreateHeader: React.FC<HeaderProps> = ({
   isSubmitable,
   isCreating,
-  onSubmit,
   ...props
 }) => {
   /* Properties */
@@ -25,7 +23,7 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({
   };
 
   return (
-    <Page.Header {...props}>
+    <Page.Header className={"flex relative"} {...props}>
       <Button
         variant={"text"}
         size={"sm"}
@@ -34,19 +32,11 @@ const DiaryCreateHeader: React.FC<HeaderProps> = ({
       >
         취소
       </Button>
-      <div className={"text-base font-normal"}>새 일기장</div>
-      <Button
-        variant={"text"}
-        disabled={!isSubmitable}
-        size={"sm"}
-        className={"text-sm font-normal"}
-        onClick={() => {
-          if (isCreating) return;
-          onSubmit?.();
-        }}
+      <div
+        className={"absolute left-1/2 -translate-x-1/2 text-base font-normal"}
       >
-        완료
-      </Button>
+        새 일기장
+      </div>
     </Page.Header>
   );
 };

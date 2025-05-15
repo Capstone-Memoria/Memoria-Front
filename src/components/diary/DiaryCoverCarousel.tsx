@@ -1,33 +1,20 @@
 import { useCarouselInteraction } from "@/hooks/useCarouselInteraction"; // 커스텀 훅 import
 import { cn } from "@/lib/utils/className"; // 경로는 실제 프로젝트에 맞게 수정하세요.
 import React from "react"; // React import 추가
-import DiaryCover from "./DiaryCover"; // 경로는 실제 프로젝트에 맞게 수정하세요.
+import DiaryCover, { DiaryCoverItem } from "./DiaryCover"; // 경로는 실제 프로젝트에 맞게 수정하세요.
 
 interface DiaryCoverCarouselProps {
   className?: string;
   onSelectChange?: (item: DiaryCoverItem) => void;
   items: DiaryCoverItem[];
-}
-
-export interface DiaryCoverItem {
-  type: "preset" | "uploaded";
-  coverColor: string;
-}
-
-export interface PresetDiaryCoverItem extends DiaryCoverItem {
-  type: "preset";
-  imageSrc: string;
-}
-
-export interface UploadedDiaryCoverItem extends DiaryCoverItem {
-  type: "uploaded";
-  image: File;
+  coverWidth?: number;
 }
 
 const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
   className,
   onSelectChange,
   items,
+  coverWidth = 168,
 }) => {
   const {
     potentialIndex,
@@ -49,7 +36,6 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
     itemCount: items.length,
     onSelect: (index) => {
       onSelectChange?.(items[index]);
-      console.log(items[index]);
     },
   });
 
@@ -105,19 +91,12 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
                 }}
               >
                 <DiaryCover
-                  showPin={false}
-                  className={"w-42 h-60 pointer-events-none"} // 내부 요소 이벤트 방지
-                  coverColor={item.coverColor}
-                  imageSrc={
-                    item.type === "preset"
-                      ? (item as PresetDiaryCoverItem).imageSrc
-                      : undefined
-                  }
-                  imageFile={
-                    item.type === "uploaded"
-                      ? (item as UploadedDiaryCoverItem).image
-                      : undefined
-                  }
+                  style={{
+                    maxWidth: coverWidth,
+                  }}
+                  className={"pointer-events-none"} // 내부 요소 이벤트 방지
+                  // 가로/세로 = 168/240 = 7/10
+                  item={item}
                 />
               </div>
             );
