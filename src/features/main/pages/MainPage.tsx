@@ -120,10 +120,7 @@ const MainPage = () => {
                       <DiaryBookComponent
                         onClick={() => navigate(`/diary/${diaryBook.id}`)}
                         key={diaryBook.id}
-                        title={diaryBook.title}
-                        memberCount={diaryBook.memberCount}
-                        pinned={diaryBook.isPinned ?? false}
-                        coverImage={diaryBook.coverImage}
+                        diaryBook={diaryBook}
                         coverColor={randomColor}
                       />
                     ))}
@@ -150,10 +147,7 @@ const MainPage = () => {
                         <DiaryBookComponent
                           onClick={() => navigate(`/diary/${diaryBook.id}`)}
                           key={diaryBook.id}
-                          title={diaryBook.title}
-                          memberCount={1}
-                          pinned={diaryBook.isPinned ?? false}
-                          coverImage={diaryBook.coverImage}
+                          diaryBook={diaryBook}
                           coverColor={randomColor}
                         />
                       ))}

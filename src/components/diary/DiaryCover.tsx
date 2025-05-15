@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils/className";
+import { Sticker } from "@/models/Sticker";
 import { HTMLAttributes, useEffect, useMemo, useState } from "react";
 import Image from "../base/Image";
 
@@ -35,6 +36,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   // pinned?: boolean;
   // showPin?: boolean;
   // notificationCount?: number;
+  stickers?: Sticker[];
   item?: DiaryCoverItem;
   title?: string;
 }
@@ -42,6 +44,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
 const DiaryCover: React.FC<DiaryCoverProps> = ({
   item,
   title = "Diary Cover",
+  stickers,
   ...props
 }) => {
   const [fileObjectUrl, setFileObjectUrl] = useState<string>();
@@ -84,6 +87,9 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
           alt={`${title} cover image`}
         />
       );
+    }
+    if (item?.type === "empty") {
+      return <div className={"flex-1 h-full bg-gray-300"}></div>;
     }
 
     return null;

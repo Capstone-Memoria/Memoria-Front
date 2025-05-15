@@ -1,26 +1,22 @@
 import { cn } from "@/lib/utils/className";
-import { AttachedFile } from "@/models/AttachedFile";
+import { DiaryBook as DiaryBookModel } from "@/models/DiaryBook";
 import { HTMLAttributes, useMemo } from "react";
 import { FaStar } from "react-icons/fa";
 import DiaryCover, { DiaryCoverItem } from "./DiaryCover";
+import StickerOverlay from "./StickerOverlay";
 
 interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
-  title: string;
-  memberCount: number;
-  pinned?: boolean;
-  // notifications?: number;
-  coverImage?: AttachedFile;
+  diaryBook: DiaryBookModel;
   coverColor?: string;
 }
 
 const DiaryBook: React.FC<DiaryBookProps> = ({
-  title,
-  memberCount,
-  coverImage,
+  diaryBook,
   coverColor,
-  pinned = false,
   ...props
 }) => {
+  const { title, memberCount, coverImage, isPinned, stickers } = diaryBook;
+
   const coverItem: DiaryCoverItem | undefined = useMemo(() => {
     return coverImage
       ? {
@@ -42,9 +38,11 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
         props.className
       )}
     >
-      <div className={"relative"}>
-        <DiaryBookPin pinned={pinned} />
-        <DiaryCover className={"mb-2"} title={title} item={coverItem} />
+      <div className={"relative w-full h-full"}>
+        <DiaryBookPin pinned={isPinned} />
+        <StickerOverlay stickers={stickers ?? []}>
+          <DiaryCover className={"mb-2"} title={title} item={coverItem} />
+        </StickerOverlay>
       </div>
       <p className={"text-[13px] font-medium"}>{title}</p>
       <p className={"text-[11px] font-light text-gray-1"}>
