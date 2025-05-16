@@ -192,7 +192,7 @@ const CreateDiaryPage = () => {
           </div>
         </div>
         <div className={"w-full px-4"}>
-          <div className={"flex justify-between items-center mt-5"}>
+          <div className={"flex justify-between gap-4 items-center mt-5"}>
             <CreateCoverImageDrawer
               open={createCoverDrawerOpen}
               onOpenChange={setCreateCoverDrawerOpen}
@@ -200,7 +200,7 @@ const CreateDiaryPage = () => {
               <Button
                 variant={"secondary"}
                 className={
-                  "w-36 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                  "w-full flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
                 }
               >
                 <FaMagic /> AI로 만들기
@@ -211,7 +211,7 @@ const CreateDiaryPage = () => {
               variant={"secondary"}
               onClick={handleUploadButtonClick}
               className={
-                "w-36 flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                "w-full flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
               }
             >
               <MdUpload className={"text-base"} /> 사진 업로드

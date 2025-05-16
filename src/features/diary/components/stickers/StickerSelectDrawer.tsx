@@ -50,9 +50,13 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={"min-h-[70%]"}>
-        <div className={"p-4"}>
-          <div className={"flex gap-2 overflow-x-auto scrollbar-hide pb-2"}>
+      <DrawerContent className={"h-[39vh] min-h-[45%]"}>
+        <div className={"p-4 px-4"}>
+          <div
+            className={
+              "flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden pb-2 border-b border-gray-200"
+            }
+          >
             <div className={"flex gap-2 min-w-max"}>
               {Object.entries(categoryNames).map(([category, name]) => (
                 <div
@@ -74,7 +78,11 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
             </div>
           </div>
         </div>
-        <div className={"mt-4 grid grid-cols-4 gap-5 place-items-center"}>
+        <div
+          className={
+            "mt-2 grid grid-cols-5 gap-5 place-items-center overflow-y-auto pb-8 px-4"
+          }
+        >
           <AnimatePresence mode={"popLayout"}>
             {stickerCategories[selectedCategory].map((sticker) => (
               <motion.div
