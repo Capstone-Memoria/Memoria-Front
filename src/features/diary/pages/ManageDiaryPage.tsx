@@ -1,11 +1,7 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Spinner from "@/components/base/Spinner";
-import {
-  DiaryCoverItem,
-  FileDiaryCoverItem,
-  PresetDiaryCoverItem,
-} from "@/components/diary/DiaryCoverCarousel";
+import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import Page from "@/components/page/Page";
 import {
   Accordion,
@@ -14,6 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Sticker } from "@/models/Sticker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
@@ -23,6 +20,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import EditDiaryCoverPanel from "../components/EditDiaryCoverPanel";
 import EditDiaryTitlePanel from "../components/EditDiaryTitlePanel";
+import DiaryDecorateDialog from "../components/stickers/DiaryDecorateDialog";
 
 const ManageDiaryPage = () => {
   const navigate = useNavigate();
@@ -70,14 +68,36 @@ const ManageDiaryPage = () => {
     },
   });
 
+  const { mutate: tryUpdateStickers, isPending: isStickerSaving } = useMutation(
+    {
+      mutationFn: (stickers: Sticker[]) => {
+        if (!diaryId) throw new Error("Diary ID is missing!");
+        return api.diaryBook.updateStickers(Number(diaryId), stickers);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["fetchDiaryBookById", diaryId],
+        });
+        setIsDecorateDialogOpen(false); // 성공 시 다이얼로그 닫기
+      },
+      onError: (error) => {
+        console.error("스티커 업데이트 실패:", error);
+        alert("스티커 업데이트에 실패했습니다.");
+      },
+    }
+  );
+
   // 아코디언 패널 상태 관리
   const [openedPanel, setOpenedPanel] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDecorateDialogOpen, setIsDecorateDialogOpen] = useState(false);
+  const [currentStickers, setCurrentStickers] = useState<Sticker[]>([]);
 
   useEffect(() => {
     if (data) {
       setTitle(data.title);
+      setCurrentStickers(data.stickers || []);
     }
   }, [data]);
 
@@ -106,46 +126,51 @@ const ManageDiaryPage = () => {
     if (isSaving) return; // 중복 클릭 방지
 
     if (!selectedCover) {
-      // 커버가 선택되지 않은 경우 (EditDiaryCoverPanel의 '저장' 버튼 로직에 따라 달라짐)
       alert("일기장 표지를 선택해주세요.");
       return;
     }
 
     let coverImageFile: File;
 
-    // 선택된 커버 이미지 타입에 따라 파일 준비
-    if (selectedCover.type === "uploaded") {
-      // 업로드된 이미지인 경우 File 객체 그대로 사용
-      coverImageFile = (selectedCover as FileDiaryCoverItem).image;
+    if (selectedCover.type === "file") {
+      coverImageFile = selectedCover.image;
     } else if (selectedCover.type === "preset") {
-      // 프리셋 이미지인 경우 URL에서 File 객체로 변환
-      const presetCover = selectedCover as PresetDiaryCoverItem;
       try {
-        const response = await fetch(presetCover.imageSrc);
+        const response = await fetch(selectedCover.imageSrc);
         const blob = await response.blob();
-        // File 객체 생성 (CreateDiaryPage와 유사)
         coverImageFile = new File([blob], `preset-cover-${Date.now()}.jpg`, {
-          type: blob.type || "image/jpeg", // 타입 명시, 없을 경우 jpeg 폴백
+          type: blob.type || "image/jpeg",
         });
       } catch (error) {
         console.error("프리셋 이미지 변환 중 오류 발생:", error);
         alert("이미지 처리에 실패했습니다. 다시 시도해주세요.");
-        return; // 변환 실패 시 저장 중단
+        return;
       }
     } else {
-      // 지원되지 않는 타입 에러 처리
       console.error("지원되지 않는 커버 이미지 타입입니다.");
       alert("지원되지 않는 커버 이미지 타입입니다.");
-      return; // 저장 중단
+      return;
     }
 
-    // 파일이 준비되면 뮤테이션 호출
     tryUpdateDiaryBook({
       coverImage: coverImageFile,
     });
-
-    // Note: 패널 닫기는 tryUpdateDiaryBook의 onSuccess에서 처리됨
   };
+
+  const handleStickerSave = (updatedStickers: Sticker[]) => {
+    tryUpdateStickers(updatedStickers);
+  };
+
+  const selectedCoverForDialog: DiaryCoverItem | null = data?.coverImage
+    ? {
+        type: "uploaded",
+        imageId: data.coverImage.id.toString(),
+        coverColor: "bg-gray-200", // 기본 커버 색상, DiaryBook에 coverColor 필드가 없으므로 기본값 사용
+      }
+    : {
+        type: "empty",
+        coverColor: "bg-gray-200",
+      };
 
   return (
     <Page.Container className={"h-full flex flex-col"}>
@@ -198,18 +223,29 @@ const ManageDiaryPage = () => {
             </AccordionTrigger>
             <AccordionContent>
               <EditDiaryCoverPanel
-                // currentCoverImageUrl={data?.coverImageUrl}
-                // selectedFile={coverImageFile}
-                // setSelectedFile={setCoverImageFile}
                 onCancel={() => {
-                  // 패널 내부에서 취소 버튼 클릭 시 호출
-                  setOpenedPanel(""); // 아코디언 닫기
-                  // EditDiaryCoverPanel 내부에서 업로드된 파일 상태 등 초기화 로직이 있어야 함
+                  setOpenedPanel("");
                 }}
-                onSave={handleEditCoverSave} // 새로운 커버 저장 핸들러 연결
-                isSaving={isSaving} // 저장 중 상태 전달
-                // onMouseLeave={handleCoverSave} // 이 로직은 제거
+                onSave={handleEditCoverSave}
+                isSaving={isSaving}
               />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* 스티커 편집 */}
+          <AccordionItem value={"edit-stickers"}>
+            <AccordionTrigger
+              className={"flex justify-between items-center"}
+              onClick={() => setIsDecorateDialogOpen(true)}
+            >
+              <div className={"text-base"}>일기장 꾸미기 (스티커)</div>
+              <MdOutlineModeEditOutline />
+            </AccordionTrigger>
+            {/* AccordionContent는 Dialog로 대체되므로 비워두거나 간단한 안내 메시지 표시 가능 */}
+            <AccordionContent>
+              <p className={"text-sm text-gray-500"}>
+                위 버튼을 클릭하여 스티커를 수정하세요.
+              </p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -249,6 +285,13 @@ const ManageDiaryPage = () => {
           </Drawer>
         </div>
       </Page.Content>
+      <DiaryDecorateDialog
+        open={isDecorateDialogOpen}
+        onOpenChange={setIsDecorateDialogOpen}
+        selectedCover={selectedCoverForDialog}
+        initialStickers={currentStickers}
+        onSave={handleStickerSave}
+      />
     </Page.Container>
   );
 };

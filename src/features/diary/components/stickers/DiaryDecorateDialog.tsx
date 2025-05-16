@@ -8,10 +8,13 @@ import { RiArrowGoBackLine, RiArrowGoForwardLine } from "react-icons/ri";
 import { StickerOption } from "../../models/StickerData";
 import StickerSelectDrawer from "./StickerSelectDrawer";
 import TransformableSticker from "./TransformableSticker";
+import { useEffect } from "react";
+
 interface DiaryDecorateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedCover: DiaryCoverItem | null;
+  initialStickers?: Sticker[];
   onSave?: (stickers: Sticker[]) => void;
 }
 
@@ -19,13 +22,23 @@ const DiaryDecorateDialog = ({
   open,
   onOpenChange,
   selectedCover,
+  initialStickers,
   onSave,
 }: DiaryDecorateDialogProps) => {
   const [stickerDrawerOpen, setStickerDrawerOpen] = useState(false);
-  const [stickers, setStickers] = useState<Sticker[]>([]);
+  const [stickers, setStickers] = useState<Sticker[]>(initialStickers || []);
   const [focusedStickerUuid, setFocusedStickerUuid] = useState<string | null>(
     null
   );
+
+  useEffect(() => {
+    if (open && initialStickers) {
+      setStickers(initialStickers);
+    } else if (!open) {
+      // Optionally reset stickers when dialog closes, or manage externally
+      // setStickers([]); 
+    }
+  }, [open, initialStickers]);
 
   const handleStickerSelect = (sticker: StickerOption) => {
     console.log("new sticker added", sticker);
