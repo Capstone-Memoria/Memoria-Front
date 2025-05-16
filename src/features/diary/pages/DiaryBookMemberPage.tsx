@@ -457,7 +457,6 @@ const DiaryBookMemberPage = () => {
       <Dialog
         open={!!memberToRemove}
         title={`${memberToRemove?.user.nickName} 님을 일기장에서 삭제하시겠어요?`}
-        description={"삭제된 멤버의 일기는 모두 삭제됩니다."}
         confirmLabel={"멤버 삭제"}
         cancelLabel={"취소"}
         onConfirm={confirmRemove}

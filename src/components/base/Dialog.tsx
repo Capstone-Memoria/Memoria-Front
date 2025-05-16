@@ -73,7 +73,12 @@ const Dialog = ({
           </div>
         ) : (
           /* Single OK = alert dialog */
-          <Button className={"w-full"} size={"sm"} onClick={onClose}>
+          <Button
+            className={"w-full text-green-500"}
+            size={"lg"}
+            variant={"text"}
+            onClick={onClose}
+          >
             {confirmLabel}
           </Button>
         )}
