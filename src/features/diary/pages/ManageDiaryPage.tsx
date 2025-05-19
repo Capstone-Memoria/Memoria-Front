@@ -1,5 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
+import ColorPicker from "@/components/base/ColorPicker";
 import Spinner from "@/components/base/Spinner";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import Page from "@/components/page/Page";
@@ -40,6 +41,7 @@ const ManageDiaryPage = () => {
       title?: string;
       isPinned?: boolean;
       coverImage?: File;
+      spineColor?: string;
     }) => {
       if (!diaryId) throw new Error("Diary ID is missing!");
       return api.diaryBook.updateDiaryBook(Number(diaryId), request);
@@ -90,6 +92,7 @@ const ManageDiaryPage = () => {
   // 아코디언 패널 상태 관리
   const [openedPanel, setOpenedPanel] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [selectedSpineColor, setSelectedSpineColor] = useState<string>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDecorateDialogOpen, setIsDecorateDialogOpen] = useState(false);
   const [currentStickers, setCurrentStickers] = useState<Sticker[]>([]);
@@ -98,6 +101,7 @@ const ManageDiaryPage = () => {
     if (data) {
       setTitle(data.title);
       setCurrentStickers(data.stickers || []);
+      setSelectedSpineColor(data.spineColor);
     }
   }, [data]);
 
@@ -154,6 +158,7 @@ const ManageDiaryPage = () => {
 
     tryUpdateDiaryBook({
       coverImage: coverImageFile,
+      spineColor: selectedSpineColor,
     });
   };
 
@@ -165,12 +170,20 @@ const ManageDiaryPage = () => {
     ? {
         type: "uploaded",
         imageId: data.coverImage.id.toString(),
-        coverColor: "bg-gray-200", // 기본 커버 색상, DiaryBook에 coverColor 필드가 없으므로 기본값 사용
       }
     : {
         type: "empty",
-        coverColor: "bg-gray-200",
       };
+
+  const handleSpineColorSave = () => {
+    if (!diaryId) {
+      console.error("Diary ID is missing!");
+      return;
+    }
+    tryUpdateDiaryBook({
+      spineColor: selectedSpineColor,
+    });
+  };
 
   return (
     <Page.Container className={"h-full flex flex-col"}>
@@ -229,6 +242,51 @@ const ManageDiaryPage = () => {
                 onSave={handleEditCoverSave}
                 isSaving={isSaving}
               />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* 일기장 책등 색상 */}
+          <AccordionItem value={"edit-spine-color"}>
+            <AccordionTrigger className={"flex justify-between items-center"}>
+              <div className={"text-base"}>일기장 책등 색상</div>
+              <div className={"flex items-center gap-2"}>
+                {isSaving || isDiaryBookFetching ? (
+                  <Spinner />
+                ) : (
+                  <div
+                    className={"w-6 h-6 rounded-full border border-gray-300"}
+                    style={{ backgroundColor: selectedSpineColor }}
+                  />
+                )}
+                <MdOutlineModeEditOutline />
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className={"flex flex-col items-center gap-4 p-4"}>
+                <ColorPicker
+                  selectedColor={selectedSpineColor}
+                  onColorSelect={setSelectedSpineColor}
+                />
+                <div className={"flex gap-2 w-full"}>
+                  <Button
+                    variant={"secondary"}
+                    className={"flex-1"}
+                    onClick={() => {
+                      setOpenedPanel("");
+                      if (data) setSelectedSpineColor(data.spineColor);
+                    }}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    className={"flex-1"}
+                    onClick={handleSpineColorSave}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? <Spinner /> : "저장"}
+                  </Button>
+                </div>
+              </div>
             </AccordionContent>
           </AccordionItem>
 

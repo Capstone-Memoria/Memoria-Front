@@ -8,6 +8,7 @@ interface DiaryCoverCarouselProps {
   onSelectChange?: (item: DiaryCoverItem) => void;
   items: DiaryCoverItem[];
   coverWidth?: number;
+  spineColor?: string; // 책등 색상 prop 추가
 }
 
 const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
@@ -15,6 +16,7 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
   onSelectChange,
   items,
   coverWidth = 168,
+  spineColor, // spineColor prop 받기
 }) => {
   const {
     potentialIndex,
@@ -92,11 +94,12 @@ const DiaryCoverCarousel: React.FC<DiaryCoverCarouselProps> = ({
               >
                 <DiaryCover
                   style={{
-                    maxWidth: coverWidth,
+                    width: coverWidth,
                   }}
                   className={"pointer-events-none"} // 내부 요소 이벤트 방지
                   // 가로/세로 = 168/240 = 7/10
                   item={item}
+                  spineColor={spineColor} // DiaryCover에 spineColor 전달
                 />
               </div>
             );

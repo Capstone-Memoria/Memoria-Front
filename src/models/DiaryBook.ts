@@ -15,4 +15,5 @@ export interface DiaryBook {
   stickers?: Sticker[];
   owner: User;
   coverImage?: AttachedFile;
+  spineColor?: string;
 }

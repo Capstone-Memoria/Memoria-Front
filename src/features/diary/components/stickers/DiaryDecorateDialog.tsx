@@ -1,14 +1,13 @@
 import DiaryCover, { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import { Sticker } from "@/models/Sticker";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiArrowNarrowLeft } from "react-icons/hi";
 import { PiSmileyStickerFill } from "react-icons/pi";
 import { RiArrowGoBackLine, RiArrowGoForwardLine } from "react-icons/ri";
 import { StickerOption } from "../../models/StickerData";
 import StickerSelectDrawer from "./StickerSelectDrawer";
 import TransformableSticker from "./TransformableSticker";
-import { useEffect } from "react";
 
 interface DiaryDecorateDialogProps {
   open: boolean;
@@ -16,6 +15,7 @@ interface DiaryDecorateDialogProps {
   selectedCover: DiaryCoverItem | null;
   initialStickers?: Sticker[];
   onSave?: (stickers: Sticker[]) => void;
+  spineColor?: string;
 }
 
 const DiaryDecorateDialog = ({
@@ -24,6 +24,7 @@ const DiaryDecorateDialog = ({
   selectedCover,
   initialStickers,
   onSave,
+  spineColor,
 }: DiaryDecorateDialogProps) => {
   const [stickerDrawerOpen, setStickerDrawerOpen] = useState(false);
   const [stickers, setStickers] = useState<Sticker[]>(initialStickers || []);
@@ -36,7 +37,7 @@ const DiaryDecorateDialog = ({
       setStickers(initialStickers);
     } else if (!open) {
       // Optionally reset stickers when dialog closes, or manage externally
-      // setStickers([]); 
+      // setStickers([]);
     }
   }, [open, initialStickers]);
 
@@ -156,9 +157,9 @@ const DiaryDecorateDialog = ({
                   item={
                     selectedCover ?? {
                       type: "empty",
-                      coverColor: "bg-gray-500",
                     }
                   }
+                  spineColor={spineColor}
                 />
                 <AnimatePresence>
                   {stickers.map((sticker) => (

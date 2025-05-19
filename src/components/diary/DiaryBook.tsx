@@ -41,7 +41,12 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
       <div className={"relative w-full h-full"}>
         <DiaryBookPin pinned={isPinned} />
         <StickerOverlay stickers={stickers ?? []}>
-          <DiaryCover className={"mb-2"} title={title} item={coverItem} />
+          <DiaryCover
+            className={"mb-2"}
+            title={title}
+            item={coverItem}
+            spineColor={diaryBook.spineColor}
+          />
         </StickerOverlay>
       </div>
       <p className={"text-[13px] font-medium"}>{title}</p>

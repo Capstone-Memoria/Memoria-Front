@@ -16,6 +16,7 @@ import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
 import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
 import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
 import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
+import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import { Sticker } from "@/models/Sticker";
@@ -25,33 +26,29 @@ const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
   {
     type: "preset",
     imageSrc: CoverExampleImg1,
-    coverColor: "bg-red-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg2,
-    coverColor: "bg-blue-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg3,
-    coverColor: "bg-green-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg4,
-    coverColor: "bg-yellow-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg5,
-    coverColor: "bg-purple-500",
   },
 ];
 
 const CreateDiaryPage = () => {
   const navigate = useNavigate();
   const [diaryTitle, setDiaryTitle] = useState("");
+  const [selectedSpineColor, setSelectedSpineColor] = useState<string>();
   const [canSubmit, setCanSubmit] = useState(false);
   const [createCoverDrawerOpen, setCreateCoverDrawerOpen] = useState(false);
   const [decorateDialogOpen, setDecorateDialogOpen] = useState(false);
@@ -96,12 +93,14 @@ const CreateDiaryPage = () => {
   } = useMutation({
     mutationFn: async () => {
       if (!selectedCover) throw new Error("커버 이미지를 선택해주세요");
+      if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
 
       // 선택된 커버로부터 이미지파일 추출
       const coverImageFile = await getCoverImageFile(selectedCover);
       return api.diaryBook.createDiaryBook({
         title: diaryTitle,
         coverImage: coverImageFile,
+        spineColor: selectedSpineColor,
       });
     },
     onSuccess: () => navigate("/main"),
@@ -120,12 +119,14 @@ const CreateDiaryPage = () => {
     mutationFn: async (stickers: Sticker[]) => {
       if (!selectedCover) throw new Error("커버 이미지를 선택해주세요.");
       if (!diaryTitle) throw new Error("일기장 제목을 입력해주세요.");
+      if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
 
       const coverImageFile = await getCoverImageFile(selectedCover);
       return api.diaryBook.createDiaryBookWithStickers({
         title: diaryTitle,
         coverImage: coverImageFile,
         stickers: stickers,
+        spineColor: selectedSpineColor,
       });
     },
     onSuccess: () => navigate("/main"),
@@ -176,6 +177,14 @@ const CreateDiaryPage = () => {
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
+        <p className={"mt-8 text-gray-500"}>일기장 책등 색상을 선택해주세요</p>
+        <div className={"mt-2"}>
+          <ColorPicker
+            className={"place-items-center gap-y-6"}
+            selectedColor={selectedSpineColor}
+            onColorSelect={setSelectedSpineColor}
+          />
+        </div>
         <p className={"mt-8 text-gray-500"}>
           일기장 커버 이미지를 선택해주세요
         </p>
@@ -188,6 +197,7 @@ const CreateDiaryPage = () => {
               className={"w-fit py-8"}
               items={diaryCoverItems}
               onSelectChange={setSelectedCover}
+              spineColor={selectedSpineColor}
             />
           </div>
         </div>
@@ -222,9 +232,13 @@ const CreateDiaryPage = () => {
             className={
               "w-full mt-6 rounded-md flex items-center justify-center gap-3"
             }
-            onClick={() => setDecorateDialogOpen(true)}
+            onClick={() => {
+              if (!(!selectedCover || !diaryTitle || !selectedSpineColor)) {
+                setDecorateDialogOpen(true);
+              }
+            }}
             variant={"primary"}
-            disabled={!selectedCover || !diaryTitle}
+            disabled={!selectedCover || !diaryTitle || !selectedSpineColor}
             size={"lg"}
           >
             <TbSticker2 />
@@ -255,6 +269,7 @@ const CreateDiaryPage = () => {
           onOpenChange={setDecorateDialogOpen}
           selectedCover={selectedCover}
           onSave={handleSaveWithStickers}
+          spineColor={selectedSpineColor}
         />
       </Page.Content>
     </Page.Container>

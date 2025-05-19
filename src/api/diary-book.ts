@@ -17,12 +17,14 @@ export const fetchMyDiaryBook = async (PageParam: PageParam) => {
 interface DiaryBookCreateRequest {
   title: string;
   coverImage: File;
+  spineColor: string;
 }
 
 export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
   const formData = new FormData();
   formData.append("title", request.title);
   formData.append("coverImage", request.coverImage);
+  formData.append("spineColor", request.spineColor);
 
   const response = await server.post<DiaryBook>("api/diary-book", formData);
 
@@ -55,6 +57,7 @@ interface DiaryBookUpdateRequest {
   title?: string;
   isPinned?: boolean;
   coverImage?: File;
+  spineColor?: string;
 }
 
 export const updateDiaryBook = async (
@@ -66,7 +69,7 @@ export const updateDiaryBook = async (
   if (request.isPinned)
     formData.append("isPinned", request.isPinned.toString());
   if (request.coverImage) formData.append("coverImage", request.coverImage);
-
+  if (request.spineColor) formData.append("spineColor", request.spineColor);
   const response = await server.patch<DiaryBook>(
     `/api/diary-book/${diaryBookId}`,
     formData

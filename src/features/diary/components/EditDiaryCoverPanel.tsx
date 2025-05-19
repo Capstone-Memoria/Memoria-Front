@@ -24,27 +24,22 @@ const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
   {
     type: "preset",
     imageSrc: CoverExampleImg1,
-    coverColor: "bg-red-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg2,
-    coverColor: "bg-blue-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg3,
-    coverColor: "bg-green-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg4,
-    coverColor: "bg-yellow-500",
   },
   {
     type: "preset",
     imageSrc: CoverExampleImg5,
-    coverColor: "bg-purple-500",
   },
 ];
 

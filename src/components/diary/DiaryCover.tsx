@@ -3,9 +3,7 @@ import { Sticker } from "@/models/Sticker";
 import { HTMLAttributes, useEffect, useMemo, useState } from "react";
 import Image from "../base/Image";
 
-type BaseDiaryCoverItem = {
-  coverColor: string;
-};
+type BaseDiaryCoverItem = {};
 
 type UploadedDiaryCoverItemType = BaseDiaryCoverItem & {
   type: "uploaded";
@@ -39,12 +37,14 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   stickers?: Sticker[];
   item?: DiaryCoverItem;
   title?: string;
+  spineColor?: string;
 }
 
 const DiaryCover: React.FC<DiaryCoverProps> = ({
   item,
   title = "Diary Cover",
   stickers,
+  spineColor,
   ...props
 }) => {
   const [fileObjectUrl, setFileObjectUrl] = useState<string>();
@@ -103,7 +103,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
       <div
         className={cn(
           "absolute w-[6%] min-w-[6px] max-w-[12px] h-full rounded-l-xs shrink-0",
-          item?.coverColor
+          spineColor ? spineColor : "bg-gray-500"
         )}
       />
       <div
