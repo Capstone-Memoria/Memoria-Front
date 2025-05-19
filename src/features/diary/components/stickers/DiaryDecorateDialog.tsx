@@ -1,14 +1,15 @@
 import DiaryCover, { DiaryCoverItem } from "@/components/diary/DiaryCover";
+import { cn } from "@/lib/utils";
 import { Sticker } from "@/models/Sticker";
+import { useElementSize } from "@reactuses/core";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HiArrowNarrowLeft } from "react-icons/hi";
 import { PiSmileyStickerFill } from "react-icons/pi";
 import { RiArrowGoBackLine, RiArrowGoForwardLine } from "react-icons/ri";
 import { StickerOption } from "../../models/StickerData";
 import StickerSelectDrawer from "./StickerSelectDrawer";
 import TransformableSticker from "./TransformableSticker";
-
 interface DiaryDecorateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,6 +32,24 @@ const DiaryDecorateDialog = ({
   const [focusedStickerUuid, setFocusedStickerUuid] = useState<string | null>(
     null
   );
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useElementSize(canvasRef);
+  const bodySize = useElementSize(document.body);
+
+  const coverSize = useMemo(() => {
+    if (!canvasSize) return { width: 0, height: 0 };
+
+    const coverWidth = canvasSize[0];
+    const coverHeight = canvasSize[0] * (10 / 7);
+
+    if (canvasSize[1] < coverHeight) {
+      const coverHeight = canvasSize[1];
+      const coverWidth = coverHeight * (7 / 10);
+      return { width: coverWidth, height: coverHeight };
+    }
+
+    return { width: coverWidth, height: coverHeight };
+  }, [canvasSize, bodySize]);
 
   useEffect(() => {
     if (open && initialStickers) {
@@ -146,14 +165,21 @@ const DiaryDecorateDialog = ({
 
             {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
             <div
-              className={
-                "flex-1 overflow-auto flex items-center justify-center p-10"
-              }
+              className={cn(
+                "flex-1 flex items-center justify-center overflow-hidden"
+              )}
+              ref={canvasRef}
               onClick={handleCanvasClick}
             >
-              <div className={"relative w-full overflow-hidden"}>
+              <div
+                className={"relative w-full h-full overflow-hidden"}
+                style={{
+                  width: coverSize.width,
+                  height: coverSize.height,
+                }}
+              >
                 <DiaryCover
-                  className={"w-full h-full relative z-0"}
+                  className={"relative z-0"}
                   item={
                     selectedCover ?? {
                       type: "empty",
