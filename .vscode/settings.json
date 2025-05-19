@@ -8,5 +8,6 @@
     "source.organizeImports": "explicit",
     "source.removeUnusedImports": "explicit",
     "source.sortImports": "explicit"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

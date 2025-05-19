@@ -23,8 +23,11 @@ const Header: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
 
 const Content: React.FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
   return (
-    <div {...props} className={cn("px-4 py-4", props.className)}>
-      {props.children}
+    <div
+      {...props}
+      className={cn("px-4 py-4 overflow-y-auto flex-grow", props.className)}
+    >
+      <div>{props.children}</div>
     </div>
   );
 };

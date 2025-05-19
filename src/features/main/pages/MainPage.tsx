@@ -1,10 +1,12 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
-import DiaryBook from "@/components/diary/DiaryBook";
+import DiaryBookComponent from "@/components/diary/DiaryBook";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
+import { DiaryBook } from "@/models/DiaryBook";
+import { Page as PageType } from "@/models/Pagination";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useQuery } from "@tanstack/react-query";
 import { BookPlus } from "lucide-react";
@@ -16,7 +18,7 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   /* Server-State */
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<PageType<DiaryBook>>({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
@@ -36,6 +38,18 @@ const MainPage = () => {
     }
     return [];
   }, [tab, data]);
+
+  /* coverColor 랜덤한 색상으로 하나의 아이템마다 다르게 바꾸기 */
+  const randomColor = useMemo(() => {
+    const colors = [
+      "bg-red-200",
+      "bg-blue-200",
+      "bg-green-200",
+      "bg-yellow-200",
+      "bg-purple-200",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }, []);
 
   return (
     <Page.Container>
@@ -95,34 +109,20 @@ const MainPage = () => {
           >
             <div className={"px-6"}>
               <div className={"grid grid-cols-3 gap-6"}>
-                {isLoading ? (
-                  Array.from({ length: 9 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
-                    />
-                  ))
-                ) : (data?.content ?? []).length === 0 && !isLoading ? (
-                  <div
-                    className={
-                      "col-span-full text-center text-gray-400 text-sm py-20"
-                    }
-                  >
-                    일기장이 없습니다.
-                    <br />새 일기장을 만들어 보세요.
-                  </div>
-                ) : (
-                  (data?.content ?? []).map((diaryBook) => (
-                    <DiaryBook
-                      onClick={() => navigate(`/diary-book/${diaryBook.id}`)}
-                      key={diaryBook.id}
-                      title={diaryBook.title}
-                      memberCount={diaryBook.memberCount}
-                      pinned={diaryBook.isPinned ?? false}
-                      // notificationCount={120}
-                    />
-                  ))
-                )}
+                {isLoading
+                  ? Array.from({ length: 9 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className={"animate-pulse bg-gray-200 h-32 rounded-sm"}
+                      />
+                    ))
+                  : (data?.content ?? []).map((diaryBook) => (
+                      <DiaryBookComponent
+                        onClick={() => navigate(`/diary/${diaryBook.id}`)}
+                        key={diaryBook.id}
+                        diaryBook={diaryBook}
+                      />
+                    ))}
               </div>
             </div>
           </div>
@@ -143,15 +143,10 @@ const MainPage = () => {
                   : (data?.content ?? [])
                       .filter((book) => book.isPinned)
                       .map((diaryBook) => (
-                        <DiaryBook
-                          onClick={() =>
-                            navigate(`/diary-book/${diaryBook.id}`)
-                          }
+                        <DiaryBookComponent
+                          onClick={() => navigate(`/diary/${diaryBook.id}`)}
                           key={diaryBook.id}
-                          title={diaryBook.title}
-                          memberCount={1}
-                          pinned={diaryBook.isPinned ?? false}
-                          // notificationCount={1}
+                          diaryBook={diaryBook}
                         />
                       ))}
                 {(data?.content ?? []).filter((book) => book.isPinned)

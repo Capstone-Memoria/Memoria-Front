@@ -1,4 +1,6 @@
 import { DateTime } from "luxon";
+import { AttachedFile } from "./AttachedFile";
+import { Sticker } from "./Sticker";
 import { User } from "./User";
 
 export interface DiaryBook {
@@ -10,7 +12,10 @@ export interface DiaryBook {
   lastModified: DateTime;
   createdBy: User;
   lastModifiedBy: User;
+  stickers?: Sticker[];
   owner: User;
+  coverImage?: AttachedFile;
+  spineColor?: string;
 }
 
 export interface InvitationCode {

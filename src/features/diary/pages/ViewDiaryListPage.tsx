@@ -59,11 +59,9 @@ const ViewDiaryListPage = () => {
         }
 
         try {
-          console.log("Updating diary book (pin toggle) with data:", {
-            diaryBookId: updateFormData.get("diaryBookId"),
-            isPinned: updateFormData.get("isPinned"),
+          await api.diaryBook.updateDiaryBook(Number(diaryBookId), {
+            isPinned: !isPinned,
           });
-          await api.diaryBook.updateDiaryBook(updateFormData); // isPinned 업데이트 요청
           setIsPinned(!isPinned);
         } catch (e) {
           console.error("즐겨찾기 업데이트 실패", e);

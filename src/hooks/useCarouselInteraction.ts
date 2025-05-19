@@ -1,4 +1,3 @@
-// src/hooks/useCarouselInteraction.ts
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 // --- 설정 상수 ---
@@ -84,7 +83,7 @@ export const useCarouselInteraction = ({
         clearTimeout(animationTimeoutRef.current);
       }
     };
-  }, []);
+  }, [itemCount]);
 
   // --- 초기 선택 콜백 호출 ---
   useEffect(() => {
@@ -129,7 +128,7 @@ export const useCarouselInteraction = ({
     if (!containerWidth || actualItemWidth === 0) return 0;
     const centerOffset = (containerWidth - actualItemWidth) / 2;
     return centerOffset - currentIndex * actualItemWidth + offsetX;
-  }, [containerWidth, actualItemWidth, currentIndex, offsetX]);
+  }, [containerWidth, actualItemWidth, currentIndex, offsetX, itemCount]);
 
   // --- 개별 아이템 스타일 계산 ---
   const calculateItemStyle = useCallback(
@@ -162,7 +161,7 @@ export const useCarouselInteraction = ({
         opacity: opacity,
       };
     },
-    [containerWidth, actualItemWidth, getTranslateX]
+    [containerWidth, actualItemWidth, getTranslateX, itemCount]
   );
 
   // --- 드래그/터치 공통 로직 ---

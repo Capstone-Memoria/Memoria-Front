@@ -3,7 +3,7 @@ import { useImageStore } from "@/stores/ImageStore";
 import { useMutation } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import { MdError, MdImageNotSupported } from "react-icons/md";
+import { MdError } from "react-icons/md";
 
 interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   imageId?: string;
@@ -88,7 +88,7 @@ const Image: React.FC<ImageProps> = ({
         />
       )}
       {error && <MdError className={"text-xl text-gray-400"} />}
-      {!imageId && <MdImageNotSupported className={"text-xl text-gray-400"} />}
+      {!imageId && <div className={"size-full bg-green-200"}></div>}
     </div>
   );
 };

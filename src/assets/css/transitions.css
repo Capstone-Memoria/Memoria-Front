@@ -386,3 +386,16 @@
     transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: max-height, opacity;
 }
+
+/* DiaryDecorateDialog Transitions */
+.ease-expo-out {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.translate-x-full {
+  transform: translateX(100%);
+}
+
+.translate-x-0 {
+  transform: translateX(0);
+}
