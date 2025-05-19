@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
 import { Sticker } from "@/models/Sticker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -254,8 +255,10 @@ const ManageDiaryPage = () => {
                   <Spinner />
                 ) : (
                   <div
-                    className={"w-6 h-6 rounded-full border border-gray-300"}
-                    style={{ backgroundColor: selectedSpineColor }}
+                    className={cn(
+                      "w-6 h-6 rounded-full border border-gray-300",
+                      selectedSpineColor
+                    )}
                   />
                 )}
                 <MdOutlineModeEditOutline />
