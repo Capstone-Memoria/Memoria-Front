@@ -51,6 +51,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={"flex items-center px-4 h-16 gap-4"}
+            transition={{
+              duration: 0.2,
+            }}
           >
             <motion.div
               layout
@@ -72,6 +75,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   className={"flex-1 flex items-center justify-between"}
+                  transition={{
+                    duration: 0.2,
+                  }}
                 >
                   <div>
                     <motion.div className={"text-sm font-medium text-gray-900"}>
@@ -93,6 +99,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   className={"flex-1 flex flex-col justify-between"}
+                  transition={{
+                    duration: 0.2,
+                  }}
                 >
                   <motion.div className={"text-sm font-medium text-gray-900"}>
                     {aiComment?.title}
@@ -111,6 +120,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
                 initial={{ opacity: 0, y: -10, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
+                transition={{
+                  duration: 0.2,
+                }}
               >
                 <div
                   className={
@@ -133,6 +145,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.2,
+              }}
               layout
             >
               <MdArrowDownward className={"text-green-500"} />

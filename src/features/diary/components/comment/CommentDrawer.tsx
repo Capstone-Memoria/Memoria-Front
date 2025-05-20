@@ -4,7 +4,7 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { CommentTree } from "@/models/Comment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import React, {
   createContext,
   useEffect,
@@ -15,8 +15,8 @@ import React, {
 import { BsArrowReturnRight, BsPersonFill } from "react-icons/bs";
 import { IoReturnUpForwardOutline } from "react-icons/io5";
 import { MdArrowUpward, MdClose } from "react-icons/md";
-import CommentItem from "./CommentItem";
 import LetterFromAI from "../ai/LetterFromAI";
+import CommentItem from "./CommentItem";
 
 interface CommentDrawerProps {
   open: boolean;
@@ -209,22 +209,22 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                   </div>
                 ))
               ) : (
-                <>
+                <LayoutGroup>
                   {aiComments?.map((comment) => (
-                    <LetterFromAI key={`ai-${comment.id}`} aiComment={comment} />
+                    <LetterFromAI aiComment={comment} />
                   ))}
-                  {comments && comments.length > 0 ? (
-                    comments.map((comment) => (
-                      <CommentItem key={comment.id} comment={comment} />
-                    ))
-                  ) : (
-                    (!aiComments || aiComments.length === 0) && (
-                      <div className={"text-center text-gray-500"}>
-                        아직 댓글이 없습니다.
-                      </div>
-                    )
-                  )}
-                </>
+                  <motion.div layout>
+                    {comments && comments.length > 0
+                      ? comments.map((comment) => (
+                          <CommentItem key={comment.id} comment={comment} />
+                        ))
+                      : (!aiComments || aiComments.length === 0) && (
+                          <div className={"text-center text-gray-500"}>
+                            아직 댓글이 없습니다.
+                          </div>
+                        )}
+                  </motion.div>
+                </LayoutGroup>
               )}
             </div>
           </div>
