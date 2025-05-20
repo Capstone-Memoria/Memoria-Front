@@ -197,7 +197,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
               );
             })
           ) : (
-            <div className={"text-sm text-gray-400"}>
+            <div className={"text-sm text-gray-400 flex items-center"}>
               첫 리액션을 남겨보세요
             </div>
           )}
