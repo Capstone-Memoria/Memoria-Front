@@ -61,9 +61,18 @@ const CreateDiaryPage = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [isSpineColorPickerEnabled, setIsSpineColorPickerEnabled] =
+    useState(false);
+  const [isCoverCarouselEnabled, setIsCoverCarouselEnabled] = useState(false);
+
   useEffect(() => {
     setCanSubmit(diaryTitle.length > 0);
+    setIsSpineColorPickerEnabled(diaryTitle.length > 0);
   }, [diaryTitle]);
+
+  useEffect(() => {
+    setIsCoverCarouselEnabled(diaryTitle.length > 0 && !!selectedSpineColor);
+  }, [diaryTitle, selectedSpineColor]);
 
   // --- 파일 업로드 핸들러 ---
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +97,6 @@ const CreateDiaryPage = () => {
   /* Server Side */
   const {
     mutate: tryCreateDiaryBookWithoutStickers,
-    isPending: isCreatingWithoutStickers,
     error: errorWithoutStickers,
   } = useMutation({
     mutationFn: async () => {
@@ -113,7 +121,6 @@ const CreateDiaryPage = () => {
   // 스티커와 함께 다이어리북 생성하는 뮤테이션
   const {
     mutate: tryCreateDiaryBookWithStickers,
-    isPending: isCreatingWithStickers,
     error: errorWithStickers,
   } = useMutation({
     mutationFn: async (stickers: Sticker[]) => {
@@ -137,11 +144,6 @@ const CreateDiaryPage = () => {
     },
   });
 
-  const handleSubmitWithoutStickers = () => {
-    if (diaryTitle.length > 0) tryCreateDiaryBookWithoutStickers();
-    else alert("일기장 제목을 입력해주세요.");
-  };
-
   // DiaryDecorateDialog에서 저장 버튼 클릭 시 호출될 함수
   const handleSaveWithStickers = async (stickers: Sticker[]) => {
     tryCreateDiaryBookWithStickers(stickers);
@@ -158,7 +160,7 @@ const CreateDiaryPage = () => {
             alert("일기장 제목을 입력해주세요.");
           }
         }}
-        isCreating={isCreatingWithStickers}
+        isCreating={false}
       />
       <Page.Content className={"overflow-x-hidden  flex flex-col flex-1 "}>
         <input
@@ -178,7 +180,11 @@ const CreateDiaryPage = () => {
           />
         </div>
         <p className={"mt-8 text-gray-500"}>일기장 책등 색상을 선택해주세요</p>
-        <div className={"mt-2"}>
+        <div
+          className={`mt-2 transition-opacity duration-300 ${
+            isSpineColorPickerEnabled ? "opacity-100" : "opacity-50"
+          }`}
+        >
           <ColorPicker
             className={"place-items-center gap-y-6"}
             selectedColor={selectedSpineColor}
@@ -189,7 +195,9 @@ const CreateDiaryPage = () => {
           일기장 커버 이미지를 선택해주세요
         </p>
         <div
-          className={"mt-8 flex-1 flex flex-col items-center justify-center"}
+          className={`mt-8 flex-1 flex flex-col items-center justify-center transition-opacity duration-300 ${
+            isCoverCarouselEnabled ? "opacity-100" : "opacity-50"
+          }`}
         >
           <div>
             <DiaryCoverCarousel
