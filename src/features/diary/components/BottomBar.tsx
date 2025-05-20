@@ -146,7 +146,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         )}
       >
         <div
-          className={"flex gap-2 flex-1 select-none h-full items-center"}
+          className={"gap-2 flex-1 select-none h-full flex justify-center "}
           onTouchStart={(e) => {
             setCurrentTouchPosition({
               x: e.touches[0].clientX,
@@ -186,7 +186,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
               return (
                 <div
                   key={index}
-                  className={`flex flex-1 items-center justify-center gap-2 px-2 py-1 rounded-full`}
+                  className={`flex items-center justify-center gap-2 px-2 py-1 rounded-full`}
                 >
                   <ReactionIcon
                     count={reaction.count}
@@ -215,9 +215,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
             ></div>
           ) : (
             aiComments &&
-            aiComments.length > 0 && (
-              <RiMailFill className={"text-lg"} />
-            )
+            aiComments.length > 0 && <RiMailFill className={"text-lg"} />
           )}
           <BsChatFill className={""} />
           {isFetchingComments ? (
