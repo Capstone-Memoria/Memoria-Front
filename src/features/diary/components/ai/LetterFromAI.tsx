@@ -20,7 +20,9 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
           duration: 0.4,
           ease: [0.16, 1, 0.3, 1],
         }}
-        className={cn("border rounded-lg  min-h-12 relative")}
+        className={cn(
+          "border rounded-lg  min-h-12 relative max-h-60 overflow-y-scroll"
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         <motion.div
