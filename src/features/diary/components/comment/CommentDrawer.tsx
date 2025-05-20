@@ -213,7 +213,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                   {aiComments?.map((comment) => (
                     <LetterFromAI aiComment={comment} />
                   ))}
-                  <motion.div layout>
+                  <motion.div layout className={"flex flex-col gap-2 mt-2"}>
                     {comments && comments.length > 0
                       ? comments.map((comment) => (
                           <CommentItem key={comment.id} comment={comment} />
