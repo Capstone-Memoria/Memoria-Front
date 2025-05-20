@@ -38,23 +38,10 @@ const MainPage = () => {
     }
     return [];
   }, [tab, data]);
-
-  /* coverColor 랜덤한 색상으로 하나의 아이템마다 다르게 바꾸기 */
-  const randomColor = useMemo(() => {
-    const colors = [
-      "bg-red-200",
-      "bg-blue-200",
-      "bg-green-200",
-      "bg-yellow-200",
-      "bg-purple-200",
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }, []);
-
   return (
-    <Page.Container>
+    <Page.Container className={"h-full flex flex-col"}>
       <DefaultHeader />
-      <Page.Content>
+      <div className={"px-4 py-6"}>
         <div className={"my-6 flex items-center justify-between"}>
           <div>
             <p className={"font-semibold text-xl"}>
@@ -72,7 +59,7 @@ const MainPage = () => {
             <BookPlus className={"size-4"} />새 일기장
           </Button>
         </div>
-      </Page.Content>
+      </div>
       <div className={"flex pl-6 gap-4"}>
         <button
           className={cn(
@@ -96,7 +83,7 @@ const MainPage = () => {
         </button>
       </div>
       {/* Tab Content Container */}
-      <div className={"w-full overflow-x-hidden"}>
+      <div className={"w-full overflow-x-hidden flex-1 bg-white"}>
         <div
           className={cn(
             "flex w-[200%] transition-transform duration-600 ease-expo-out",
@@ -104,9 +91,7 @@ const MainPage = () => {
           )}
         >
           {/* All Diaries Tab Content */}
-          <div
-            className={"w-1/2 bg-white h-full min-h-[calc(100vh-160px)] py-8"}
-          >
+          <div className={"w-1/2  py-8"}>
             <div className={"px-6"}>
               <div className={"grid grid-cols-3 gap-6"}>
                 {isLoading
@@ -128,9 +113,7 @@ const MainPage = () => {
           </div>
 
           {/* Pinned Diaries Tab Content */}
-          <div
-            className={"w-1/2 bg-white h-full min-h-[calc(100vh-160px)] py-8"}
-          >
+          <div className={"w-1/2 py-8"}>
             <div className={"px-6"}>
               <div className={"grid grid-cols-3 gap-6"}>
                 {isLoading

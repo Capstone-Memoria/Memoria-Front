@@ -123,7 +123,7 @@ const WriteDiaryPage = () => {
           classNames={"fade"}
           nodeRef={nodeRef}
         >
-          <div ref={nodeRef} className={"flex-1"}>
+          <div ref={nodeRef} className={"flex-1 flex flex-col"}>
             {isSubmitting ? (
               <div
                 className={
@@ -138,7 +138,7 @@ const WriteDiaryPage = () => {
                 </div>
               </div>
             ) : (
-              <Page.Content className={"flex flex-col gap-5 flex-1"}>
+              <div className={"flex flex-col py-6 px-4 flex-1 gap-4"}>
                 <DiaryBookSelectButton
                   isLoading={isLoading}
                   selectedDiaryBookTitle={selectedDiaryBook?.title}
@@ -170,7 +170,7 @@ const WriteDiaryPage = () => {
                     onContentUpdate={(content) => setContent(content)}
                   />
                 </div>
-              </Page.Content>
+              </div>
             )}
           </div>
         </CSSTransition>
