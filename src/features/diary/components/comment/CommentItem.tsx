@@ -129,7 +129,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
 
   return (
     <>
-      <div
+      <motion.div
+        layout
         className={"gap-2 relative"}
         onClick={handleClick}
         onTouchStart={handleTouchStart}
@@ -190,7 +191,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
             </AnimatePresence>
           </div>
         )}
-      </div>
+      </motion.div>
       {comment.children && comment.children.length > 0 && (
         <div className={"pl-5 flex flex-col gap-2"}>
           {comment.children.map((child) => (

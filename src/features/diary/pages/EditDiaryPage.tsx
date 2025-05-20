@@ -114,7 +114,7 @@ const EditDiaryPage = () => {
           classNames={"fade"}
           nodeRef={nodeRef}
         >
-          <div ref={nodeRef} className={"flex-1"}>
+          <div ref={nodeRef} className={"flex-1 flex flex-col"}>
             {updateMutation.isPending ? (
               <div
                 className={
@@ -129,7 +129,7 @@ const EditDiaryPage = () => {
                 </div>
               </div>
             ) : (
-              <Page.Content className={"flex flex-col gap-6 flex-1"}>
+              <Page.Content className={"flex flex-col flex-1"}>
                 {isDiaryLoading || isDiaryBookLoading ? (
                   <div className={"space-y-6"}>
                     <div
@@ -167,7 +167,7 @@ const EditDiaryPage = () => {
                     </div>
                   </div>
                 ) : (
-                  <>
+                  <div className={"flex flex-col gap-6 flex-1"}>
                     <div
                       className={
                         "w-full flex justify-between items-center mt-2 bg-gray-100 rounded-3xl px-4 py-2"
@@ -193,7 +193,7 @@ const EditDiaryPage = () => {
                         onContentUpdate={(content) => setContent(content)}
                       />
                     </div>
-                  </>
+                  </div>
                 )}
               </Page.Content>
             )}
