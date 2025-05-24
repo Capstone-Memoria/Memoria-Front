@@ -1,4 +1,5 @@
 import Image from "@/components/base/Image";
+import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
 import { AIComment } from "@/models/AIComment";
 import { useResizeObserver, useScroll } from "@reactuses/core";
@@ -44,6 +45,8 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
           ref={containerRef}
           onClick={() => setIsOpen(!isOpen)}
         >
+          <ShineBorder shineColor={["#fb2c36", "#2b7fff"]} />
+
           <motion.div
             layout
             key={"closed"}

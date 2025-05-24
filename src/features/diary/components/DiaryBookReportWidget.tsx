@@ -1,4 +1,4 @@
-import { BorderBeam } from "@/components/magicui/border-beam";
+import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
 import React, { HTMLAttributes } from "react";
 import { LuArrowRight } from "react-icons/lu";
@@ -18,7 +18,7 @@ const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
         className
       )}
     >
-      <BorderBeam
+      {/* <BorderBeam
         duration={6}
         size={130}
         className={"from-transparent via-red-500 to-transparent"}
@@ -28,7 +28,8 @@ const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
         delay={3}
         size={130}
         className={"from-transparent via-blue-500 to-transparent"}
-      />
+      /> */}
+      <ShineBorder shineColor={["#fb2c36", "#2b7fff"]} />
 
       <div className={"flex "}>
         <div className={"flex flex-col gap-1 flex-1"}>
