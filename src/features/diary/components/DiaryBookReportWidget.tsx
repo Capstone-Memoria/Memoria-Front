@@ -1,13 +1,22 @@
 import { BorderBeam } from "@/components/magicui/border-beam";
-import React from "react";
+import { cn } from "@/lib/utils";
+import React, { HTMLAttributes } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import { MdAutoAwesome } from "react-icons/md";
-const DiaryBookReportWidget: React.FC = () => {
+
+type DiaryBookReportWidgetProps = HTMLAttributes<HTMLDivElement>;
+
+const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
+  className,
+  ...props
+}) => {
   return (
     <div
-      className={
-        "relative border border-gray-300 bg-white shadow-lg p-4 rounded-lg items-center gap-4 overflow-hidden transition-transform active:scale-95"
-      }
+      {...props}
+      className={cn(
+        "relative border border-gray-300 bg-white shadow-lg p-4 rounded-lg items-center gap-4 overflow-hidden transition-transform active:scale-95",
+        className
+      )}
     >
       <BorderBeam
         duration={6}

@@ -156,7 +156,7 @@ const DiaryDecorateDialog = ({
 
         <div
           className={cn(
-            "flex-1 flex items-center justify-center overflow-hidden"
+            "flex-1 flex items-center justify-center overflow-hidden touch-none"
           )}
           ref={canvasRef}
           onClick={handleCanvasClick}
