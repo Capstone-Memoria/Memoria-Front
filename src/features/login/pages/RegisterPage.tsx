@@ -121,11 +121,11 @@ const RegisterPage = () => {
             isError
           />
         </div>
-        <div className={"flex-1 min-h-12"} />
+        <div className={"flex-1 min-h-6"} />
         <div className={"text-red-500 text-center mb-3 text-sm"}>
           {error?.message}
         </div>
-        <Button size={"xl"} onClick={handleRegister}>
+        <Button size={"xl"} onClick={handleRegister} className={"w-full"}>
           {isPending ? "처리중.." : "회원가입 하기"}
         </Button>
       </Page.Content>
