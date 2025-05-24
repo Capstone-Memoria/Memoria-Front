@@ -124,30 +124,28 @@ const CreateDiaryPage = () => {
   });
 
   // 스티커와 함께 다이어리북 생성하는 뮤테이션
-  const {
-    mutate: tryCreateDiaryBookWithStickers,
-    error: errorWithStickers,
-  } = useMutation({
-    mutationFn: async (stickers: Sticker[]) => {
-      if (!selectedCover) throw new Error("커버 이미지를 선택해주세요.");
-      if (!diaryTitle) throw new Error("일기장 제목을 입력해주세요.");
-      if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
+  const { mutate: tryCreateDiaryBookWithStickers, error: errorWithStickers } =
+    useMutation({
+      mutationFn: async (stickers: Sticker[]) => {
+        if (!selectedCover) throw new Error("커버 이미지를 선택해주세요.");
+        if (!diaryTitle) throw new Error("일기장 제목을 입력해주세요.");
+        if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
 
-      const coverImageFile = await getCoverImageFile(selectedCover);
-      return api.diaryBook.createDiaryBookWithStickers({
-        title: diaryTitle,
-        coverImage: coverImageFile,
-        stickers: stickers,
-        spineColor: selectedSpineColor,
-      });
-    },
-    onSuccess: () => navigate("/main"),
-    onError: (err) => {
-      alert(
-        `일기장 생성 실패: ${err instanceof Error ? err.message : "서버 오류"}`
-      );
-    },
-  });
+        const coverImageFile = await getCoverImageFile(selectedCover);
+        return api.diaryBook.createDiaryBookWithStickers({
+          title: diaryTitle,
+          coverImage: coverImageFile,
+          stickers: stickers,
+          spineColor: selectedSpineColor,
+        });
+      },
+      onSuccess: () => navigate("/main"),
+      onError: (err) => {
+        alert(
+          `일기장 생성 실패: ${err instanceof Error ? err.message : "서버 오류"}`
+        );
+      },
+    });
 
   // DiaryDecorateDialog에서 저장 버튼 클릭 시 호출될 함수
   const handleSaveWithStickers = async (stickers: Sticker[]) => {
@@ -184,9 +182,9 @@ const CreateDiaryPage = () => {
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
         </div>
-        <p className={"mt-8 text-gray-500"}>일기장 책등 색상을 선택해주세요</p>
+        <p className={"mt-6"}>일기장 책등 색상을 선택해주세요</p>
         <div
-          className={`mt-2 transition-opacity duration-300 ${
+          className={`mt-6 transition-opacity duration-300 ${
             isSpineColorPickerEnabled ? "opacity-100" : "opacity-50"
           }`}
         >
@@ -196,11 +194,9 @@ const CreateDiaryPage = () => {
             onColorSelect={setSelectedSpineColor}
           />
         </div>
-        <p className={"mt-8 text-gray-500"}>
-          일기장 커버 이미지를 선택해주세요
-        </p>
+        <p className={"mt-6"}>일기장 커버 이미지를 선택해주세요</p>
         <div
-          className={`mt-8 flex-1 flex flex-col items-center justify-center transition-opacity duration-300 ${
+          className={`mt-4 flex-1 flex flex-col items-center justify-center transition-opacity duration-300 ${
             isCoverCarouselEnabled ? "opacity-100" : "opacity-50"
           }`}
         >
@@ -243,7 +239,7 @@ const CreateDiaryPage = () => {
           {/* 꾸미기 버튼 추가 */}
           <Button
             className={
-              "w-full mt-6 rounded-md flex items-center justify-center gap-3"
+              "w-full mt-4 rounded-md flex items-center justify-center gap-3"
             }
             onClick={() => {
               if (!(!selectedCover || !diaryTitle || !selectedSpineColor)) {
