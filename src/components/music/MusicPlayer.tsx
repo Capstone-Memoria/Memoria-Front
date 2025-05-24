@@ -1,8 +1,10 @@
 import api from "@/api";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
-import { BiNetworkChart } from "react-icons/bi";
 import { IoMusicalNotes, IoPause, IoPlay } from "react-icons/io5";
+import { MdQueueMusic } from "react-icons/md";
+import { BorderBeam } from "../magicui/border-beam";
+import { ShineBorder } from "../magicui/shine-border";
 interface MusicPlayerProps extends React.HTMLAttributes<HTMLDivElement> {
   musicFileId?: string;
 }
@@ -75,14 +77,31 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   return (
     <div
       className={cn(
-        "border p-4 rounded-md flex items-center gap-4",
-        isMusicLoaded
-          ? "bg-green-500 text-white"
-          : "bg-green-300 text-green-900",
+        "border p-4 rounded-md flex items-center gap-4 bg-white shadow-lg relative overflow-hidden",
         className
       )}
       {...props}
     >
+      {!isMusicLoaded ? (
+        <>
+          <BorderBeam
+            duration={6}
+            size={80}
+            className={"from-transparent via-red-500 to-transparent"}
+          />
+          <BorderBeam
+            duration={6}
+            delay={3}
+            size={80}
+            className={"from-transparent via-blue-500 to-transparent"}
+          />
+        </>
+      ) : (
+        <>
+          <ShineBorder shineColor={["#fb2c36", "#2b7fff"]} />
+        </>
+      )}
+
       {/* 오디오 요소 (숨김) */}
       <audio
         ref={audioRef}
@@ -96,8 +115,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         <>
           <IoMusicalNotes className={"size-5"} />
           <div className={"flex-1 flex flex-col"}>
-            <div className={"text-lg font-medium"}>음악 제목</div>
-            <div className={"text-xs"}>AI가 자동으로 생성한 음악이에요</div>
+            <div className={"text-sm"}>AI가 자동으로 생성한 음악이에요</div>
             {/* 진행률 표시 */}
             {musicFileId && (
               <div
@@ -146,8 +164,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
             <div className={"text-lg font-medium"}>음악 생성 중</div>
             <div className={"text-xs"}>AI가 음악을 만들고 있어요</div>
           </div>
-          <div className={"text-2xl text-green-900 animate-pulse"}>
-            <BiNetworkChart />
+          <div className={"text-2xl text-gray-600"}>
+            <MdQueueMusic />
           </div>
         </div>
       )}

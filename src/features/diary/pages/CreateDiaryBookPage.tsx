@@ -19,6 +19,7 @@ import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
 import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
+import { BorderBeam } from "@/components/magicui/border-beam";
 import { Sticker } from "@/models/Sticker";
 import DiaryDecorateDialog from "../components/stickers/DiaryDecorateDialog";
 
@@ -119,30 +120,28 @@ const CreateDiaryPage = () => {
   });
 
   // 스티커와 함께 다이어리북 생성하는 뮤테이션
-  const {
-    mutate: tryCreateDiaryBookWithStickers,
-    error: errorWithStickers,
-  } = useMutation({
-    mutationFn: async (stickers: Sticker[]) => {
-      if (!selectedCover) throw new Error("커버 이미지를 선택해주세요.");
-      if (!diaryTitle) throw new Error("일기장 제목을 입력해주세요.");
-      if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
+  const { mutate: tryCreateDiaryBookWithStickers, error: errorWithStickers } =
+    useMutation({
+      mutationFn: async (stickers: Sticker[]) => {
+        if (!selectedCover) throw new Error("커버 이미지를 선택해주세요.");
+        if (!diaryTitle) throw new Error("일기장 제목을 입력해주세요.");
+        if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
 
-      const coverImageFile = await getCoverImageFile(selectedCover);
-      return api.diaryBook.createDiaryBookWithStickers({
-        title: diaryTitle,
-        coverImage: coverImageFile,
-        stickers: stickers,
-        spineColor: selectedSpineColor,
-      });
-    },
-    onSuccess: () => navigate("/main"),
-    onError: (err) => {
-      alert(
-        `일기장 생성 실패: ${err instanceof Error ? err.message : "서버 오류"}`
-      );
-    },
-  });
+        const coverImageFile = await getCoverImageFile(selectedCover);
+        return api.diaryBook.createDiaryBookWithStickers({
+          title: diaryTitle,
+          coverImage: coverImageFile,
+          stickers: stickers,
+          spineColor: selectedSpineColor,
+        });
+      },
+      onSuccess: () => navigate("/main"),
+      onError: (err) => {
+        alert(
+          `일기장 생성 실패: ${err instanceof Error ? err.message : "서버 오류"}`
+        );
+      },
+    });
 
   // DiaryDecorateDialog에서 저장 버튼 클릭 시 호출될 함수
   const handleSaveWithStickers = async (stickers: Sticker[]) => {
@@ -215,25 +214,32 @@ const CreateDiaryPage = () => {
               open={createCoverDrawerOpen}
               onOpenChange={setCreateCoverDrawerOpen}
             >
-              <Button
-                variant={"secondary"}
+              <div
                 className={
-                  "w-full flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                  "w-full flex items-center justify-center gap-4 text-sm relative bg-white border rounded-md py-2 shadow"
                 }
               >
+                <BorderBeam
+                  duration={6}
+                  size={40}
+                  className={"from-transparent via-red-500 to-transparent"}
+                />
+                <BorderBeam
+                  duration={6}
+                  delay={3}
+                  size={40}
+                  className={"from-transparent via-blue-500 to-transparent"}
+                />
                 <FaMagic /> AI로 만들기
-              </Button>
+              </div>
             </CreateCoverImageDrawer>
-            <Button
-              size={"sm"}
-              variant={"secondary"}
-              onClick={handleUploadButtonClick}
+            <div
               className={
-                "w-full flex items-center justify-center gap-4 text-sm rounded-sm bg-gray-200"
+                "w-full flex items-center justify-center gap-4 text-sm relative bg-white border rounded-md py-2 shadow"
               }
             >
               <MdUpload className={"text-base"} /> 사진 업로드
-            </Button>
+            </div>
           </div>
           {/* 꾸미기 버튼 추가 */}
           <Button
