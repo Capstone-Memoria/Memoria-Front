@@ -23,6 +23,7 @@ const DiaryBookMemberPage = () => {
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isGeneratingInvite, setIsGeneratingInvite] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [showAdminHelp, setShowAdminHelp] = useState(false);
 
   // State for direct invite
   const [directInviteEmail, setDirectInviteEmail] = useState("");
@@ -225,26 +226,57 @@ const DiaryBookMemberPage = () => {
   return (
     <Page.Container>
       <DefaultHeader logoType={"back"} />
-      <Page.Content className={"px-6 py-4"}>
-        <h1 className={"text-xl font-medium mb-6"}>멤버 관리</h1>
+      <Page.Content className={"px-6 py-18"}>
+        <h1 className={"text-xl font-medium mb-6"}>일기장 멤버 관리</h1>
 
         {/* Member List Card */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
           <div className={"flex justify-between items-center mb-4"}>
             <h2 className={"text-lg font-medium"}>멤버 목록</h2>
             {amIAdmin && (
-              <Button
-                variant={"text"}
-                size={"sm"}
-                onClick={() => setIsEditMode(!isEditMode)}
-                className={"text-gray-600 hover:text-black"}
-                disabled={
-                  updatePermissionMutation.isPending ||
-                  removeMemberMutation.isPending
-                } // Disable while mutating
-              >
-                {isEditMode ? "완료" : "관리자 변경"}
-              </Button>
+              <div className={"relative flex items-center gap-3"}>
+                {/* 관리자 변경 텍스트 */}
+                <button
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  disabled={
+                    updatePermissionMutation.isPending ||
+                    removeMemberMutation.isPending
+                  }
+                  className={
+                    "text-sm text-gray-600 underline underline-offset-4"
+                  }
+                >
+                  {isEditMode ? "완료" : "관리자 변경"}
+                </button>
+
+                {/* 물음표 버튼 */}
+                <button
+                  onClick={() => setShowAdminHelp(!showAdminHelp)}
+                  className={
+                    "w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs font-bold text-gray-600"
+                  }
+                >
+                  ?
+                </button>
+
+                {/* 말풍선 */}
+                {showAdminHelp && (
+                  <div
+                    className={
+                      "absolute top-[120%] right-0 z-10 w-[240px] bg-green-600 text-white text-sm p-3 rounded-md shadow-md"
+                    }
+                  >
+                    <div
+                      className={
+                        "absolute -top-2 right-3 w-0 h-0 border-l-8 border-r-8 border-b-[8px] border-l-transparent border-r-transparent border-b-green-600"
+                      }
+                    />
+                    일기장의 관리자만 멤버 삭제 및 추가가 가능합니다.
+                    <br />
+                    관리자 변경을 통해 관리자를 설정하여보세요.
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className={"flex flex-col gap-1"}>
@@ -252,7 +284,7 @@ const DiaryBookMemberPage = () => {
               <div
                 key={member.id}
                 className={
-                  "flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+                  "flex items-center justify-between py-4 border-b border-gray-400 last:border-b-0"
                 }
               >
                 {/* Member Info */}
@@ -262,7 +294,7 @@ const DiaryBookMemberPage = () => {
                       "w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gray-200" // TODO: Add dynamic bg color based on user?
                     )}
                   >
-                    <span className={"text-gray-600 text-lg font-medium"}>
+                    <span className={"text-black-600 text-lg font-medium"}>
                       {member.user.nickName.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -278,7 +310,11 @@ const DiaryBookMemberPage = () => {
                         />
                       )}
                     </div>
-                    <span className={"text-xs text-gray-500"}>
+                    <span
+                      className={
+                        "text-xs text-gray-400 leading-none mt-[2px] block"
+                      }
+                    >
                       {member.user.email}
                     </span>
                   </div>
