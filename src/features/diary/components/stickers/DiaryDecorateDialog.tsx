@@ -38,6 +38,18 @@ const DiaryDecorateDialog = ({
   const canvasSize = useElementSize(canvasRef);
   const bodySize = useElementSize(document.body);
 
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [open]);
+
   const coverSize = useMemo(() => {
     if (!canvasSize) return { width: 0, height: 0 };
 
@@ -162,14 +174,14 @@ const DiaryDecorateDialog = ({
           onClick={handleCanvasClick}
         >
           <div
-            className={"relative w-full h-full overflow-hidden"}
+            className={"relative w-full h-full px-3 overflow-hidden"}
             style={{
               width: coverSize.width,
               height: coverSize.height,
             }}
           >
             <DiaryCover
-              className={"relative z-0 px-3"}
+              className={"relative z-0"}
               item={
                 selectedCover ?? {
                   type: "empty",
