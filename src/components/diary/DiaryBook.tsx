@@ -2,14 +2,20 @@ import { cn } from "@/lib/utils/className";
 import { DiaryBook as DiaryBookModel } from "@/models/DiaryBook";
 import { HTMLAttributes, useMemo } from "react";
 import { FaStar } from "react-icons/fa";
+import { PiDotsThreeCircleFill } from "react-icons/pi";
 import DiaryCover, { DiaryCoverItem } from "./DiaryCover";
 import StickerOverlay from "./StickerOverlay";
 
 interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   diaryBook: DiaryBookModel;
+  onMenuClick?: (e: React.MouseEvent, diaryBook: DiaryBookModel) => void;
 }
 
-const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
+const DiaryBook: React.FC<DiaryBookProps> = ({
+  diaryBook,
+  onMenuClick,
+  ...props
+}) => {
   const { title, memberCount, coverImage, isPinned, stickers } = diaryBook;
 
   const coverItem: DiaryCoverItem | undefined = useMemo(() => {
@@ -22,6 +28,13 @@ const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
           type: "empty",
         };
   }, [coverImage]);
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    if (onMenuClick) {
+      onMenuClick(e, diaryBook);
+    }
+  };
 
   return (
     <div
@@ -42,10 +55,18 @@ const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
           />
         </StickerOverlay>
       </div>
-      <p className={"text-[13px] font-medium"}>{title}</p>
-      <p className={"text-[11px] font-light text-gray-1"}>
-        멤버 {memberCount}명
-      </p>
+      <div className={"w-full flex justify-between items-center"}>
+        <div>
+          <p className={"text-[13px] font-medium"}>{title}</p>
+          <p className={"text-[11px] font-light text-gray-1"}>
+            멤버 {memberCount}명
+          </p>
+        </div>
+        <PiDotsThreeCircleFill
+          className={"text-lg text-gray-400 cursor-pointer"}
+          onClick={handleMenuClick}
+        />
+      </div>
     </div>
   );
 };
