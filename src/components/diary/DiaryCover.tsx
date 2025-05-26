@@ -102,18 +102,18 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
     >
       <div
         className={cn(
-          "absolute w-[6%] min-w-[6px] max-w-[12px] h-full rounded-l-xs shrink-0",
+          "absolute w-[6%] min-w-[14px] max-w-[26px] h-full rounded-l-xs shrink-0",
           spineColor ? spineColor : "bg-gray-500"
         )}
       />
       <div
         className={cn(
-          "w-full h-full flex rounded-r-md bg-gray-300 shadow-md overflow-hidden" // 시각적 스타일 + overflow-hidden 적용
+          "w-full h-full flex rounded-r-md bg-gray-300 shadow-md overflow-hidden"
         )}
       >
         {renderedImage}
       </div>
-    </div> // 바깥쪽 div 끝
+    </div>
   );
 };
 

@@ -169,7 +169,7 @@ const DiaryDecorateDialog = ({
             }}
           >
             <DiaryCover
-              className={"relative z-0"}
+              className={"relative z-0 px-3"}
               item={
                 selectedCover ?? {
                   type: "empty",
