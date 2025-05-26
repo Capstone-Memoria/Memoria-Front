@@ -60,6 +60,8 @@ const CreateDiaryPage = () => {
   const [selectedCover, setSelectedCover] = useState<DiaryCoverItem | null>(
     DIARY_COVER_PRESETS[0]
   );
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [spineColorError, setSpineColorError] = useState<string | null>(null);
 
   const [diaryCoverItems, setDiaryCoverItems] =
     useState<DiaryCoverItem[]>(DIARY_COVER_PRESETS);
@@ -73,10 +75,20 @@ const CreateDiaryPage = () => {
   useEffect(() => {
     setCanSubmit(diaryTitle.length > 0);
     setIsSpineColorPickerEnabled(diaryTitle.length > 0);
+
+    // 제목이 입력되면 에러 메시지 제거
+    if (diaryTitle.length > 0) {
+      setTitleError(null);
+    }
   }, [diaryTitle]);
 
   useEffect(() => {
     setIsCoverCarouselEnabled(diaryTitle.length > 0 && !!selectedSpineColor);
+
+    // 책등 색상이 선택되면 에러 메시지 제거
+    if (selectedSpineColor) {
+      setSpineColorError(null);
+    }
   }, [diaryTitle, selectedSpineColor]);
 
   // --- 파일 업로드 핸들러 ---
@@ -152,6 +164,23 @@ const CreateDiaryPage = () => {
     tryCreateDiaryBookWithStickers(stickers);
   };
 
+  // 유효성 검사 함수
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!diaryTitle.trim()) {
+      setTitleError("일기장 제목을 입력해주세요.");
+      isValid = false;
+    }
+
+    if (!selectedSpineColor) {
+      setSpineColorError("책등 색상을 선택해주세요.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   return (
     <Page.Container className={"flex flex-col h-full"}>
       <DiaryCreateHeader
@@ -160,7 +189,7 @@ const CreateDiaryPage = () => {
           if (canSubmit) {
             setDecorateDialogOpen(true);
           } else {
-            alert("일기장 제목을 입력해주세요.");
+            validateForm();
           }
         }}
         isCreating={false}
@@ -181,24 +210,27 @@ const CreateDiaryPage = () => {
             value={diaryTitle}
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
+          {titleError && (
+            <p className={"text-red-500 text-sm mt-1"}>{titleError}</p>
+          )}
         </div>
         <p className={"mt-6"}>일기장 책등 색상을 선택해주세요</p>
-        <div
-          className={`mt-6 transition-opacity duration-300 ${
-            isSpineColorPickerEnabled ? "opacity-100" : "opacity-50"
-          }`}
-        >
+        <div className={`mt-6 transition-opacity duration-300`}>
           <ColorPicker
             className={"place-items-center gap-y-6"}
             selectedColor={selectedSpineColor}
             onColorSelect={setSelectedSpineColor}
           />
+          {spineColorError && (
+            <p className={"text-red-500 text-sm mt-4 text-left"}>
+              {spineColorError}
+            </p>
+          )}
         </div>
         <p className={"mt-6"}>일기장 커버 이미지를 선택해주세요</p>
         <div
-          className={`mt-4 flex-1 flex flex-col items-center justify-center transition-opacity duration-300 ${
-            isCoverCarouselEnabled ? "opacity-100" : "opacity-50"
-          }`}
+          className={`mt-4 flex-1 flex flex-col items-center justify-center transition-opacity duration-300
+          `}
         >
           <div>
             <DiaryCoverCarousel
@@ -244,6 +276,8 @@ const CreateDiaryPage = () => {
             onClick={() => {
               if (!(!selectedCover || !diaryTitle || !selectedSpineColor)) {
                 setDecorateDialogOpen(true);
+              } else {
+                validateForm();
               }
             }}
             variant={"primary"}

@@ -1,4 +1,12 @@
-export type StickerCategory = "alphabet" | "shape" | "character" | "character2";
+export type StickerCategory =
+  | "alphabet"
+  | "alphabet2"
+  | "deco"
+  | "month"
+  | "colorchip"
+  | "shape"
+  | "character"
+  | "character2";
 
 /**
  * @models/ 에 있는 Sticker Interface와는 다른 모델
