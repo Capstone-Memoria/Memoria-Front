@@ -102,7 +102,7 @@ const DiaryCover: React.FC<DiaryCoverProps> = ({
     >
       <div
         className={cn(
-          "absolute w-[6%] min-w-[14px] max-w-[26px] h-full rounded-l-xs shrink-0",
+          "absolute w-[6%] min-w-[10px] max-w-[26px] h-full rounded-l-xs shrink-0",
           spineColor ? spineColor : "bg-gray-500"
         )}
       />
