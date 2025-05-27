@@ -51,6 +51,12 @@ const DiaryBookMemberPage = () => {
     enabled: !!diaryBookId, // Only run query if diaryBookId is valid
   });
 
+  const { data: diaryBook } = useQuery({
+    queryKey: ["fetchDiaryBook", diaryBookId],
+    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
+    enabled: !!diaryBookId,
+  });
+
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -227,7 +233,9 @@ const DiaryBookMemberPage = () => {
     <Page.Container>
       <DefaultHeader logoType={"back"} />
       <Page.Content className={"px-6 py-18"}>
-        <h1 className={"text-xl font-medium mb-6"}>일기장 멤버 관리</h1>
+        <h1 className={"text-xl font-medium mb-6"}>
+          {diaryBook?.title} 일기장 멤버 관리
+        </h1>
 
         {/* Member List Card */}
         <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
