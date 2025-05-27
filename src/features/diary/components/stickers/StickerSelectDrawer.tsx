@@ -7,11 +7,13 @@ import { PRESET_STICKER_OPTIONS } from "../../data/sticker";
 import { StickerCategory, StickerOption } from "../../models/StickerData";
 
 // 스티커 탭 이미지 import
-import StickerTab1 from "@/assets/images/StickerTab1.png";
-import StickerTab2 from "@/assets/images/StickerTab2.png";
-import StickerTab3 from "@/assets/images/StickerTab3.png";
-import StickerTab4 from "@/assets/images/StickerTab4.png";
-import StickerTab5 from "@/assets/images/StickerTab5.png";
+import StickerTab1 from "@/assets/images/stickers/stickerTab/1-alphabet_1.png";
+import StickerTab2 from "@/assets/images/stickers/stickerTab/2-colors.png";
+import StickerTab3 from "@/assets/images/stickers/stickerTab/3- weather.png";
+import StickerTab4 from "@/assets/images/stickers/stickerTab/4-deco.png";
+import StickerTab5 from "@/assets/images/stickers/stickerTab/5-alphabet_2.png";
+import StickerTab6 from "@/assets/images/stickers/stickerTab/6-numbers.png";
+import StickerTab7 from "@/assets/images/stickers/stickerTab/7-months.png";
 
 interface StickerSelectDrawerProps {
   open: boolean;
@@ -107,13 +109,12 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
       label: "최근 사용",
     },
     alphabet: { image: StickerTab1, label: "알파벳" },
-    alphabet2: { image: StickerTab2, label: "알파벳2" },
-    deco: { image: StickerTab5, label: "데코" },
-    month: { image: StickerTab3, label: "월" },
-    colorchip: { image: StickerTab4, label: "컬러칩" },
-    shape: { image: StickerTab2, label: "도형" },
-    character: { image: StickerTab3, label: "캐릭터" },
-    character2: { image: StickerTab4, label: "캐릭터2" },
+    colorchip: { image: StickerTab2, label: "컬러칩" },
+    weather: { image: StickerTab3, label: "날씨" },
+    deco: { image: StickerTab4, label: "데코" },
+    alphabet2: { image: StickerTab5, label: "알파벳2" },
+    numbers: { image: StickerTab6, label: "숫자" },
+    month: { image: StickerTab7, label: "월" },
   };
 
   return (

@@ -262,6 +262,11 @@ export const PRESET_STICKER_OPTIONS: StickerOption[] = [
     category: "alphabet2",
   },
   {
+    id: "deco-paper",
+    imageUrl: "/src/assets/images/stickers/deco/paper.png",
+    category: "deco",
+  },
+  {
     id: "deco-star",
     imageUrl: "/src/assets/images/stickers/deco/star.png",
     category: "deco",
@@ -288,7 +293,7 @@ export const PRESET_STICKER_OPTIONS: StickerOption[] = [
   },
   {
     id: "deco-pink-signboard",
-    imageUrl: "/src/assets/images/stickers/deco/pink signboard.png",
+    imageUrl: "/src/assets/images/stickers/deco/pinksignboard.png",
     category: "deco",
   },
   {
@@ -324,6 +329,56 @@ export const PRESET_STICKER_OPTIONS: StickerOption[] = [
   {
     id: "deco-card",
     imageUrl: "/src/assets/images/stickers/deco/card.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-1",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape1.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-2",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape2.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-3",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape3.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-4",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape4.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-5",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape5.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-6",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape6.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-7",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape7.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-8",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape8.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-9",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape9.png",
+    category: "deco",
+  },
+  {
+    id: "deco-maskingtape-10",
+    imageUrl: "/src/assets/images/stickers/deco/maskingtape10.png",
     category: "deco",
   },
   {
@@ -442,37 +497,173 @@ export const PRESET_STICKER_OPTIONS: StickerOption[] = [
     category: "colorchip",
   },
   {
-    id: "shape-circle",
-    imageUrl: "https://via.placeholder.com/64/ADD8E6/000000?text=●",
-    category: "shape",
+    id: "weather-sunny",
+    imageUrl: "/src/assets/images/stickers/weather/sunny.png",
+    category: "weather",
   },
   {
-    id: "shape-square",
-    imageUrl: "https://via.placeholder.com/64/ADD8E6/000000?text=■",
-    category: "shape",
+    id: "weather-cloudy",
+    imageUrl: "/src/assets/images/stickers/weather/cloudy.png",
+    category: "weather",
   },
   {
-    id: "character-1",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2017/09/01/00/15/png-2702691_640.png",
-    category: "character",
+    id: "weather-sunny-cloudy",
+    imageUrl: "/src/assets/images/stickers/weather/sunny+cloudy.png",
+    category: "weather",
   },
   {
-    id: "character-2",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2016/03/31/19/58/avatar-1295429_640.png",
-    category: "character",
+    id: "weather-rainy",
+    imageUrl: "/src/assets/images/stickers/weather/rainy.png",
+    category: "weather",
   },
   {
-    id: "character2-1",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/03/11/56/smiley-312633_640.png",
-    category: "character2",
+    id: "weather-snowy",
+    imageUrl: "/src/assets/images/stickers/weather/snowy.png",
+    category: "weather",
   },
   {
-    id: "character2-2",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2014/04/03/10/32/heart-311372_640.png",
-    category: "character2",
+    id: "weather-windy",
+    imageUrl: "/src/assets/images/stickers/weather/windy.png",
+    category: "weather",
+  },
+  {
+    id: "weather-night",
+    imageUrl: "/src/assets/images/stickers/weather/night.png",
+    category: "weather",
+  },
+  {
+    id: "weather-rainbow",
+    imageUrl: "/src/assets/images/stickers/weather/rainbow.png",
+    category: "weather",
+  },
+  {
+    id: "number-1",
+    imageUrl: "/src/assets/images/stickers/number/numbers1.png",
+    category: "numbers",
+  },
+  {
+    id: "number-2",
+    imageUrl: "/src/assets/images/stickers/number/numbers2.png",
+    category: "numbers",
+  },
+  {
+    id: "number-3",
+    imageUrl: "/src/assets/images/stickers/number/numbers3.png",
+    category: "numbers",
+  },
+  {
+    id: "number-4",
+    imageUrl: "/src/assets/images/stickers/number/numbers4.png",
+    category: "numbers",
+  },
+  {
+    id: "number-5",
+    imageUrl: "/src/assets/images/stickers/number/numbers5.png",
+    category: "numbers",
+  },
+  {
+    id: "number-6",
+    imageUrl: "/src/assets/images/stickers/number/numbers6.png",
+    category: "numbers",
+  },
+  {
+    id: "number-7",
+    imageUrl: "/src/assets/images/stickers/number/numbers7.png",
+    category: "numbers",
+  },
+  {
+    id: "number-8",
+    imageUrl: "/src/assets/images/stickers/number/numbers8.png",
+    category: "numbers",
+  },
+  {
+    id: "number-9",
+    imageUrl: "/src/assets/images/stickers/number/numbers9.png",
+    category: "numbers",
+  },
+  {
+    id: "number-10",
+    imageUrl: "/src/assets/images/stickers/number/numbers10.png",
+    category: "numbers",
+  },
+  {
+    id: "number-11",
+    imageUrl: "/src/assets/images/stickers/number/numbers11.png",
+    category: "numbers",
+  },
+  {
+    id: "number-12",
+    imageUrl: "/src/assets/images/stickers/number/numbers12.png",
+    category: "numbers",
+  },
+  {
+    id: "number-13",
+    imageUrl: "/src/assets/images/stickers/number/numbers13.png",
+    category: "numbers",
+  },
+  {
+    id: "number-14",
+    imageUrl: "/src/assets/images/stickers/number/numbers14.png",
+    category: "numbers",
+  },
+  {
+    id: "number-15",
+    imageUrl: "/src/assets/images/stickers/number/numbers15.png",
+    category: "numbers",
+  },
+  {
+    id: "number-16",
+    imageUrl: "/src/assets/images/stickers/number/numbers16.png",
+    category: "numbers",
+  },
+  {
+    id: "number-17",
+    imageUrl: "/src/assets/images/stickers/number/numbers17.png",
+    category: "numbers",
+  },
+  {
+    id: "number-18",
+    imageUrl: "/src/assets/images/stickers/number/numbers18.png",
+    category: "numbers",
+  },
+  {
+    id: "number-19",
+    imageUrl: "/src/assets/images/stickers/number/numbers19.png",
+    category: "numbers",
+  },
+  {
+    id: "number-20",
+    imageUrl: "/src/assets/images/stickers/number/numbers20.png",
+    category: "numbers",
+  },
+  {
+    id: "number-21",
+    imageUrl: "/src/assets/images/stickers/number/numbers21.png",
+    category: "numbers",
+  },
+  {
+    id: "number-22",
+    imageUrl: "/src/assets/images/stickers/number/numbers22.png",
+    category: "numbers",
+  },
+  {
+    id: "number-23",
+    imageUrl: "/src/assets/images/stickers/number/numbers23.png",
+    category: "numbers",
+  },
+  {
+    id: "number-24",
+    imageUrl: "/src/assets/images/stickers/number/numbers24.png",
+    category: "numbers",
+  },
+  {
+    id: "number-25",
+    imageUrl: "/src/assets/images/stickers/number/numbers25.png",
+    category: "numbers",
+  },
+  {
+    id: "number-26",
+    imageUrl: "/src/assets/images/stickers/number/numbers26.png",
+    category: "numbers",
   },
 ];

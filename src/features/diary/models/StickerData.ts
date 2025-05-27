@@ -4,9 +4,8 @@ export type StickerCategory =
   | "deco"
   | "month"
   | "colorchip"
-  | "shape"
-  | "character"
-  | "character2";
+  | "numbers"
+  | "weather";
 
 /**
  * @models/ 에 있는 Sticker Interface와는 다른 모델
