@@ -5,7 +5,11 @@ export type StickerCategory =
   | "month"
   | "colorchip"
   | "numbers"
-  | "weather";
+  | "weather"
+  | "text"
+  | "image";
+
+export type StickerType = "preset" | "text" | "image";
 
 /**
  * @models/ 에 있는 Sticker Interface와는 다른 모델
@@ -15,4 +19,13 @@ export interface StickerOption {
   id: string;
   imageUrl: string;
   category: StickerCategory;
+  type: StickerType;
+  content?: string; // 텍스트 스티커의 경우 텍스트 내용
+  textStyle?: {
+    fontWeight?: string; // 'normal' | 'bold'
+    fontStyle?: string; // 'normal' | 'italic'
+    fontSize?: number; // px 단위
+    fontFamily?: string;
+    color?: string;
+  };
 }

@@ -3,8 +3,7 @@ import { DiaryBook as DiaryBookModel } from "@/models/DiaryBook";
 import { HTMLAttributes, useMemo } from "react";
 import { FaStar } from "react-icons/fa";
 import { PiDotsThreeCircleFill } from "react-icons/pi";
-import DiaryCover, { DiaryCoverItem } from "./DiaryCover";
-import StickerOverlay from "./StickerOverlay";
+import { DiaryCoverItem } from "./DiaryCover";
 
 interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   diaryBook: DiaryBookModel;
@@ -55,14 +54,14 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
     >
       <div className={"relative w-full h-full"}>
         <DiaryBookPin pinned={isPinned} onClick={handlePinToggle} />
-        <StickerOverlay stickers={stickers ?? []}>
+        {/* <StickerOverlay stickers={stickers ?? []}>
           <DiaryCover
             className={"mb-2"}
             title={title}
             item={coverItem}
             spineColor={diaryBook.spineColor}
           />
-        </StickerOverlay>
+        </StickerOverlay> */}
       </div>
       <div className={"w-full flex justify-between items-start"}>
         <div>

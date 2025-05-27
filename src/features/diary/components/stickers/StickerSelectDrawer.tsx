@@ -1,7 +1,13 @@
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { IoTimeOutline } from "react-icons/io5";
 import { PRESET_STICKER_OPTIONS } from "../../data/sticker";
 import { StickerCategory, StickerOption } from "../../models/StickerData";
@@ -25,6 +31,12 @@ type DisplayStickerCategory = "recent" | StickerCategory;
 
 const MAX_RECENT_STICKERS = 10;
 
+type CategoryTabContent = {
+  icon?: React.ReactNode;
+  image?: string;
+  label: string;
+};
+
 const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
   open,
   onOpenChange,
@@ -35,6 +47,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
   const [recentUsedStickers, setRecentUsedStickers] = useState<StickerOption[]>(
     []
   );
+  const stickersContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedRecentStickers = localStorage.getItem("recentUsedStickers");
@@ -50,6 +63,13 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
       }
     }
   }, []);
+
+  // 카테고리 변경 시 스크롤 위치 초기화
+  useEffect(() => {
+    if (stickersContainerRef.current) {
+      stickersContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedCategory]);
 
   const updateRecentStickers = useCallback((sticker: StickerOption) => {
     setRecentUsedStickers((prevStickers: StickerOption[]): StickerOption[] => {
@@ -100,10 +120,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
       };
     }, [recentUsedStickers]);
 
-  const categoryTabs: Record<
-    DisplayStickerCategory,
-    { icon?: React.ReactNode; image?: string; label: string }
-  > = {
+  const categoryTabs = {
     recent: {
       icon: <IoTimeOutline className={"text-2xl"} />,
       label: "최근 사용",
@@ -115,6 +132,10 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
     alphabet2: { image: StickerTab5, label: "알파벳2" },
     numbers: { image: StickerTab6, label: "숫자" },
     month: { image: StickerTab7, label: "월" },
+  } as Record<DisplayStickerCategory, CategoryTabContent>;
+
+  const handleCategoryChange = (category: DisplayStickerCategory) => {
+    setSelectedCategory(category);
   };
 
   return (
@@ -131,7 +152,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
                 ([category, { icon, image, label }]) => (
                   <div
                     onClick={() =>
-                      setSelectedCategory(category as DisplayStickerCategory)
+                      handleCategoryChange(category as DisplayStickerCategory)
                     }
                     className={cn(
                       "transition-all flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-md overflow-hidden",
@@ -160,6 +181,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
           </div>
         </div>
         <div
+          ref={stickersContainerRef}
           className={
             "mt-2 grid grid-cols-5 gap-5 place-items-center overflow-y-auto pb-8 px-4"
           }

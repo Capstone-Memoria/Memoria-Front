@@ -17,6 +17,7 @@ interface TransformableStickerProps extends HTMLAttributes<HTMLDivElement> {
   onDelete: (item: Sticker) => void;
   isFocused: boolean;
   onStickerFocus: (item: Sticker) => void;
+  onStickerDoubleClick?: (item: Sticker) => void;
 }
 
 const TransformableSticker = ({
@@ -26,6 +27,7 @@ const TransformableSticker = ({
   onDelete,
   isFocused,
   onStickerFocus,
+  onStickerDoubleClick,
 }: TransformableStickerProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -37,13 +39,51 @@ const TransformableSticker = ({
     rotation: number;
   } | null>(null);
 
-  const currentSticker = PRESET_STICKER_OPTIONS.find(
-    (option) => option.id === sticker.stickerType
-  );
+  // 스티커 타입에 따라 다른 렌더링 처리
+  const renderStickerContent = () => {
+    // 스티커 ID가 text- 로 시작하면 텍스트 스티커로 처리
+    if (sticker.stickerType.startsWith("text-")) {
+      return (
+        <div
+          className={"w-full h-full flex items-center justify-center"}
+          style={{
+            fontWeight: sticker.textStyle?.fontWeight,
+            fontStyle: sticker.textStyle?.fontStyle,
+            fontSize: `${sticker.textStyle?.fontSize || 16}px`,
+            fontFamily: sticker.textStyle?.fontFamily || "sans-serif",
+            color: sticker.textStyle?.color || "#000000",
+            wordBreak: "break-word",
+            textAlign: "center",
+            padding: "8px",
+          }}
+        >
+          {sticker.content}
+        </div>
+      );
+    }
 
-  if (!currentSticker) {
-    return null;
-  }
+    // 스티커 ID가 image- 로 시작하면 이미지 스티커로 처리
+    if (sticker.stickerType.startsWith("image-")) {
+      return (
+        <img
+          src={sticker.content}
+          alt={"이미지 스티커"}
+          className={"w-full h-full object-contain"}
+        />
+      );
+    }
+
+    // 기본 프리셋 스티커
+    const currentSticker = PRESET_STICKER_OPTIONS.find(
+      (option) => option.id === sticker.stickerType
+    );
+
+    if (!currentSticker) {
+      return null;
+    }
+
+    return <img src={currentSticker.imageUrl} alt={currentSticker.id} />;
+  };
 
   const handleMoveTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setIsDragging(true);
@@ -154,6 +194,12 @@ const TransformableSticker = ({
     onDelete(sticker);
   };
 
+  const handleDoubleClick = () => {
+    if (onStickerDoubleClick) {
+      onStickerDoubleClick(sticker);
+    }
+  };
+
   return (
     <div
       className={cn("absolute z-10 border-3 rounded-md", {
@@ -167,13 +213,15 @@ const TransformableSticker = ({
         transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
       }}
     >
-      <img
+      <div
         onTouchStart={handleMoveTouchStart}
         onTouchMove={handleMoveTouchMove}
         onTouchEnd={handleMoveTouchEnd}
-        src={currentSticker.imageUrl}
-        alt={currentSticker.id}
-      />
+        onDoubleClick={handleDoubleClick}
+        className={"w-full h-full"}
+      >
+        {renderStickerContent()}
+      </div>
       {isFocused && (
         <>
           <div
