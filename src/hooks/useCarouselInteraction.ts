@@ -44,11 +44,15 @@ export const useCarouselInteraction = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [potentialIndex, setPotentialIndex] = useState(0); // 추가: 예상 인덱스 상태
   const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0); // Y축 시작점 추가
   const [offsetX, setOffsetX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [actualItemWidth, setActualItemWidth] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [dragDirection, setDragDirection] = useState<
+    "horizontal" | "vertical" | null
+  >(null); // 드래그 방향 상태 추가
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLDivElement>(null); // 첫 번째 아이템 측정용
@@ -166,13 +170,16 @@ export const useCarouselInteraction = ({
 
   // --- 드래그/터치 공통 로직 ---
   const handleDragStart = useCallback(
-    (clientX: number) => {
+    (clientX: number, clientY: number) => {
+      // clientY 추가
       if (isAnimating) {
         stopAnimation();
       }
       setStartX(clientX);
+      setStartY(clientY); // Y축 시작점 설정
       setIsDragging(true);
       setOffsetX(0);
+      setDragDirection(null); // 드래그 방향 초기화
       // 드래그 시작 시 potentialIndex는 현재 currentIndex와 동일하게 설정
       setPotentialIndex(currentIndex);
 
@@ -184,10 +191,12 @@ export const useCarouselInteraction = ({
   );
 
   const handleDragMove = useCallback(
-    (clientX: number) => {
+    (clientX: number, clientY: number) => {
+      // clientY 추가
       if (!isDragging || actualItemWidth === 0) return;
 
       const currentX = clientX;
+      const currentY = clientY; // 현재 Y 좌표
       const currentTime = Date.now();
       const deltaTime = currentTime - lastMoveTimestampRef.current;
       const deltaX = currentX - lastMoveClientXRef.current;
@@ -198,39 +207,67 @@ export const useCarouselInteraction = ({
         lastMoveClientXRef.current = currentX;
       }
 
-      let diff = currentX - startX;
+      let diffX = currentX - startX;
+      const diffY = currentY - startY; // Y축 이동량
 
-      if (
-        (currentIndex === 0 && diff > 0) ||
-        (currentIndex === itemCount - 1 && diff < 0)
-      ) {
-        diff /= 3;
-      }
-      setOffsetX(diff);
-
-      // --- 예상 인덱스 계산 및 업데이트 ---
-      // 현재 offset을 기반으로 중앙에 올 것으로 예상되는 인덱스 계산
-      // (현재 인덱스 - 이동 오프셋 / 아이템 너비) 를 반올림
-      const currentOffset = diff; // 저항이 적용된 diff 사용
-      let estimatedIndex = currentIndex - currentOffset / actualItemWidth;
-      estimatedIndex = Math.round(estimatedIndex);
-      // 계산된 인덱스를 유효 범위 (0 ~ itemCount - 1) 내로 제한
-      estimatedIndex = Math.max(0, Math.min(itemCount - 1, estimatedIndex));
-
-      // 이전 potentialIndex와 다를 경우에만 업데이트 (불필요한 리렌더링 방지)
-      setPotentialIndex((prevIndex) => {
-        if (prevIndex !== estimatedIndex) {
-          return estimatedIndex;
+      // 드래그 방향 결정 로직
+      if (!dragDirection) {
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+          setDragDirection("horizontal");
+        } else if (Math.abs(diffY) > Math.abs(diffX)) {
+          // 수직 이동이 더 크면 아무것도 하지 않음 (스크롤 허용)
+          // 필요에 따라 수직 드래그 로직을 여기에 추가할 수 있습니다.
+          // setIsDragging(false); // 필요하다면 드래그 취소
+          return;
         }
-        return prevIndex;
-      });
+      }
+
+      if (dragDirection === "horizontal") {
+        if (
+          (currentIndex === 0 && diffX > 0) ||
+          (currentIndex === itemCount - 1 && diffX < 0)
+        ) {
+          diffX /= 3;
+        }
+        setOffsetX(diffX);
+
+        // --- 예상 인덱스 계산 및 업데이트 ---
+        const currentOffset = diffX;
+        let estimatedIndex = currentIndex - currentOffset / actualItemWidth;
+        estimatedIndex = Math.round(estimatedIndex);
+        estimatedIndex = Math.max(0, Math.min(itemCount - 1, estimatedIndex));
+
+        setPotentialIndex((prevIndex) => {
+          if (prevIndex !== estimatedIndex) {
+            return estimatedIndex;
+          }
+          return prevIndex;
+        });
+      }
       // ---------------------------------
     },
-    [isDragging, startX, currentIndex, itemCount, actualItemWidth]
+    [
+      isDragging,
+      startX,
+      startY,
+      currentIndex,
+      itemCount,
+      actualItemWidth,
+      dragDirection,
+    ] // startY, dragDirection 의존성 추가
   );
 
   const handleDragEnd = useCallback(() => {
-    if (!isDragging || actualItemWidth === 0) return;
+    if (
+      !isDragging ||
+      actualItemWidth === 0 ||
+      dragDirection !== "horizontal"
+    ) {
+      // dragDirection 조건 추가
+      setIsDragging(false); // 드래그 상태 확실히 해제
+      setDragDirection(null); // 드래그 방향 초기화
+      return;
+    }
 
     setIsDragging(false);
 
@@ -282,19 +319,20 @@ export const useCarouselInteraction = ({
     actualItemWidth,
     startAnimation,
     onSelect,
+    dragDirection,
   ]);
 
   // --- 터치 이벤트 핸들러 ---
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      handleDragStart(e.touches[0].clientX);
+      handleDragStart(e.touches[0].clientX, e.touches[0].clientY); // clientY 전달
     },
     [handleDragStart]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      handleDragMove(e.touches[0].clientX);
+      handleDragMove(e.touches[0].clientX, e.touches[0].clientY); // clientY 전달
     },
     [handleDragMove]
   );
@@ -306,7 +344,7 @@ export const useCarouselInteraction = ({
   // --- 마우스 이벤트 핸들러 ---
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      handleDragStart(e.clientX);
+      handleDragStart(e.clientX, e.clientY); // clientY 전달
       e.preventDefault();
     },
     [handleDragStart]
@@ -314,7 +352,7 @@ export const useCarouselInteraction = ({
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      handleDragMove(e.clientX);
+      handleDragMove(e.clientX, e.clientY); // clientY 전달
     },
     [handleDragMove]
   );
