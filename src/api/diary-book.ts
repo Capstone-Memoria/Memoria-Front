@@ -1,7 +1,12 @@
 import { Diary } from "@/models/Diary";
 import { DiaryBook, DiaryBookMemer } from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
-import { Sticker } from "@/models/Sticker";
+import {
+  ImageToRequestSticker,
+  ModifyingSticker,
+  RequestSticker,
+  Sticker,
+} from "@/models/Sticker";
 import server from "./axios";
 
 export const fetchMyDiaryBook = async (PageParam: PageParam) => {
@@ -32,7 +37,7 @@ export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
 };
 
 interface DiaryBookCreateWithStickersRequest extends DiaryBookCreateRequest {
-  stickers: Sticker[];
+  stickers: ModifyingSticker[];
 }
 
 export const createDiaryBookWithStickers = async (
@@ -128,11 +133,44 @@ export const fetchDiaryMembers = async (diaryBookId: number) => {
   return responcse.data;
 };
 
+export const holdStickerImage = async (imageFile: File) => {
+  const formData = new FormData();
+  formData.append("imageFile", imageFile);
+
+  const response = await server.post<{
+    uuid: string;
+  }>("/api/stickers/images/hold", formData);
+
+  return response.data.uuid;
+};
+
 export const updateStickers = async (
   diaryBookId: number,
-  stickers: Sticker[]
+  stickers: ModifyingSticker[]
 ) => {
-  await server.put(`/api/diary-book/${diaryBookId}/stickers`, {
-    stickers,
-  });
+  const imagesToHold = stickers.filter((it) => it.type === "IMAGE_TO_UPLOAD");
+  const imagesToRequest: ImageToRequestSticker[] = await Promise.all(
+    imagesToHold.map(async (it) => {
+      const heldImageUuid = await holdStickerImage(it.imageFile);
+      return {
+        ...it,
+        type: "IMAGE_TO_REQUEST",
+        heldStickerImageUuid: heldImageUuid,
+      } satisfies ImageToRequestSticker;
+    })
+  );
+
+  const stickersToRequest: RequestSticker[] = [
+    ...stickers.filter((it) => it.type !== "IMAGE_TO_UPLOAD"),
+    ...imagesToRequest,
+  ];
+
+  const response = await server.put<Sticker[]>(
+    `/api/diary-book/${diaryBookId}/stickers`,
+    {
+      stickers: stickersToRequest,
+    }
+  );
+
+  return response.data;
 };

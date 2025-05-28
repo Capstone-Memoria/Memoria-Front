@@ -2,7 +2,12 @@ import "@/assets/css/transitions.css";
 import DiaryCover, { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import TextStickerEditDrawer from "@/features/diary/components/stickers/TextStickerEditDrawer";
 import { cn } from "@/lib/utils";
-import { Sticker } from "@/models/Sticker";
+import {
+  CustomTextSticker,
+  ImageToUploadSticker,
+  ModifyingSticker,
+  PredefinedSticker,
+} from "@/models/Sticker";
 import { useElementSize } from "@reactuses/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BsImage, BsTextareaT } from "react-icons/bs";
@@ -18,8 +23,8 @@ interface DiaryDecorateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedCover: DiaryCoverItem | null;
-  initialStickers?: Sticker[];
-  onSave?: (stickers: Sticker[]) => void;
+  initialStickers?: ModifyingSticker[];
+  onSave?: (stickers: ModifyingSticker[]) => void;
   spineColor?: string;
 }
 
@@ -33,7 +38,7 @@ const DiaryDecorateDialog = ({
 }: DiaryDecorateDialogProps) => {
   const [stickerDrawerOpen, setStickerDrawerOpen] = useState(false);
   const [textStickerDrawerOpen, setTextStickerDrawerOpen] = useState(false);
-  const [stickers, setStickers] = useState<Sticker[]>(initialStickers || []);
+  const [stickers, setStickers] = useState<ModifyingSticker[]>([]);
   const [focusedStickerUuid, setFocusedStickerUuid] = useState<string | null>(
     null
   );
@@ -78,9 +83,10 @@ const DiaryDecorateDialog = ({
   }, [open, initialStickers]);
 
   const handleStickerSelect = (sticker: StickerOption) => {
-    const newSticker: Sticker = {
+    const newSticker: PredefinedSticker = {
       uuid: uuidv4(),
-      stickerType: sticker.id,
+      type: "PREDEFINED",
+      assetName: sticker.id,
       posX: 0.5,
       posY: 0.5,
       size: 0.3,
@@ -93,22 +99,20 @@ const DiaryDecorateDialog = ({
 
   const handleAddTextSticker = () => {
     // 텍스트 스티커 직접 생성
-    const textStickerId = `text-${uuidv4()}`;
-    const newSticker: Sticker = {
+    const newSticker: CustomTextSticker = {
       uuid: uuidv4(),
-      stickerType: textStickerId,
+      type: "CUSTOM_TEXT",
+      textContent: "텍스트",
+      fontSize: 16,
+      fontColor: "#000000",
+      fontFamily: "sans-serif",
+      italic: false,
+      bold: false,
       posX: 0.5,
       posY: 0.5,
       size: 0.3,
       rotation: 0,
-      content: "",
-      textStyle: {
-        fontWeight: "normal",
-        fontStyle: "normal",
-        fontSize: 16,
-        color: "#000000",
-        fontFamily: "sans-serif",
-      },
+      templateWidth: coverSize.width,
     };
     setStickers((prev) => [...prev, newSticker]);
     setFocusedStickerUuid(newSticker.uuid);
@@ -117,20 +121,34 @@ const DiaryDecorateDialog = ({
     setTextStickerDrawerOpen(true);
   };
 
-  const handleTextStickerEdit = (textSticker: StickerOption) => {
+  const handleTextStickerEdit = (textStickerData: {
+    content: string;
+    textStyle: {
+      fontSize: number;
+      color: string;
+      fontFamily: string;
+      fontWeight: string;
+      fontStyle: string;
+    };
+  }) => {
     if (!editingStickerUuid) return;
 
     // 텍스트 스티커 편집 내용 저장
     setStickers((prev) =>
-      prev.map((s) =>
-        s.uuid === editingStickerUuid
-          ? {
-              ...s,
-              content: textSticker.content,
-              textStyle: textSticker.textStyle,
-            }
-          : s
-      )
+      prev.map((s) => {
+        if (s.uuid === editingStickerUuid && s.type === "CUSTOM_TEXT") {
+          return {
+            ...s,
+            textContent: textStickerData.content,
+            fontSize: textStickerData.textStyle.fontSize,
+            fontColor: textStickerData.textStyle.color,
+            fontFamily: textStickerData.textStyle.fontFamily,
+            bold: textStickerData.textStyle.fontWeight === "bold",
+            italic: textStickerData.textStyle.fontStyle === "italic",
+          };
+        }
+        return s;
+      })
     );
 
     // 편집 상태 초기화
@@ -153,29 +171,28 @@ const DiaryDecorateDialog = ({
       reader.onload = (event) => {
         if (!event.target?.result) return;
 
-        const imageStickerId = `image-${uuidv4()}`;
-        const newSticker: Sticker = {
+        const newSticker: ImageToUploadSticker = {
           uuid: uuidv4(),
-          stickerType: imageStickerId,
+          type: "IMAGE_TO_UPLOAD",
+          imageFile: file,
           posX: 0.5,
           posY: 0.5,
           size: 0.3,
           rotation: 0,
-          content: event.target.result as string,
         };
 
         setStickers((prev) => [...prev, newSticker]);
         setFocusedStickerUuid(newSticker.uuid);
       };
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // FileReader는 여전히 DataURL을 읽어 미리보기를 위해 사용될 수 있지만, 실제 저장은 File 객체로 합니다.
     };
 
     input.click();
   };
 
   const handleStickerMove = (
-    sticker: Sticker,
+    sticker: ModifyingSticker,
     newPosX: number,
     newPosY: number
   ) => {
@@ -187,7 +204,7 @@ const DiaryDecorateDialog = ({
   };
 
   const handleStickerScaleAndRotate = (
-    sticker: Sticker,
+    sticker: ModifyingSticker,
     newScale: number,
     newRotation: number
   ) => {
@@ -200,12 +217,12 @@ const DiaryDecorateDialog = ({
     );
   };
 
-  const handleStickerDelete = (stickerToDelete: Sticker) => {
+  const handleStickerDelete = (stickerToDelete: ModifyingSticker) => {
     setStickers((prev) => prev.filter((s) => s.uuid !== stickerToDelete.uuid));
     setFocusedStickerUuid(null);
   };
 
-  const handleStickerFocus = (sticker: Sticker) => {
+  const handleStickerFocus = (sticker: ModifyingSticker) => {
     setFocusedStickerUuid(sticker.uuid);
     setStickers((prevStickers) => {
       const newStickers = prevStickers.filter((s) => s.uuid !== sticker.uuid);
@@ -214,9 +231,9 @@ const DiaryDecorateDialog = ({
     });
   };
 
-  const handleStickerDoubleClick = (sticker: Sticker) => {
+  const handleStickerDoubleClick = (sticker: ModifyingSticker) => {
     // 텍스트 스티커일 경우 편집 모드로 전환
-    if (sticker.stickerType.startsWith("text-")) {
+    if (sticker.type === "CUSTOM_TEXT") {
       setEditingStickerUuid(sticker.uuid);
       setTextStickerDrawerOpen(true);
     }
@@ -238,6 +255,11 @@ const DiaryDecorateDialog = ({
   const editingSticker = editingStickerUuid
     ? stickers.find((s) => s.uuid === editingStickerUuid)
     : null;
+
+  const currentEditingTextSticker =
+    editingSticker && editingSticker.type === "CUSTOM_TEXT"
+      ? (editingSticker as CustomTextSticker)
+      : null;
 
   return (
     <div
@@ -360,13 +382,19 @@ const DiaryDecorateDialog = ({
           handleStickerSelect(sticker);
         }}
       />
-      {editingSticker && (
+      {currentEditingTextSticker && (
         <TextStickerEditDrawer
           open={textStickerDrawerOpen}
           onOpenChange={setTextStickerDrawerOpen}
           onSave={handleTextStickerEdit}
-          initialText={editingSticker.content}
-          initialStyle={editingSticker.textStyle}
+          initialText={currentEditingTextSticker.textContent}
+          initialStyle={{
+            fontSize: currentEditingTextSticker.fontSize,
+            color: currentEditingTextSticker.fontColor,
+            fontFamily: currentEditingTextSticker.fontFamily,
+            fontWeight: currentEditingTextSticker.bold ? "bold" : "normal",
+            fontStyle: currentEditingTextSticker.italic ? "italic" : "normal",
+          }}
         />
       )}
     </div>

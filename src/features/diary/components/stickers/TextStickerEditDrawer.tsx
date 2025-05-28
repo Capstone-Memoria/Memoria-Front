@@ -4,21 +4,24 @@ import React, { useState } from "react";
 import { BiBold, BiItalic, BiPalette } from "react-icons/bi";
 import { GoDash, GoPlus } from "react-icons/go";
 import { IoMdInformationCircle } from "react-icons/io";
-import { v4 as uuidv4 } from "uuid";
-import { StickerOption } from "../../models/StickerData";
+
+export type TextStyle = {
+  fontSize: number;
+  color: string;
+  fontFamily: string;
+  fontWeight: string;
+  fontStyle: string;
+};
 
 interface TextStickerEditDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (textSticker: StickerOption) => void;
+  onSave: (data: {
+    content: string;
+    textStyle: TextStyle;
+  }) => void;
   initialText?: string;
-  initialStyle?: {
-    fontWeight?: string;
-    fontStyle?: string;
-    fontSize?: number;
-    color?: string;
-    fontFamily?: string;
-  };
+  initialStyle?: TextStyle;
 }
 
 const DEFAULT_FONT_SIZE = 16;
@@ -58,16 +61,10 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
   const handleSave = () => {
     if (!text.trim()) return;
 
-    const textSticker: StickerOption = {
-      id: `text-${uuidv4()}`,
-      imageUrl: "", // 텍스트 스티커는 이미지 URL이 없음
-      category: "text",
-      type: "text",
+    onSave({
       content: text,
       textStyle: textStyle,
-    };
-
-    onSave(textSticker);
+    });
   };
 
   const toggleBold = () => {

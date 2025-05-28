@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
-import { Sticker } from "@/models/Sticker";
+import { BaseSticker } from "@/models/Sticker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
@@ -78,7 +78,7 @@ const ManageDiaryBookPage = () => {
 
   const { mutate: tryUpdateStickers, isPending: isStickerSaving } = useMutation(
     {
-      mutationFn: (stickers: Sticker[]) => {
+      mutationFn: (stickers: BaseSticker[]) => {
         if (!diaryBookId) throw new Error("Diary ID is missing!");
         return api.diaryBook.updateStickers(Number(diaryBookId), stickers);
       },
@@ -101,7 +101,7 @@ const ManageDiaryBookPage = () => {
   const [selectedSpineColor, setSelectedSpineColor] = useState<string>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDecorateDialogOpen, setIsDecorateDialogOpen] = useState(false);
-  const [currentStickers, setCurrentStickers] = useState<Sticker[]>([]);
+  const [currentStickers, setCurrentStickers] = useState<BaseSticker[]>([]);
 
   useEffect(() => {
     if (data) {
@@ -168,7 +168,7 @@ const ManageDiaryBookPage = () => {
     });
   };
 
-  const handleStickerSave = (updatedStickers: Sticker[]) => {
+  const handleStickerSave = (updatedStickers: BaseSticker[]) => {
     tryUpdateStickers(updatedStickers);
   };
 

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/className";
-import { Sticker } from "@/models/Sticker";
+import { BaseSticker } from "@/models/Sticker";
 import { HTMLAttributes, useEffect, useMemo, useState } from "react";
 import Image from "../base/Image";
 
@@ -34,7 +34,7 @@ interface DiaryCoverProps extends HTMLAttributes<HTMLDivElement> {
   // pinned?: boolean;
   // showPin?: boolean;
   // notificationCount?: number;
-  stickers?: Sticker[];
+  stickers?: BaseSticker[];
   item?: DiaryCoverItem;
   title?: string;
   spineColor?: string;

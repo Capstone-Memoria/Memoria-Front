@@ -1,16 +1,62 @@
-export interface Sticker {
+import { AttachedFile } from "./AttachedFile";
+
+export type StickerType =
+  | "PREDEFINED"
+  | "CUSTOM_IMAGE"
+  | "CUSTOM_TEXT"
+  | "IMAGE_TO_UPLOAD"
+  | "IMAGE_TO_REQUEST";
+
+export type BaseSticker = {
   uuid: string;
-  stickerType: string;
-  posX: number; //스티커의 중앙이 위치할 다이어리의 너비의 몇퍼센트인지 (0~1.0)
-  posY: number; //스티커의 중앙이 위치할 다이어리의 높이의 몇퍼센트인지 (0~1.0)
-  size: number; //스티커의 너비가 다이어리의 너비의 몇퍼센트인지 (0~1.0)
-  rotation: number; //스티커의 회전 각도 (0~360)
-  content?: string; // 텍스트 스티커의 경우 텍스트 내용
-  textStyle?: {
-    fontWeight?: string; // 'normal' | 'bold'
-    fontStyle?: string; // 'normal' | 'italic'
-    fontSize?: number; // px 단위
-    fontFamily?: string; // 'sans-serif' | 'serif' | 'monospace' | 'cursive'
-    color?: string;
-  };
-}
+  type: StickerType;
+  diaryBookId?: string;
+  posX: number;
+  posY: number;
+  size: number;
+  rotation: number;
+};
+
+export type PredefinedSticker = BaseSticker & {
+  type: "PREDEFINED";
+  assetName: string;
+};
+
+export type CustomImageSticker = BaseSticker & {
+  type: "CUSTOM_IMAGE";
+  imageFile: AttachedFile;
+};
+
+export type ImageToUploadSticker = BaseSticker & {
+  type: "IMAGE_TO_UPLOAD";
+  imageFile: File;
+};
+
+export type ImageToRequestSticker = BaseSticker & {
+  type: "IMAGE_TO_REQUEST";
+  heldStickerImageUuid: string;
+};
+
+export type CustomTextSticker = BaseSticker & {
+  type: "CUSTOM_TEXT";
+  textContent: string;
+  fontSize: number;
+  fontColor: string;
+  fontFamily: string;
+  italic: boolean;
+  bold: boolean;
+  templateWidth: number;
+};
+
+export type Sticker =
+  | PredefinedSticker
+  | CustomImageSticker
+  | CustomTextSticker;
+
+export type ModifyingSticker =
+  | Exclude<Sticker, CustomImageSticker>
+  | ImageToUploadSticker;
+
+export type RequestSticker =
+  | Exclude<Sticker, CustomImageSticker>
+  | ImageToRequestSticker;
