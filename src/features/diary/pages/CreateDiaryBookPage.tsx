@@ -11,12 +11,12 @@ import { TbSticker2 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
 
-import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
-import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
-import CoverExampleImg3 from "@/assets/images/CoverImage3.png";
-import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
-import CoverExampleImg5 from "@/assets/images/CoverImage5.png";
-import CoverExampleImg6 from "@/assets/images/CoverImage6.png";
+import CoverExampleImg1 from "@/assets/images/coverimage1.png";
+import CoverExampleImg2 from "@/assets/images/coverimage2.png";
+import CoverExampleImg3 from "@/assets/images/coverimage3.png";
+import CoverExampleImg4 from "@/assets/images/coverimage4.png";
+import CoverExampleImg5 from "@/assets/images/coverimage5.png";
+import CoverExampleImg6 from "@/assets/images/coverimage6.png";
 import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
