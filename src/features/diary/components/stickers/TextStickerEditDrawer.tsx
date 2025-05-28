@@ -16,10 +16,7 @@ export type TextStyle = {
 interface TextStickerEditDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: {
-    content: string;
-    textStyle: TextStyle;
-  }) => void;
+  onSave: (data: { content: string; textStyle: TextStyle }) => void;
   initialText?: string;
   initialStyle?: TextStyle;
 }
@@ -111,7 +108,7 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
-      <DrawerContent className={"min-h-[380px]"}>
+      <DrawerContent className={"min-h-[300px]"}>
         <div className={"p-4 flex flex-col gap-3 h-full"}>
           <h3
             className={
@@ -129,6 +126,14 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
               className={
                 "w-full p-3 border rounded-md focus:border-green-500 focus:outline-none"
               }
+              style={{
+                fontWeight: textStyle.fontWeight,
+                fontStyle: textStyle.fontStyle,
+                fontSize: `${textStyle.fontSize}px`,
+                fontFamily: textStyle.fontFamily,
+                color: textStyle.color,
+                textAlign: "center",
+              }}
               placeholder={"텍스트를 입력하세요."}
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -236,28 +241,6 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
                 >
                   <GoPlus />
                 </button>
-              </div>
-            </div>
-
-            {/* 미리보기 */}
-            <div
-              className={
-                "mt-1 p-3 border rounded-md flex items-center justify-center flex-1 min-h-[80px]"
-              }
-            >
-              <div
-                style={{
-                  fontWeight: textStyle.fontWeight,
-                  fontStyle: textStyle.fontStyle,
-                  fontSize: `${textStyle.fontSize}px`,
-                  fontFamily: textStyle.fontFamily,
-                  color: textStyle.color,
-                  wordBreak: "break-word",
-                  textAlign: "center",
-                  maxWidth: "100%",
-                }}
-              >
-                {text || "텍스트 미리보기"}
               </div>
             </div>
 
