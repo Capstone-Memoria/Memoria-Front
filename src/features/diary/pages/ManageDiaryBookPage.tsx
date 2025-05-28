@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
-import { ModifyingSticker } from "@/models/Sticker";
+import { ImageToUploadSticker, ModifyingSticker } from "@/models/Sticker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
@@ -106,14 +106,45 @@ const ManageDiaryBookPage = () => {
   );
 
   useEffect(() => {
-    if (data) {
-      setTitle(data.title);
-      // setCurrentStickers(data.stickers.map((it) => ({
-      //   ...it,
-      //   type: it.type === "CUSTOM_IMAGE" ? "IMAGE_TO_UPLOAD" : it.type,
-      // })) || []);
-      setSelectedSpineColor(data.spineColor);
-    }
+    const fetchStickers = async () => {
+      if (data) {
+        setTitle(data.title);
+        const stickers: ModifyingSticker[] = [
+          ...(data.stickers?.filter((it) => it.type !== "CUSTOM_IMAGE") ?? []),
+        ];
+
+        const convertedImageStickers: ImageToUploadSticker[] =
+          await Promise.all(
+            data.stickers
+              ?.filter((it) => it.type === "CUSTOM_IMAGE")
+              .map(async (it) => {
+                const imageBlob: Blob = await api.image.fetchImage(
+                  it.imageFile.id
+                );
+                const imageFile = new File([imageBlob], it.imageFile.id, {
+                  type: imageBlob.type,
+                });
+
+                return {
+                  uuid: it.uuid,
+                  type: "IMAGE_TO_UPLOAD",
+                  imageFile: imageFile,
+                  posX: it.posX,
+                  posY: it.posY,
+                  size: it.size,
+                  rotation: it.rotation,
+                } satisfies ImageToUploadSticker;
+              }) ?? []
+          );
+        const totalStickers: ModifyingSticker[] = [
+          ...stickers,
+          ...convertedImageStickers,
+        ];
+        setCurrentStickers(totalStickers);
+        setSelectedSpineColor(data.spineColor);
+      }
+    };
+    fetchStickers();
   }, [data]);
 
   // 삭제 핸들러
@@ -369,6 +400,7 @@ const ManageDiaryBookPage = () => {
         selectedCover={selectedCoverForDialog}
         initialStickers={currentStickers}
         onSave={handleStickerSave}
+        spineColor={selectedSpineColor}
       />
     </Page.Container>
   );

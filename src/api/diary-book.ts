@@ -3,6 +3,7 @@ import { DiaryBook, DiaryBookMemer } from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
 import {
   ImageToRequestSticker,
+  ImageToUploadSticker,
   ModifyingSticker,
   RequestSticker,
   Sticker,
@@ -146,35 +147,54 @@ export const holdStickerImage = async (imageFile: File) => {
   return response.data.uuid;
 };
 
+type Ordered<T> = {
+  order: number;
+  data: T;
+};
+
 export const updateStickers = async (
   diaryBookId: number,
   stickers: ModifyingSticker[]
 ) => {
-  const imagesToHold = stickers.filter((it) => it.type === "IMAGE_TO_UPLOAD");
-  const imagesToRequest: ImageToRequestSticker[] = await Promise.all(
-    imagesToHold.map(async (it) => {
-      const heldImageUuid = await holdStickerImage(it.imageFile);
-      return {
-        type: "CUSTOM_IMAGE",
-        uuid: it.uuid,
-        posX: it.posX,
-        posY: it.posY,
-        size: it.size,
-        rotation: it.rotation,
-        heldStickerImageUuid: heldImageUuid,
-      } satisfies ImageToRequestSticker;
+  const orderedData: Ordered<ModifyingSticker>[] = stickers.map(
+    (it, index) => ({
+      order: index,
+      data: it,
     })
   );
 
-  const stickersToRequest: RequestSticker[] = [
-    ...stickers.filter((it) => it.type !== "IMAGE_TO_UPLOAD"),
+  const imagesToHold: Ordered<ImageToUploadSticker>[] = orderedData.filter(
+    (it) => it.data.type === "IMAGE_TO_UPLOAD"
+  ) as Ordered<ImageToUploadSticker>[];
+  const imagesToRequest: Ordered<ImageToRequestSticker>[] = await Promise.all(
+    imagesToHold.map(async (it) => {
+      const heldImageUuid = await holdStickerImage(it.data.imageFile);
+      return {
+        order: it.order,
+        data: {
+          type: "CUSTOM_IMAGE",
+          uuid: it.data.uuid,
+          posX: it.data.posX,
+          posY: it.data.posY,
+          size: it.data.size,
+          rotation: it.data.rotation,
+          heldStickerImageUuid: heldImageUuid,
+        } satisfies ImageToRequestSticker,
+      };
+    })
+  );
+
+  const stickersToRequest: Ordered<RequestSticker>[] = [
+    ...(orderedData.filter(
+      (it) => it.data.type !== "IMAGE_TO_UPLOAD"
+    ) as Ordered<RequestSticker>[]),
     ...imagesToRequest,
-  ];
+  ].sort((a, b) => a.order - b.order);
 
   const response = await server.put<Sticker[]>(
     `/api/diary-book/${diaryBookId}/stickers`,
     {
-      stickers: stickersToRequest,
+      stickers: stickersToRequest.map((it) => it.data),
     }
   );
 
