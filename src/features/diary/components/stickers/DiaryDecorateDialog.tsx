@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 import { Sticker } from "@/models/Sticker";
 import { useElementSize } from "@reactuses/core";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BsImage, BsTextareaT } from "react-icons/bs";
+import { GoSmiley } from "react-icons/go";
 import { HiArrowNarrowLeft } from "react-icons/hi";
-import { PiSticker } from "react-icons/pi";
 import { RiArrowGoBackLine, RiArrowGoForwardLine } from "react-icons/ri";
+import { RxImage, RxText } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
 import { StickerOption } from "../../models/StickerData";
 import StickerSelectDrawer from "./StickerSelectDrawer";
@@ -327,27 +327,27 @@ const DiaryDecorateDialog = ({
                 <RiArrowGoForwardLine size={20} />
               </button>
             </div>
-            <div className={"flex gap-3"}>
+            <div className={"flex gap-3 "}>
               <button
                 className={"p-2 rounded-full antialiased"}
                 aria-label={"텍스트 스티커 추가"}
                 onClick={handleAddTextSticker}
               >
-                <BsTextareaT className={"text-2xl text-black"} />
+                <RxText className={"text-2xl text-black"} />
               </button>
               <button
                 className={"p-2 rounded-full antialiased"}
                 aria-label={"이미지 스티커 추가"}
                 onClick={handleImageUpload}
               >
-                <BsImage className={"text-2xl text-black"} />
+                <RxImage className={"text-2xl text-black"} />
               </button>
               <button
                 className={"p-2 rounded-full antialiased"}
                 aria-label={"스티커 목록 열기"}
                 onClick={() => setStickerDrawerOpen(true)}
               >
-                <PiSticker className={"text-2xl text-black"} />
+                <GoSmiley className={"text-2xl text-black"} />
               </button>
             </div>
           </div>

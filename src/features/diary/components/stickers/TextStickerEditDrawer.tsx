@@ -129,8 +129,10 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
             {/* 텍스트 입력 필드 */}
             <input
               type={"text"}
-              className={"w-full p-3 border rounded-md"}
-              placeholder={"텍스트를 입력하세요..."}
+              className={
+                "w-full p-3 border rounded-md focus:border-green-500 focus:outline-none"
+              }
+              placeholder={"텍스트를 입력하세요."}
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
