@@ -1,12 +1,19 @@
 import "@/assets/css/transitions.css";
 import DiaryCover, { DiaryCoverItem } from "@/components/diary/DiaryCover";
+import TextStickerEditDrawer from "@/features/diary/components/stickers/TextStickerEditDrawer";
 import { cn } from "@/lib/utils";
-import { Sticker } from "@/models/Sticker";
+import {
+  CustomTextSticker,
+  ImageToUploadSticker,
+  ModifyingSticker,
+  PredefinedSticker,
+} from "@/models/Sticker";
 import { useElementSize } from "@reactuses/core";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { GoSmiley } from "react-icons/go";
 import { HiArrowNarrowLeft } from "react-icons/hi";
-import { PiSmileyStickerFill } from "react-icons/pi";
 import { RiArrowGoBackLine, RiArrowGoForwardLine } from "react-icons/ri";
+import { RxImage, RxText } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
 import { StickerOption } from "../../models/StickerData";
 import StickerSelectDrawer from "./StickerSelectDrawer";
@@ -16,8 +23,8 @@ interface DiaryDecorateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedCover: DiaryCoverItem | null;
-  initialStickers?: Sticker[];
-  onSave?: (stickers: Sticker[]) => void;
+  initialStickers?: ModifyingSticker[];
+  onSave?: (stickers: ModifyingSticker[]) => void;
   spineColor?: string;
 }
 
@@ -30,13 +37,29 @@ const DiaryDecorateDialog = ({
   spineColor,
 }: DiaryDecorateDialogProps) => {
   const [stickerDrawerOpen, setStickerDrawerOpen] = useState(false);
-  const [stickers, setStickers] = useState<Sticker[]>(initialStickers || []);
+  const [textStickerDrawerOpen, setTextStickerDrawerOpen] = useState(false);
+  const [stickers, setStickers] = useState<ModifyingSticker[]>([]);
   const [focusedStickerUuid, setFocusedStickerUuid] = useState<string | null>(
+    null
+  );
+  const [editingStickerUuid, setEditingStickerUuid] = useState<string | null>(
     null
   );
   const canvasRef = useRef<HTMLDivElement>(null);
   const canvasSize = useElementSize(canvasRef);
   const bodySize = useElementSize(document.body);
+
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [open]);
 
   const coverSize = useMemo(() => {
     if (!canvasSize) return { width: 0, height: 0 };
@@ -54,15 +77,35 @@ const DiaryDecorateDialog = ({
   }, [canvasSize, bodySize]);
 
   useEffect(() => {
-    if (open && initialStickers) {
+    if (open && initialStickers && coverSize.width > 0) {
+      const adjustedStickers = initialStickers.map((sticker) => {
+        if (
+          sticker.type === "CUSTOM_TEXT" &&
+          sticker.templateWidth &&
+          sticker.templateWidth > 0
+        ) {
+          const currentFontSize = sticker.fontSize;
+          const templateWidth = sticker.templateWidth;
+          const newFontSize =
+            (currentFontSize / templateWidth) * coverSize.width;
+          return {
+            ...sticker,
+            fontSize: newFontSize,
+          };
+        }
+        return sticker;
+      });
+      setStickers(adjustedStickers);
+    } else if (open && initialStickers) {
       setStickers(initialStickers);
     }
-  }, [open, initialStickers]);
+  }, [open, initialStickers, coverSize.width]);
 
   const handleStickerSelect = (sticker: StickerOption) => {
-    const newSticker: Sticker = {
+    const newSticker: PredefinedSticker = {
       uuid: uuidv4(),
-      stickerType: sticker.id,
+      type: "PREDEFINED",
+      assetName: sticker.id,
       posX: 0.5,
       posY: 0.5,
       size: 0.3,
@@ -73,8 +116,102 @@ const DiaryDecorateDialog = ({
     setFocusedStickerUuid(newSticker.uuid);
   };
 
+  const handleAddTextSticker = () => {
+    // 텍스트 스티커 직접 생성
+    const newSticker: CustomTextSticker = {
+      uuid: uuidv4(),
+      type: "CUSTOM_TEXT",
+      textContent: "텍스트",
+      fontSize: 16,
+      fontColor: "#000000",
+      fontFamily: "sans-serif",
+      italic: false,
+      bold: false,
+      posX: 0.5,
+      posY: 0.5,
+      size: 0.3,
+      rotation: 0,
+      templateWidth: coverSize.width,
+    };
+    setStickers((prev) => [...prev, newSticker]);
+    setFocusedStickerUuid(newSticker.uuid);
+    // 텍스트 스티커 생성 후 바로 편집 모드로 전환
+    setEditingStickerUuid(newSticker.uuid);
+    setTextStickerDrawerOpen(true);
+  };
+
+  const handleTextStickerEdit = (textStickerData: {
+    content: string;
+    textStyle: {
+      fontSize: number;
+      color: string;
+      fontFamily: string;
+      fontWeight: string;
+      fontStyle: string;
+    };
+  }) => {
+    if (!editingStickerUuid) return;
+
+    // 텍스트 스티커 편집 내용 저장
+    setStickers((prev) =>
+      prev.map((s) => {
+        if (s.uuid === editingStickerUuid && s.type === "CUSTOM_TEXT") {
+          return {
+            ...s,
+            textContent: textStickerData.content,
+            fontSize: textStickerData.textStyle.fontSize,
+            fontColor: textStickerData.textStyle.color,
+            fontFamily: textStickerData.textStyle.fontFamily,
+            bold: textStickerData.textStyle.fontWeight === "bold",
+            italic: textStickerData.textStyle.fontStyle === "italic",
+          };
+        }
+        return s;
+      })
+    );
+
+    // 편집 상태 초기화
+    setTextStickerDrawerOpen(false);
+    setEditingStickerUuid(null);
+  };
+
+  const handleImageUpload = () => {
+    // 이미지 업로드 처리 로직
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      if (!target.files || target.files.length === 0) return;
+
+      const file = target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        if (!event.target?.result) return;
+
+        const newSticker: ImageToUploadSticker = {
+          uuid: uuidv4(),
+          type: "IMAGE_TO_UPLOAD",
+          imageFile: file,
+          posX: 0.5,
+          posY: 0.5,
+          size: 0.3,
+          rotation: 0,
+        };
+
+        setStickers((prev) => [...prev, newSticker]);
+        setFocusedStickerUuid(newSticker.uuid);
+      };
+
+      reader.readAsDataURL(file); // FileReader는 여전히 DataURL을 읽어 미리보기를 위해 사용될 수 있지만, 실제 저장은 File 객체로 합니다.
+    };
+
+    input.click();
+  };
+
   const handleStickerMove = (
-    sticker: Sticker,
+    sticker: ModifyingSticker,
     newPosX: number,
     newPosY: number
   ) => {
@@ -86,7 +223,7 @@ const DiaryDecorateDialog = ({
   };
 
   const handleStickerScaleAndRotate = (
-    sticker: Sticker,
+    sticker: ModifyingSticker,
     newScale: number,
     newRotation: number
   ) => {
@@ -99,18 +236,26 @@ const DiaryDecorateDialog = ({
     );
   };
 
-  const handleStickerDelete = (stickerToDelete: Sticker) => {
+  const handleStickerDelete = (stickerToDelete: ModifyingSticker) => {
     setStickers((prev) => prev.filter((s) => s.uuid !== stickerToDelete.uuid));
     setFocusedStickerUuid(null);
   };
 
-  const handleStickerFocus = (sticker: Sticker) => {
+  const handleStickerFocus = (sticker: ModifyingSticker) => {
     setFocusedStickerUuid(sticker.uuid);
     setStickers((prevStickers) => {
       const newStickers = prevStickers.filter((s) => s.uuid !== sticker.uuid);
       newStickers.push(sticker);
       return newStickers;
     });
+  };
+
+  const handleStickerDoubleClick = (sticker: ModifyingSticker) => {
+    // 텍스트 스티커일 경우 편집 모드로 전환
+    if (sticker.type === "CUSTOM_TEXT") {
+      setEditingStickerUuid(sticker.uuid);
+      setTextStickerDrawerOpen(true);
+    }
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -124,6 +269,16 @@ const DiaryDecorateDialog = ({
     onSave?.(stickers);
     onOpenChange(false);
   };
+
+  // 현재 편집 중인 텍스트 스티커 찾기
+  const editingSticker = editingStickerUuid
+    ? stickers.find((s) => s.uuid === editingStickerUuid)
+    : null;
+
+  const currentEditingTextSticker =
+    editingSticker && editingSticker.type === "CUSTOM_TEXT"
+      ? (editingSticker as CustomTextSticker)
+      : null;
 
   return (
     <div
@@ -162,7 +317,7 @@ const DiaryDecorateDialog = ({
           onClick={handleCanvasClick}
         >
           <div
-            className={"relative w-full h-full overflow-hidden"}
+            className={"relative w-full h-full px-3 overflow-hidden"}
             style={{
               width: coverSize.width,
               height: coverSize.height,
@@ -184,6 +339,7 @@ const DiaryDecorateDialog = ({
                 sticker={sticker}
                 isFocused={sticker.uuid === focusedStickerUuid}
                 onStickerFocus={handleStickerFocus}
+                onStickerDoubleClick={handleStickerDoubleClick}
                 onScaleAndRotate={handleStickerScaleAndRotate}
                 onMove={handleStickerMove}
                 onDelete={handleStickerDelete}
@@ -212,13 +368,29 @@ const DiaryDecorateDialog = ({
                 <RiArrowGoForwardLine size={20} />
               </button>
             </div>
-            <button
-              className={"p-2 rounded-full bg-green-500 antialiased"}
-              aria-label={"스티커 목록 열기"}
-              onClick={() => setStickerDrawerOpen(true)}
-            >
-              <PiSmileyStickerFill className={"text-2xl text-white"} />
-            </button>
+            <div className={"flex gap-3 "}>
+              <button
+                className={"p-2 rounded-full antialiased"}
+                aria-label={"텍스트 스티커 추가"}
+                onClick={handleAddTextSticker}
+              >
+                <RxText className={"text-2xl text-black"} />
+              </button>
+              <button
+                className={"p-2 rounded-full antialiased"}
+                aria-label={"이미지 스티커 추가"}
+                onClick={handleImageUpload}
+              >
+                <RxImage className={"text-2xl text-black"} />
+              </button>
+              <button
+                className={"p-2 rounded-full antialiased"}
+                aria-label={"스티커 목록 열기"}
+                onClick={() => setStickerDrawerOpen(true)}
+              >
+                <GoSmiley className={"text-2xl text-black"} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -229,6 +401,21 @@ const DiaryDecorateDialog = ({
           handleStickerSelect(sticker);
         }}
       />
+      {currentEditingTextSticker && (
+        <TextStickerEditDrawer
+          open={textStickerDrawerOpen}
+          onOpenChange={setTextStickerDrawerOpen}
+          onSave={handleTextStickerEdit}
+          initialText={currentEditingTextSticker.textContent}
+          initialStyle={{
+            fontSize: currentEditingTextSticker.fontSize,
+            color: currentEditingTextSticker.fontColor,
+            fontFamily: currentEditingTextSticker.fontFamily,
+            fontWeight: currentEditingTextSticker.bold ? "bold" : "normal",
+            fontStyle: currentEditingTextSticker.italic ? "italic" : "normal",
+          }}
+        />
+      )}
     </div>
   );
 };

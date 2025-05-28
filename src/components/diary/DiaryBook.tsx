@@ -2,14 +2,22 @@ import { cn } from "@/lib/utils/className";
 import { DiaryBook as DiaryBookModel } from "@/models/DiaryBook";
 import { HTMLAttributes, useMemo } from "react";
 import { FaStar } from "react-icons/fa";
+import { PiDotsThreeCircleFill } from "react-icons/pi";
 import DiaryCover, { DiaryCoverItem } from "./DiaryCover";
 import StickerOverlay from "./StickerOverlay";
 
 interface DiaryBookProps extends HTMLAttributes<HTMLDivElement> {
   diaryBook: DiaryBookModel;
+  onMenuClick?: (e: React.MouseEvent, diaryBook: DiaryBookModel) => void;
+  onPinToggle?: (diaryBook: DiaryBookModel) => void;
 }
 
-const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
+const DiaryBook: React.FC<DiaryBookProps> = ({
+  diaryBook,
+  onMenuClick,
+  onPinToggle,
+  ...props
+}) => {
   const { title, memberCount, coverImage, isPinned, stickers } = diaryBook;
 
   const coverItem: DiaryCoverItem | undefined = useMemo(() => {
@@ -23,6 +31,20 @@ const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
         };
   }, [coverImage]);
 
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    if (onMenuClick) {
+      onMenuClick(e, diaryBook);
+    }
+  };
+
+  const handlePinToggle = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    if (onPinToggle) {
+      onPinToggle(diaryBook);
+    }
+  };
+
   return (
     <div
       {...props}
@@ -32,7 +54,7 @@ const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
       )}
     >
       <div className={"relative w-full h-full"}>
-        <DiaryBookPin pinned={isPinned} />
+        <DiaryBookPin pinned={isPinned} onClick={handlePinToggle} />
         <StickerOverlay stickers={stickers ?? []}>
           <DiaryCover
             className={"mb-2"}
@@ -42,10 +64,18 @@ const DiaryBook: React.FC<DiaryBookProps> = ({ diaryBook, ...props }) => {
           />
         </StickerOverlay>
       </div>
-      <p className={"text-[13px] font-medium"}>{title}</p>
-      <p className={"text-[11px] font-light text-gray-1"}>
-        멤버 {memberCount}명
-      </p>
+      <div className={"w-full flex justify-between items-start"}>
+        <div>
+          <p className={"text-[13px] font-medium"}>{title}</p>
+          <p className={"text-[11px] font-light text-gray-1"}>
+            멤버 {memberCount}명
+          </p>
+        </div>
+        <PiDotsThreeCircleFill
+          className={"text-lg mt-0.5 text-gray-400 cursor-pointer"}
+          onClick={handleMenuClick}
+        />
+      </div>
     </div>
   );
 };
@@ -54,18 +84,23 @@ export default DiaryBook;
 
 //--- Local Components ---
 
-const DiaryBookPin: React.FC<{ pinned?: boolean }> = ({ pinned }) => {
-  if (!pinned) {
-    return null;
-  }
+interface DiaryBookPinProps {
+  pinned?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
+}
 
+const DiaryBookPin: React.FC<DiaryBookPinProps> = ({ pinned, onClick }) => {
   return (
     <div
-      className={
-        "absolute top-0 left-[6px] rounded-t-[2px] -translate-y-[14px] px-[4px] pt-[3px] pb-[4px] bg-[#FFE539]"
-      }
+      className={cn(
+        "absolute top-0 left-[6px] rounded-t-[2px] -translate-y-[14px] px-[4px] pt-[3px] pb-[4px] cursor-pointer transition-colors",
+        pinned ? "bg-[#FFE539]" : "hidden"
+      )}
+      onClick={onClick}
     >
-      <FaStar className={"fill-gray-2 text-[7px]"} />
+      <FaStar
+        className={cn("text-[7px]", pinned ? "fill-gray-2" : "fill-gray-400")}
+      />
     </div>
   );
 };

@@ -4,11 +4,12 @@ import DiaryBookComponent from "@/components/diary/DiaryBook";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { DiaryBook } from "@/models/DiaryBook";
 import { Page as PageType } from "@/models/Pagination";
 import { useAuthStore } from "@/stores/AuthenticationStore";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BookPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 const MainPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   /* Server-State */
   const { data, isLoading } = useQuery<PageType<DiaryBook>>({
@@ -29,6 +31,10 @@ const MainPage = () => {
 
   /* States */
   const [tab, setTab] = useState<"all" | "pinned">("all");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedDiaryBook, setSelectedDiaryBook] = useState<DiaryBook | null>(
+    null
+  );
 
   const filteredDiaryBooks = useMemo(() => {
     if (tab === "all") {
@@ -38,6 +44,61 @@ const MainPage = () => {
     }
     return [];
   }, [tab, data]);
+
+  const handleMenuClick = (e: React.MouseEvent, diaryBook: DiaryBook) => {
+    e.stopPropagation();
+    setSelectedDiaryBook(diaryBook);
+    setIsMenuOpen(true);
+  };
+
+  const handlePinToggle = async () => {
+    if (!selectedDiaryBook) return;
+
+    try {
+      await api.diaryBook.updateDiaryBook(Number(selectedDiaryBook.id), {
+        isPinned: !selectedDiaryBook.isPinned,
+      });
+      // 데이터 리프레시를 위해 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
+    } catch (e) {
+      console.error("즐겨찾기 업데이트 실패", e);
+    } finally {
+      setIsMenuOpen(false);
+    }
+  };
+
+  const handleDiaryExit = async () => {
+    if (!selectedDiaryBook) return;
+
+    try {
+      // TODO: 다이어리 탈퇴 API 구현 필요
+      // await api.diaryBook.exitDiaryBook(Number(selectedDiaryBook.id));
+      // 데이터 리프레시를 위해 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
+      setIsMenuOpen(false);
+    } catch (e) {
+      console.error("다이어리 탈퇴 실패", e);
+    }
+  };
+
+  const menuItems = selectedDiaryBook
+    ? [
+        {
+          label: "일기장 관리",
+          onClick: () => navigate(`/diary-book/${selectedDiaryBook.id}/manage`),
+        },
+        {
+          label: "일기장 멤버 관리",
+          onClick: () =>
+            navigate(`/diary-book/${selectedDiaryBook.id}/members`),
+        },
+        {
+          label: selectedDiaryBook.isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
+          onClick: handlePinToggle,
+        },
+      ]
+    : [];
+
   return (
     <Page.Container className={"h-full flex flex-col"}>
       <DefaultHeader />
@@ -93,7 +154,7 @@ const MainPage = () => {
           {/* All Diaries Tab Content */}
           <div className={"w-1/2  py-8"}>
             <div className={"px-6"}>
-              <div className={"grid grid-cols-3 gap-6"}>
+              <div className={"grid grid-cols-3 gap-x-6 gap-y-8"}>
                 {isLoading
                   ? Array.from({ length: 9 }).map((_, index) => (
                       <div
@@ -106,6 +167,7 @@ const MainPage = () => {
                         onClick={() => navigate(`/diary-book/${diaryBook.id}`)}
                         key={diaryBook.id}
                         diaryBook={diaryBook}
+                        onMenuClick={handleMenuClick}
                       />
                     ))}
               </div>
@@ -132,6 +194,7 @@ const MainPage = () => {
                           }
                           key={diaryBook.id}
                           diaryBook={diaryBook}
+                          onMenuClick={handleMenuClick}
                         />
                       ))}
                 {(data?.content ?? []).filter((book) => book.isPinned)
@@ -155,6 +218,28 @@ const MainPage = () => {
         className={"fixed bottom-20 right-5"}
         onClick={() => navigate("/diary/write")}
       />
+
+      {/* Drawer for Menu */}
+      <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <DrawerContent className={""}>
+          <div className={"flex flex-col gap-2 p-4"}>
+            {menuItems.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  item.onClick();
+                  setIsMenuOpen(false);
+                }}
+                className={
+                  "text-center text-base font-normal w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0"
+                }
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </Page.Container>
   );
 };

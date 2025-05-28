@@ -4,10 +4,10 @@ import React, { ChangeEvent, HTMLAttributes, useRef, useState } from "react"; //
 // 커버 이미지 예시 임포트
 import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
 import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
-import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
+import CoverExampleImg3 from "@/assets/images/CoverImage3.png";
 import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
-import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
-
+import CoverExampleImg5 from "@/assets/images/CoverImage5.png";
+import CoverExampleImg6 from "@/assets/images/CoverImage6.png";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import { FaMagic } from "react-icons/fa";
@@ -40,6 +40,10 @@ const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
   {
     type: "preset",
     imageSrc: CoverExampleImg5,
+  },
+  {
+    type: "preset",
+    imageSrc: CoverExampleImg6,
   },
 ];
 
