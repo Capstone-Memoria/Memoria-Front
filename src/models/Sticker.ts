@@ -33,7 +33,7 @@ export type ImageToUploadSticker = BaseSticker & {
 };
 
 export type ImageToRequestSticker = BaseSticker & {
-  type: "IMAGE_TO_REQUEST";
+  type: "CUSTOM_IMAGE";
   heldStickerImageUuid: string;
 };
 

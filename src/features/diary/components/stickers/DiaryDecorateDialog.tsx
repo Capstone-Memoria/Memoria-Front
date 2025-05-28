@@ -77,10 +77,29 @@ const DiaryDecorateDialog = ({
   }, [canvasSize, bodySize]);
 
   useEffect(() => {
-    if (open && initialStickers) {
+    if (open && initialStickers && coverSize.width > 0) {
+      const adjustedStickers = initialStickers.map((sticker) => {
+        if (
+          sticker.type === "CUSTOM_TEXT" &&
+          sticker.templateWidth &&
+          sticker.templateWidth > 0
+        ) {
+          const currentFontSize = sticker.fontSize;
+          const templateWidth = sticker.templateWidth;
+          const newFontSize =
+            (currentFontSize / templateWidth) * coverSize.width;
+          return {
+            ...sticker,
+            fontSize: newFontSize,
+          };
+        }
+        return sticker;
+      });
+      setStickers(adjustedStickers);
+    } else if (open && initialStickers) {
       setStickers(initialStickers);
     }
-  }, [open, initialStickers]);
+  }, [open, initialStickers, coverSize.width]);
 
   const handleStickerSelect = (sticker: StickerOption) => {
     const newSticker: PredefinedSticker = {

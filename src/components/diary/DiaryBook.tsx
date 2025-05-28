@@ -94,7 +94,7 @@ const DiaryBookPin: React.FC<DiaryBookPinProps> = ({ pinned, onClick }) => {
     <div
       className={cn(
         "absolute top-0 left-[6px] rounded-t-[2px] -translate-y-[14px] px-[4px] pt-[3px] pb-[4px] cursor-pointer transition-colors",
-        pinned ? "bg-[#FFE539]" : "bg-gray-200 hover:bg-gray-300"
+        pinned ? "bg-[#FFE539]" : "hidden"
       )}
       onClick={onClick}
     >

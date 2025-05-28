@@ -7,18 +7,25 @@ import {
   PredefinedSticker,
   Sticker,
 } from "@/models/Sticker"; // Sticker 모델 타입들을 가져옵니다.
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useMemo, useRef } from "react";
 
 interface StaticStickerProps extends HTMLAttributes<HTMLDivElement> {
-  sticker: Sticker; // BaseSticker 대신 Sticker 유니온 타입을 사용합니다.
+  sticker: Sticker;
+  templateWidth: number;
 }
 
-const StaticSticker: React.FC<StaticStickerProps> = ({ sticker, ...props }) => {
-  // 스티커 타입에 따라 다른 렌더링 처리
-  const renderStickerContent = () => {
+const StaticSticker = ({
+  sticker,
+  templateWidth,
+  ...props
+}: StaticStickerProps) => {
+  const stickerRef = useRef<HTMLDivElement>(null);
+
+  // 스티커 타입에 따라 다른 렌더링 처리 (useMemo 사용)
+  const renderStickerContent = useMemo(() => {
     if (sticker.type === "PREDEFINED") {
       const presetSticker = PRESET_STICKER_OPTIONS.find(
-        (option) => option.id === (sticker as PredefinedSticker).assetName // stickerType 대신 assetName 사용
+        (option) => option.id === (sticker as PredefinedSticker).assetName
       );
       if (!presetSticker) return null;
       return (
@@ -31,11 +38,23 @@ const StaticSticker: React.FC<StaticStickerProps> = ({ sticker, ...props }) => {
       );
     } else if (sticker.type === "CUSTOM_TEXT") {
       const textSticker = sticker as CustomTextSticker;
+      let fontSize = textSticker.fontSize; // 기본값
+
+      if (
+        textSticker.templateWidth &&
+        templateWidth > 0 &&
+        textSticker.templateWidth > 0 &&
+        textSticker.size > 0
+      ) {
+        const factor = templateWidth / textSticker.templateWidth;
+        fontSize = factor * textSticker.fontSize;
+      }
+
       return (
         <div
           className={"w-full h-full flex items-center justify-center"}
           style={{
-            fontSize: `${textSticker.fontSize}px`,
+            fontSize: `${fontSize}px`,
             color: textSticker.fontColor,
             fontFamily: textSticker.fontFamily,
             fontStyle: textSticker.italic ? "italic" : "normal",
@@ -49,33 +68,22 @@ const StaticSticker: React.FC<StaticStickerProps> = ({ sticker, ...props }) => {
       );
     } else if (sticker.type === "CUSTOM_IMAGE") {
       const imageSticker = sticker as CustomImageSticker;
-      if (typeof imageSticker.imageFile === "string") {
-        // imageFile이 문자열인 경우 imageId로 간주하여 Image 컴포넌트 사용
-        return (
-          <Image
-            imageId={imageSticker.imageFile}
-            alt={"이미지 스티커"}
-            imageClassName={"w-full h-full object-contain"} // Image 컴포넌트 내부 img 태그에 적용될 클래스
-            className={"w-full h-full bg-gray-100 size-20"} // Image 컴포넌트 자체의 div에 적용될 클래스
-            draggable={"false"}
-          />
-        );
-      } else if (imageSticker.imageFile instanceof File) {
-        // imageFile이 File 객체인 경우 StaticSticker에서는 렌더링하지 않음 (또는 임시 URL로 표시 가능)
-        // 여기서는 null을 반환하여 렌더링하지 않도록 처리합니다.
-        // 만약 File 객체도 표시해야 한다면, URL.createObjectURL을 사용하는 이전 로직 활용 가능
-        // console.warn("StaticSticker: CUSTOM_IMAGE 스티커의 imageFile이 File 객체입니다. 이는 StaticSticker에서 예상치 못한 상황일 수 있습니다.");
-        return null;
-      }
-      return null; // 그 외의 경우 (예: imageFile이 undefined)
+      return (
+        <Image
+          imageId={imageSticker.imageFile.id}
+          alt={"이미지 스티커"}
+          imageClassName={"w-full h-full object-contain"}
+          className={"w-full h-full bg-gray-100 size-20"}
+          draggable={"false"}
+        />
+      );
     }
-    return null;
-  };
+  }, [sticker, templateWidth]);
 
-  // BaseSticker의 공통 속성을 사용합니다.
   return (
     <div
       {...props}
+      ref={stickerRef}
       style={{
         position: "absolute",
         left: `${sticker.posX * 100}%`,
@@ -83,9 +91,9 @@ const StaticSticker: React.FC<StaticStickerProps> = ({ sticker, ...props }) => {
         width: `${sticker.size * 100}%`, // 부모 크기 기준 스티커 크기
         transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
       }}
-      className={cn("flex items-center justify-center")} // Tailwind CSS 클래스 추가 가능
+      className={cn("flex items-center justify-center")}
     >
-      {renderStickerContent()}
+      {renderStickerContent}
     </div>
   );
 };

@@ -70,11 +70,13 @@ export const updateDiaryBook = async (
   request: DiaryBookUpdateRequest
 ) => {
   const formData = new FormData();
-  if (request.title) formData.append("title", request.title);
-  if (request.isPinned)
+  if (request.title !== undefined) formData.append("title", request.title);
+  if (request.isPinned !== undefined)
     formData.append("isPinned", request.isPinned.toString());
-  if (request.coverImage) formData.append("coverImage", request.coverImage);
-  if (request.spineColor) formData.append("spineColor", request.spineColor);
+  if (request.coverImage !== undefined)
+    formData.append("coverImage", request.coverImage);
+  if (request.spineColor !== undefined)
+    formData.append("spineColor", request.spineColor);
 
   const response = await server.patch<DiaryBook>(
     `/api/diary-book/${diaryBookId}`,
@@ -153,8 +155,12 @@ export const updateStickers = async (
     imagesToHold.map(async (it) => {
       const heldImageUuid = await holdStickerImage(it.imageFile);
       return {
-        ...it,
-        type: "IMAGE_TO_REQUEST",
+        type: "CUSTOM_IMAGE",
+        uuid: it.uuid,
+        posX: it.posX,
+        posY: it.posY,
+        size: it.size,
+        rotation: it.rotation,
         heldStickerImageUuid: heldImageUuid,
       } satisfies ImageToRequestSticker;
     })
