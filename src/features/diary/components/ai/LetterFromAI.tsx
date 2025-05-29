@@ -45,7 +45,7 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
           ref={containerRef}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <ShineBorder shineColor={["#fb2c36", "#2b7fff"]} />
+          {!isOpen && <ShineBorder shineColor={["#fb2c36", "#2b7fff"]} />}
 
           <motion.div
             layout
