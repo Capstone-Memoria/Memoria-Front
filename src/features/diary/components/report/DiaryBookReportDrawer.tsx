@@ -7,9 +7,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { DiaryBookStatistics } from "@/models/DiaryBookStatistics";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { MdAutoAwesome } from "react-icons/md";
 import DiaryBookReportWidgets from "./DiaryBookReportWidgets";
 
@@ -30,32 +28,17 @@ const DiaryBookReportDrawer: React.FC<DiaryBookReportDrawerProps> = ({
     enabled: !!diaryBookId,
   });
 
-  const [statistics, setStatistics] = useState<DiaryBookStatistics | null>(
-    null
-  );
-  const [isStatisticsFetching, setIsStatisticsFetching] = useState(false);
+  const today = new Date();
+  const month = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}`;
 
-  useEffect(() => {
-    if (open && diaryBookId) {
-      const fetchStatistics = async () => {
-        setIsStatisticsFetching(true);
-        try {
-          const today = new Date();
-          const month = `${today.getFullYear()}-${String(
-            today.getMonth() + 1
-          ).padStart(2, "0")}`;
-          const data = await fetchDiaryBookStatistics(diaryBookId, month);
-          setStatistics(data);
-        } catch (error) {
-          console.error("Failed to fetch statistics:", error);
-          setStatistics(null);
-        } finally {
-          setIsStatisticsFetching(false);
-        }
-      };
-      fetchStatistics();
-    }
-  }, [open, diaryBookId]);
+  const { data: statistics, isFetching: isStatisticsFetching } = useQuery({
+    queryKey: ["fetchDiaryBookStatistics", diaryBookId, month],
+    queryFn: () => fetchDiaryBookStatistics(diaryBookId, month),
+    enabled: open && !!diaryBookId,
+  });
 
   return (
     <Drawer open={open} onOpenChange={setIsOpen}>

@@ -1,3 +1,11 @@
+import cloudyImage from "@/assets/images/weathers/cloudy.png";
+import nightImage from "@/assets/images/weathers/night.png";
+import rainbowImage from "@/assets/images/weathers/rainbow.png";
+import rainyImage from "@/assets/images/weathers/rainy.png";
+import snowyImage from "@/assets/images/weathers/snowy.png";
+import sunnyImage from "@/assets/images/weathers/sunny.png";
+import sunnyAndCloudyImage from "@/assets/images/weathers/sunny_and_cloudy.png";
+import windyImage from "@/assets/images/weathers/windy.png";
 import { cn } from "@/lib/utils";
 import {
   AttendanceRankingItem,
@@ -6,15 +14,7 @@ import {
   ReactionRankingItem,
 } from "@/models/DiaryBookStatistics";
 import { HTMLAttributes } from "react";
-import { FaRainbow } from "react-icons/fa";
-import {
-  MdAcUnit,
-  MdAir,
-  MdFilterDrama,
-  MdOutlineNightsStay,
-  MdSunny,
-  MdWbCloudy,
-} from "react-icons/md";
+import { MdFilterDrama } from "react-icons/md";
 import {
   Bar,
   BarChart,
@@ -58,7 +58,7 @@ const WhatIsOurDiaryBookWidget: React.FC<WhatIsOurDiaryBookWidgetProps> = ({
 }) => {
   return (
     <BaseDiaryBookReportWidget
-      title={"우리 일기장은 어떤 일기장일까?"}
+      title={"이번달 일기장은?"}
       className={"text-center"}
     >
       {diaryBookName && oneLineSummary ? (
@@ -79,21 +79,59 @@ interface DiaryEmotionWeatherForecastWidgetProps {
 }
 
 const EmotionIcon: React.FC<{ weather?: EmotionWeather }> = ({ weather }) => {
+  let imageSrc;
   switch (weather) {
     case "SUNNY":
-      return <MdSunny className={"text-yellow-500"} />;
+      imageSrc = sunnyImage;
+      break;
     case "NIGHT":
-      return <MdOutlineNightsStay className={"text-indigo-500"} />;
+      imageSrc = nightImage;
+      break;
     case "RAINBOW":
-      return <FaRainbow className={"text-purple-500"} />;
+      imageSrc = rainbowImage;
+      break;
     case "SNOWY":
-      return <MdAcUnit className={"text-blue-300"} />;
+      imageSrc = snowyImage;
+      break;
     case "SUNNY_AND_CLOUDY":
-      return <MdWbCloudy className={"text-gray-400"} />;
+      imageSrc = sunnyAndCloudyImage;
+      break;
     case "WINDY":
-      return <MdAir className={"text-green-400"} />;
+      imageSrc = windyImage;
+      break;
+    case "CLOUDY":
+      imageSrc = cloudyImage;
+      break;
+    case "RAINY":
+      imageSrc = rainyImage;
+      break;
     default:
-      return <MdFilterDrama className={"text-gray-500"} />;
+      imageSrc = cloudyImage; // 기본값으로 흐린 날씨 이미지 사용 또는 다른 기본 이미지 설정
+      break;
+  }
+  return <img src={imageSrc} alt={weather} className={"size-24"} />;
+};
+
+const getEmotionWeatherText = (weather?: EmotionWeather): string => {
+  switch (weather) {
+    case "SUNNY":
+      return "화창한 날씨";
+    case "NIGHT":
+      return "고요한 밤하늘";
+    case "RAINBOW":
+      return "일곱 빛깔 무지개";
+    case "SNOWY":
+      return "눈이 내리는 중";
+    case "SUNNY_AND_CLOUDY":
+      return "구름 조금 맑음";
+    case "WINDY":
+      return "바람이 부는 날씨";
+    case "CLOUDY":
+      return "흐린 날씨";
+    case "RAINY":
+      return "비가 내리는 중";
+    default:
+      return "날씨 분석 중...";
   }
 };
 
@@ -103,15 +141,22 @@ const DiaryEmotionWeatherForecastWidget: React.FC<
   return (
     <BaseDiaryBookReportWidget title={"우리 일기장의 감정 날씨는?"}>
       <div className={"flex flex-col items-center gap-3"}>
-        <div className={"text-6xl"}>
+        <div className={"size-24"}>
           {emotionWeather ? (
             <EmotionIcon weather={emotionWeather} />
           ) : (
             <MdFilterDrama className={"text-gray-500"} />
           )}
         </div>
+        {emotionWeather && (
+          <p className={"text-xl font-bold text-gray-700"}>
+            {getEmotionWeatherText(emotionWeather)}
+          </p>
+        )}
         {emotionWeatherReason ? (
-          <p className={"text-lg font-semibold"}>{emotionWeatherReason}</p>
+          <p className={"text-sm text-gray-500 break-words"}>
+            {emotionWeatherReason}
+          </p>
         ) : (
           <p className={"text-lg font-semibold"}>
             감정 날씨를 분석 중입니다...

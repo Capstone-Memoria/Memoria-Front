@@ -17,9 +17,10 @@ export interface ReactionRankingItem {
 }
 
 export type EmotionWeather =
-  | "SUNNY"
+  | "CLOUDY"
   | "NIGHT"
   | "RAINBOW"
+  | "RAINY"
   | "SNOWY"
   | "SUNNY"
   | "SUNNY_AND_CLOUDY"
