@@ -19,8 +19,8 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
     //content에서 HTML 태그 제거, 텍스트만 추출.
     const text = content.replace(/<[^>]*>?/g, "");
     //text에서 세 줄 추출, 텍스트만 추출
-    const lines = text.split("\n").slice(0, 1);
-    return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join(" ");
+    const lines = text.split("\n").slice(0, 3);
+    return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join("\n");
   }, [item.content]);
 
   const handleDiaryClick = () => {
@@ -45,7 +45,13 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
       />
       <div className={"py-2 px-3 flex flex-col w-full "}>
         <div className={"font-medium"}>{item.title}</div>
-        <div className={"text-xs text-gray-500 overflow-hidden"}>{summary}</div>
+        <div
+          className={
+            "text-xs text-gray-500 overflow-hidden h-12 whitespace-pre-line [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"
+          }
+        >
+          {summary}
+        </div>
         <div className={"flex-1"} />
         <div className={"flex justify-between w-full"}>
           <div className={"flex gap-2 text-gray-600"}>
