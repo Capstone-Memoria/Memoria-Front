@@ -1,7 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
 import api from "@/api";
 import Spinner from "@/components/base/Spinner";
@@ -9,7 +10,6 @@ import DiaryListItem from "@/components/diary/DiaryListItem";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import { Diary } from "@/models/Diary";
 import DiaryBookReportWidget from "./DiaryBookReportWidget";
-import DiaryBookReportDrawer from "./report/DiaryBookReportDrawer";
 
 interface DiaryListPanelProps {
   diaryBookId: number;
@@ -26,7 +26,7 @@ const DiaryListPanel = ({
   searchQuery, // searchQuery prop 사용
 }: DiaryListPanelProps) => {
   /* Properties */
-  const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   /* Server Side */
   const PAGE_SIZE = 10; // 한 번에 가져올 일기 개수
@@ -105,7 +105,9 @@ const DiaryListPanel = ({
 
   return (
     <>
-      <DiaryBookReportWidget onClick={() => setIsReportDrawerOpen(true)} />
+      <DiaryBookReportWidget
+        onClick={() => navigate(`/diary-book/${diaryBookId}/report`)}
+      />
       <div className={"flex flex-col gap-4 mt-5"}>
         {isDiaryListLoading &&
         filteredDiaryList.length === 0 &&
@@ -159,11 +161,6 @@ const DiaryListPanel = ({
       <DiaryWriteButton
         className={"fixed bottom-20 right-5"}
         onClick={onOpenWritePage}
-      />
-      <DiaryBookReportDrawer
-        open={isReportDrawerOpen}
-        setIsOpen={setIsReportDrawerOpen}
-        diaryBookId={diaryBookId}
       />
     </>
   );
