@@ -1,5 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
+import Dialog from "@/components/base/Dialog";
 import Input from "@/components/base/Input";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
@@ -28,6 +29,14 @@ const DiaryBookMemberPage = () => {
   const [inviteSuccessMessage, setInviteSuccessMessage] = useState<
     string | null
   >(null);
+
+  const [memberToRemove, setMemberToRemove] = useState<DiaryBookMemer | null>(
+    null
+  );
+  const [alertMsg, setAlertMsg] = useState<{
+    title: string;
+    description?: string;
+  } | null>(null);
 
   // Fetch members query
   const {
@@ -62,12 +71,10 @@ const DiaryBookMemberPage = () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookMembers", diaryBookId],
       });
-      // Optionally show success message
+      setAlertMsg({ title: "권한이 변경되었습니다" }); // Optionally show success message
     },
     onError: (error) => {
-      console.error("Failed to update permission:", error);
-      // Optionally show error message
-      alert(`권한 변경 실패: ${error.message}`);
+      setAlertMsg({ title: "권한 변경 실패", description: error.message });
     },
   });
 
@@ -84,13 +91,10 @@ const DiaryBookMemberPage = () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookMembers", diaryBookId],
       });
-      // Optionally show success message
-      alert("멤버를 내보냈습니다.");
+      setAlertMsg({ title: "멤버를 내보냈습니다" });
     },
     onError: (error) => {
-      console.error("Failed to remove member:", error);
-      // Optionally show error message
-      alert(`멤버 내보내기 실패: ${error.message}`);
+      setAlertMsg({ title: "멤버 내보내기 실패", description: error.message });
     },
   });
 
@@ -123,8 +127,7 @@ const DiaryBookMemberPage = () => {
       setTimeout(() => setInviteSuccessMessage(null), 3000); // Clear message after 3 seconds
     },
     onError: (error) => {
-      console.error("Failed to send direct invite:", error);
-      alert(`직접 초대 실패: ${error.message}`);
+      setAlertMsg({ title: "직접 초대 실패", description: error.message });
       setInviteSuccessMessage(null);
     },
   });
@@ -141,14 +144,28 @@ const DiaryBookMemberPage = () => {
     });
   };
 
-  const handleRemoveMember = (memberId: number) => {
+  // const handleRemoveMember = (memberId: number) => {
+  //   if (!amIAdmin) return;
+  //   if (window.confirm("정말로 이 멤버를 내보내시겠습니까?")) {
+  //     removeMemberMutation.mutate({
+  //       diaryBookId: Number(diaryBookId),
+  //       memberId,
+  //     });
+  //   }
+  // };
+
+  const handleRemoveMember = (member: DiaryBookMemer) => {
     if (!amIAdmin) return;
-    if (window.confirm("정말로 이 멤버를 내보내시겠습니까?")) {
-      removeMemberMutation.mutate({
-        diaryBookId: Number(diaryBookId),
-        memberId,
-      });
-    }
+    setMemberToRemove(member);
+  };
+
+  const confirmRemove = () => {
+    if (!memberToRemove) return;
+    removeMemberMutation.mutate({
+      diaryBookId: Number(diaryBookId),
+      memberId: memberToRemove.id,
+    });
+    setMemberToRemove(null);
   };
 
   const handleGenerateInvite = () => {
@@ -164,15 +181,17 @@ const DiaryBookMemberPage = () => {
           setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
         })
         .catch((err) => {
-          console.error("Failed to copy link:", err);
-          alert("링크 복사에 실패했습니다.");
+          setAlertMsg({
+            title: "링크 복사에 실패했습니다.",
+            description: err.message,
+          });
         });
     }
   };
 
   const handleDirectInvite = () => {
     if (!directInviteEmail.trim() || !/\S+@\S+\.\S+/.test(directInviteEmail)) {
-      alert("유효한 이메일 주소를 입력해주세요.");
+      setAlertMsg({ title: "유효한 이메일 주소를 입력해주세요." });
       return;
     }
     directInviteMutation.mutate(directInviteEmail.trim());
@@ -303,7 +322,7 @@ const DiaryBookMemberPage = () => {
                         variant={"text"}
                         size={"sm"}
                         className={"text-gray-400 hover:text-red-500"}
-                        onClick={() => handleRemoveMember(member.id)}
+                        onClick={() => handleRemoveMember(member)}
                         disabled={removeMemberMutation.isPending} // Disable while mutating
                         title={"멤버 내보내기"}
                       >
@@ -435,6 +454,21 @@ const DiaryBookMemberPage = () => {
           </div>
         </div>
       </Page.Content>
+      <Dialog
+        open={!!memberToRemove}
+        title={`${memberToRemove?.user.nickName} 님을 일기장에서 삭제하시겠어요?`}
+        confirmLabel={"멤버 삭제"}
+        cancelLabel={"취소"}
+        onConfirm={confirmRemove}
+        onClose={() => setMemberToRemove(null)}
+      />
+      <Dialog
+        open={!!alertMsg}
+        title={alertMsg?.title ?? ""}
+        description={alertMsg?.description}
+        onConfirm={() => setAlertMsg(null)}
+        onClose={() => setAlertMsg(null)}
+      />
     </Page.Container>
   );
 };

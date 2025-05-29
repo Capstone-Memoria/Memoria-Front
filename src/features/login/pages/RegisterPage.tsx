@@ -2,6 +2,7 @@ import api from "@/api";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
 import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
+import Spinner from "@/components/base/Spinner";
 import Page from "@/components/page/Page";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -121,12 +122,22 @@ const RegisterPage = () => {
             isError
           />
         </div>
-        <div className={"flex-1 min-h-12"} />
+        <div className={"flex-1 min-h-6"} />
         <div className={"text-red-500 text-center mb-3 text-sm"}>
           {error?.message}
         </div>
-        <Button size={"xl"} onClick={handleRegister}>
-          {isPending ? "처리중.." : "회원가입 하기"}
+        <Button
+          size={"xl"}
+          onClick={handleRegister}
+          className={"w-full flex items-center justify-center gap-1 h-14"}
+        >
+          {isPending ? (
+            <>
+              <Spinner className={"text-white"} />
+            </>
+          ) : (
+            "회원가입 하기"
+          )}
         </Button>
       </Page.Content>
     </Page.Container>

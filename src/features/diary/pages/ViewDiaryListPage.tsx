@@ -169,7 +169,7 @@ const ViewDiaryListPage = () => {
                     <DrawerTrigger asChild>
                       <RiMore2Fill className={"text-xl"} />
                     </DrawerTrigger>
-                    <DrawerContent className={"pb-8"}>
+                    <DrawerContent className={""}>
                       <div className={"flex flex-col gap-2 p-4"}>
                         {menuItems.map((item, index) => (
                           <button
@@ -179,19 +179,12 @@ const ViewDiaryListPage = () => {
                               setIsMenuOpen(false);
                             }}
                             className={
-                              "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 border-b border-gray-400"
+                              "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0"
                             }
                           >
                             {item.label}
                           </button>
                         ))}
-                      </div>
-                      <div
-                        className={
-                          "text-sm text-gray-500 px-4 py-2 text-center underline"
-                        }
-                      >
-                        다이어리 탈퇴하기
                       </div>
                     </DrawerContent>
                   </Drawer>

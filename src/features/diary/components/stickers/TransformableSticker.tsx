@@ -1,22 +1,27 @@
 import { cn } from "@/lib/utils";
-import { Sticker } from "@/models/Sticker";
+import {
+  CustomTextSticker,
+  ModifyingSticker,
+  PredefinedSticker,
+} from "@/models/Sticker";
 
+import { PRESET_STICKER_OPTIONS } from "@/features/diary/data/sticker";
 import { HTMLAttributes, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { TbPointFilled } from "react-icons/tb";
-import { PRESET_STICKER_OPTIONS } from "../../data/sticker";
 
 interface TransformableStickerProps extends HTMLAttributes<HTMLDivElement> {
-  sticker: Sticker;
-  onMove: (item: Sticker, newPosX: number, newPosY: number) => void;
+  sticker: ModifyingSticker;
+  onMove: (sticker: ModifyingSticker, newPosX: number, newPosY: number) => void;
   onScaleAndRotate: (
-    item: Sticker,
+    sticker: ModifyingSticker,
     newScale: number,
     newRotation: number
   ) => void;
-  onDelete: (item: Sticker) => void;
+  onDelete: (sticker: ModifyingSticker) => void;
   isFocused: boolean;
-  onStickerFocus: (item: Sticker) => void;
+  onStickerFocus: (sticker: ModifyingSticker) => void;
+  onStickerDoubleClick: (sticker: ModifyingSticker) => void;
 }
 
 const TransformableSticker = ({
@@ -26,6 +31,8 @@ const TransformableSticker = ({
   onDelete,
   isFocused,
   onStickerFocus,
+  onStickerDoubleClick,
+  ...props
 }: TransformableStickerProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -37,13 +44,65 @@ const TransformableSticker = ({
     rotation: number;
   } | null>(null);
 
-  const currentSticker = PRESET_STICKER_OPTIONS.find(
-    (option) => option.id === sticker.stickerType
-  );
-
-  if (!currentSticker) {
+  // 스티커 타입에 따라 다른 렌더링 처리
+  const renderStickerContent = () => {
+    if (sticker.type === "PREDEFINED") {
+      const presetSticker = PRESET_STICKER_OPTIONS.find(
+        (option) => option.id === (sticker as PredefinedSticker).assetName
+      );
+      if (!presetSticker) return null;
+      return (
+        <img
+          src={presetSticker.imageUrl}
+          alt={presetSticker.id}
+          className={"w-full h-full object-contain"}
+          draggable={"false"}
+        />
+      );
+    } else if (sticker.type === "CUSTOM_TEXT") {
+      return (
+        <div
+          className={
+            "w-full h-full flex items-center justify-center overflow-hidden"
+          }
+          style={{
+            fontSize: `${(sticker as CustomTextSticker).fontSize}px`,
+            color: (sticker as CustomTextSticker).fontColor,
+            fontFamily: (sticker as CustomTextSticker).fontFamily,
+            fontStyle: (sticker as CustomTextSticker).italic
+              ? "italic"
+              : "normal",
+            fontWeight: (sticker as CustomTextSticker).bold ? "bold" : "normal",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-all",
+          }}
+        >
+          {(sticker as CustomTextSticker).textContent}
+        </div>
+      );
+    } else if (sticker.type === "IMAGE_TO_UPLOAD") {
+      // imageFile이 File 객체인 경우에만 URL.createObjectURL을 사용합니다.
+      const imageUrl =
+        sticker.imageFile instanceof File
+          ? URL.createObjectURL(sticker.imageFile)
+          : sticker.imageFile;
+      return (
+        <img
+          src={imageUrl}
+          alt={"이미지 스티커"}
+          className={"w-full h-full object-contain"}
+          draggable={"false"}
+          onLoad={(e) => {
+            // File 객체로부터 생성된 URL인 경우에만 revokeObjectURL을 호출합니다.
+            if (sticker.imageFile instanceof File) {
+              URL.revokeObjectURL(e.currentTarget.src);
+            }
+          }}
+        />
+      );
+    }
     return null;
-  }
+  };
 
   const handleMoveTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setIsDragging(true);
@@ -154,6 +213,12 @@ const TransformableSticker = ({
     onDelete(sticker);
   };
 
+  const handleDoubleClick = () => {
+    if (onStickerDoubleClick) {
+      onStickerDoubleClick(sticker);
+    }
+  };
+
   return (
     <div
       className={cn("absolute z-10 border-3 rounded-md", {
@@ -166,14 +231,17 @@ const TransformableSticker = ({
         width: sticker.size * 100 + "%",
         transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
       }}
+      {...props}
     >
-      <img
+      <div
         onTouchStart={handleMoveTouchStart}
         onTouchMove={handleMoveTouchMove}
         onTouchEnd={handleMoveTouchEnd}
-        src={currentSticker.imageUrl}
-        alt={currentSticker.id}
-      />
+        onDoubleClick={handleDoubleClick}
+        className={"w-full h-full"}
+      >
+        {renderStickerContent()}
+      </div>
       {isFocused && (
         <>
           <div

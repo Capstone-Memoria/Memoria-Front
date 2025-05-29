@@ -1,7 +1,13 @@
 import { Diary } from "@/models/Diary";
 import { DiaryBook, DiaryBookMemer } from "@/models/DiaryBook";
 import { Page, PageParam } from "@/models/Pagination";
-import { Sticker } from "@/models/Sticker";
+import {
+  ImageToRequestSticker,
+  ImageToUploadSticker,
+  ModifyingSticker,
+  RequestSticker,
+  Sticker,
+} from "@/models/Sticker";
 import server from "./axios";
 
 export const fetchMyDiaryBook = async (PageParam: PageParam) => {
@@ -32,7 +38,7 @@ export const createDiaryBook = async (request: DiaryBookCreateRequest) => {
 };
 
 interface DiaryBookCreateWithStickersRequest extends DiaryBookCreateRequest {
-  stickers: Sticker[];
+  stickers: ModifyingSticker[];
 }
 
 export const createDiaryBookWithStickers = async (
@@ -65,11 +71,13 @@ export const updateDiaryBook = async (
   request: DiaryBookUpdateRequest
 ) => {
   const formData = new FormData();
-  if (request.title) formData.append("title", request.title);
-  if (request.isPinned)
+  if (request.title !== undefined) formData.append("title", request.title);
+  if (request.isPinned !== undefined)
     formData.append("isPinned", request.isPinned.toString());
-  if (request.coverImage) formData.append("coverImage", request.coverImage);
-  if (request.spineColor) formData.append("spineColor", request.spineColor);
+  if (request.coverImage !== undefined)
+    formData.append("coverImage", request.coverImage);
+  if (request.spineColor !== undefined)
+    formData.append("spineColor", request.spineColor);
 
   const response = await server.patch<DiaryBook>(
     `/api/diary-book/${diaryBookId}`,
@@ -128,11 +136,67 @@ export const fetchDiaryMembers = async (diaryBookId: number) => {
   return responcse.data;
 };
 
+export const holdStickerImage = async (imageFile: File) => {
+  const formData = new FormData();
+  formData.append("imageFile", imageFile);
+
+  const response = await server.post<{
+    uuid: string;
+  }>("/api/stickers/images/hold", formData);
+
+  return response.data.uuid;
+};
+
+type Ordered<T> = {
+  order: number;
+  data: T;
+};
+
 export const updateStickers = async (
   diaryBookId: number,
-  stickers: Sticker[]
+  stickers: ModifyingSticker[]
 ) => {
-  await server.put(`/api/diary-book/${diaryBookId}/stickers`, {
-    stickers,
-  });
+  const orderedData: Ordered<ModifyingSticker>[] = stickers.map(
+    (it, index) => ({
+      order: index,
+      data: it,
+    })
+  );
+
+  const imagesToHold: Ordered<ImageToUploadSticker>[] = orderedData.filter(
+    (it) => it.data.type === "IMAGE_TO_UPLOAD"
+  ) as Ordered<ImageToUploadSticker>[];
+  const imagesToRequest: Ordered<ImageToRequestSticker>[] = await Promise.all(
+    imagesToHold.map(async (it) => {
+      const heldImageUuid = await holdStickerImage(it.data.imageFile);
+      return {
+        order: it.order,
+        data: {
+          type: "CUSTOM_IMAGE",
+          uuid: it.data.uuid,
+          posX: it.data.posX,
+          posY: it.data.posY,
+          size: it.data.size,
+          rotation: it.data.rotation,
+          heldStickerImageUuid: heldImageUuid,
+        } satisfies ImageToRequestSticker,
+      };
+    })
+  );
+
+  const stickersToRequest: Ordered<RequestSticker>[] = [
+    ...(orderedData.filter(
+      (it) => it.data.type !== "IMAGE_TO_UPLOAD"
+    ) as Ordered<RequestSticker>[]),
+    ...imagesToRequest,
+  ].sort((a, b) => a.order - b.order);
+
+  const response = await server.put<Sticker[]>(
+    `/api/diary-book/${diaryBookId}/stickers`,
+    {
+      stickers: stickersToRequest.map((it) => it.data),
+    }
+  );
+
+  return response.data;
 };

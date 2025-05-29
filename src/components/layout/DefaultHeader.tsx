@@ -1,6 +1,6 @@
-import BellIcon from "@/assets/images/BellIcon.svg";
+import BellIcon from "@/assets/images/BellIcon.png";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
-import ProflieIcon from "@/assets/images/ProfileIcon.svg";
+import ProflieIcon from "@/assets/images/ProfileIcon.png";
 import NotificationOverlay from "@/features/main/components/NotificationOverlay";
 import { HTMLAttributes, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
@@ -49,7 +49,7 @@ const DefaultHeader: React.FC<HeaderProps> = ({
         <img
           src={BellIcon}
           alt={"Notification Bell"}
-          className={""}
+          className={"size-5"}
           onClick={() => {
             setIsNotificationOpen(true);
           }}
@@ -57,7 +57,7 @@ const DefaultHeader: React.FC<HeaderProps> = ({
         <img
           src={ProflieIcon}
           alt={"Profile Icon"}
-          className={""}
+          className={"size-5"}
           onClick={() => {
             navigate("/profile");
           }}

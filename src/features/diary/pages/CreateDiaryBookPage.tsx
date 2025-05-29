@@ -11,16 +11,18 @@ import { TbSticker2 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { CreateCoverImageDrawer } from "../components/CreateCoverImageDrawer";
 
-import CoverExampleImg1 from "@/assets/images/CoverImage1.png";
-import CoverExampleImg2 from "@/assets/images/CoverImage2.png";
-import CoverExampleImg3 from "@/assets/images/CoverImage3.jpg";
-import CoverExampleImg4 from "@/assets/images/CoverImage4.png";
-import CoverExampleImg5 from "@/assets/images/CoverImage5.jpg";
+import CoverExampleImg1 from "@/assets/images/coverimage1.png";
+import CoverExampleImg2 from "@/assets/images/coverimage2.png";
+import CoverExampleImg3 from "@/assets/images/coverimage3.png";
+import CoverExampleImg4 from "@/assets/images/coverimage4.png";
+import CoverExampleImg5 from "@/assets/images/coverimage5.png";
+import CoverExampleImg6 from "@/assets/images/coverimage6.png";
 import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { Sticker } from "@/models/Sticker";
+import { ModifyingSticker, Sticker } from "@/models/Sticker";
 import DiaryDecorateDialog from "../components/stickers/DiaryDecorateDialog";
 
 const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
@@ -44,6 +46,10 @@ const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
     type: "preset",
     imageSrc: CoverExampleImg5,
   },
+  {
+    type: "preset",
+    imageSrc: CoverExampleImg6,
+  },
 ];
 
 const CreateDiaryPage = () => {
@@ -56,6 +62,8 @@ const CreateDiaryPage = () => {
   const [selectedCover, setSelectedCover] = useState<DiaryCoverItem | null>(
     DIARY_COVER_PRESETS[0]
   );
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [spineColorError, setSpineColorError] = useState<string | null>(null);
 
   const [diaryCoverItems, setDiaryCoverItems] =
     useState<DiaryCoverItem[]>(DIARY_COVER_PRESETS);
@@ -69,10 +77,20 @@ const CreateDiaryPage = () => {
   useEffect(() => {
     setCanSubmit(diaryTitle.length > 0);
     setIsSpineColorPickerEnabled(diaryTitle.length > 0);
+
+    // 제목이 입력되면 에러 메시지 제거
+    if (diaryTitle.length > 0) {
+      setTitleError(null);
+    }
   }, [diaryTitle]);
 
   useEffect(() => {
     setIsCoverCarouselEnabled(diaryTitle.length > 0 && !!selectedSpineColor);
+
+    // 책등 색상이 선택되면 에러 메시지 제거
+    if (selectedSpineColor) {
+      setSpineColorError(null);
+    }
   }, [diaryTitle, selectedSpineColor]);
 
   // --- 파일 업로드 핸들러 ---
@@ -128,6 +146,7 @@ const CreateDiaryPage = () => {
         if (!selectedSpineColor) throw new Error("책등 색상을 선택해주세요.");
 
         const coverImageFile = await getCoverImageFile(selectedCover);
+
         return api.diaryBook.createDiaryBookWithStickers({
           title: diaryTitle,
           coverImage: coverImageFile,
@@ -144,8 +163,26 @@ const CreateDiaryPage = () => {
     });
 
   // DiaryDecorateDialog에서 저장 버튼 클릭 시 호출될 함수
-  const handleSaveWithStickers = async (stickers: Sticker[]) => {
+  const handleSaveWithStickers = async (stickers: ModifyingSticker[]) => {
+
     tryCreateDiaryBookWithStickers(stickers);
+  };
+
+  // 유효성 검사 함수
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!diaryTitle.trim()) {
+      setTitleError("일기장 제목을 입력해주세요.");
+      isValid = false;
+    }
+
+    if (!selectedSpineColor) {
+      setSpineColorError("책등 색상을 선택해주세요.");
+      isValid = false;
+    }
+
+    return isValid;
   };
 
   return (
@@ -156,7 +193,7 @@ const CreateDiaryPage = () => {
           if (canSubmit) {
             setDecorateDialogOpen(true);
           } else {
-            alert("일기장 제목을 입력해주세요.");
+            validateForm();
           }
         }}
         isCreating={false}
@@ -177,26 +214,27 @@ const CreateDiaryPage = () => {
             value={diaryTitle}
             onChange={(e) => setDiaryTitle(e.target.value)}
           />
+          {titleError && (
+            <p className={"text-red-500 text-sm mt-1"}>{titleError}</p>
+          )}
         </div>
-        <p className={"mt-8 text-gray-500"}>일기장 책등 색상을 선택해주세요</p>
-        <div
-          className={`mt-2 transition-opacity duration-300 ${
-            isSpineColorPickerEnabled ? "opacity-100" : "opacity-50"
-          }`}
-        >
+        <p className={"mt-6"}>일기장 책등 색상을 선택해주세요</p>
+        <div className={`mt-6 transition-opacity duration-300`}>
           <ColorPicker
             className={"place-items-center gap-y-6"}
             selectedColor={selectedSpineColor}
             onColorSelect={setSelectedSpineColor}
           />
+          {spineColorError && (
+            <p className={"text-red-500 text-sm mt-4 text-left"}>
+              {spineColorError}
+            </p>
+          )}
         </div>
-        <p className={"mt-8 text-gray-500"}>
-          일기장 커버 이미지를 선택해주세요
-        </p>
+        <p className={"mt-6"}>일기장 커버 이미지를 선택해주세요</p>
         <div
-          className={`mt-8 flex-1 flex flex-col items-center justify-center transition-opacity duration-300 ${
-            isCoverCarouselEnabled ? "opacity-100" : "opacity-50"
-          }`}
+          className={`mt-4 flex-1 flex flex-col items-center justify-center transition-opacity duration-300
+          `}
         >
           <div>
             <DiaryCoverCarousel
@@ -244,11 +282,13 @@ const CreateDiaryPage = () => {
           {/* 꾸미기 버튼 추가 */}
           <Button
             className={
-              "w-full mt-6 rounded-md flex items-center justify-center gap-3"
+              "w-full mt-4 rounded-md flex items-center justify-center gap-3"
             }
             onClick={() => {
               if (!(!selectedCover || !diaryTitle || !selectedSpineColor)) {
                 setDecorateDialogOpen(true);
+              } else {
+                validateForm();
               }
             }}
             variant={"primary"}
