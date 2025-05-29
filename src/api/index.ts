@@ -8,6 +8,7 @@ import * as file from "./file";
 import * as image from "./image";
 import * as invitation from "./invitation";
 import * as reaction from "./reation";
+import * as statistics from "./statistics";
 import * as user from "./user";
 
 export default {
@@ -22,4 +23,5 @@ export default {
   file,
   invitation,
   aiCharacter,
+  statistics,
 };

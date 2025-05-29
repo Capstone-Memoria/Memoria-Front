@@ -44,6 +44,10 @@ const ViewDiaryListPage = () => {
       onClick: () => navigate(`/diary-book/${diaryBookId}/members`),
     },
     {
+      label: "분석 보고서 보기",
+      onClick: () => navigate(`/diary-book/${diaryBookId}/report`),
+    },
+    {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
 
       onClick: async () => {

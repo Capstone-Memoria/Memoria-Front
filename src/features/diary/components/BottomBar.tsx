@@ -4,7 +4,7 @@ import { Reaction, ReactionType } from "@/models/Diary";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HTMLAttributes, useEffect, useState } from "react";
 import { BsChatFill } from "react-icons/bs";
-import { RiMailFill } from "react-icons/ri"; // Changed to Mail icon
+import { GiEnvelope } from "react-icons/gi";
 import ReactionAddPanel from "./reactions/ReactionAddPanel";
 import { ReactionIcon } from "./reactions/ReactionIcon";
 
@@ -215,7 +215,9 @@ const BottomBar: React.FC<BottomBarProps> = ({
             ></div>
           ) : (
             aiComments &&
-            aiComments.length > 0 && <RiMailFill className={"text-lg"} />
+            aiComments.length > 0 && (
+              <GiEnvelope className={"text-lg text-blue-500"} />
+            )
           )}
           <BsChatFill className={""} />
           {isFetchingComments ? (

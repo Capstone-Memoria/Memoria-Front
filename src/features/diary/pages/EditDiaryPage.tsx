@@ -18,6 +18,8 @@ const EditDiaryPage = () => {
     diaryId: string;
   }>();
 
+  
+
   const [diaryTitle, setDiaryTitle] = useState("");
   const [content, setContent] = useState("");
   const [toAddImages, setToAddImages] = useState<File[]>([]);

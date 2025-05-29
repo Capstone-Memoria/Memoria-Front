@@ -2,13 +2,14 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
 import api from "@/api";
-import Banner from "@/components/base/Banner";
 import Spinner from "@/components/base/Spinner";
 import DiaryListItem from "@/components/diary/DiaryListItem";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import { Diary } from "@/models/Diary";
+import DiaryBookReportWidget from "./DiaryBookReportWidget";
 
 interface DiaryListPanelProps {
   diaryBookId: number;
@@ -24,6 +25,9 @@ const DiaryListPanel = ({
   onOpenWritePage,
   searchQuery, // searchQuery prop 사용
 }: DiaryListPanelProps) => {
+  /* Properties */
+  const navigate = useNavigate();
+
   /* Server Side */
   const PAGE_SIZE = 10; // 한 번에 가져올 일기 개수
 
@@ -101,14 +105,9 @@ const DiaryListPanel = ({
 
   return (
     <>
-      <Banner
-        variant={"green"}
-        title={"우리 일기장은 어떤 일기장일까?"}
-        className={"mt-2"}
-      >
-        메모리아에게 일기장 분석받기
-      </Banner>
-
+      <DiaryBookReportWidget
+        onClick={() => navigate(`/diary-book/${diaryBookId}/report`)}
+      />
       <div className={"flex flex-col gap-4 mt-5"}>
         {isDiaryListLoading &&
         filteredDiaryList.length === 0 &&
