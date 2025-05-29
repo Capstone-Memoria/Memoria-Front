@@ -1,4 +1,5 @@
 import api from "@/api";
+import { fetchDiaryBookStatistics } from "@/api/statistics";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import {
   Drawer,
@@ -6,7 +7,9 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { DiaryBookStatistics } from "@/models/DiaryBookStatistics";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { MdAutoAwesome } from "react-icons/md";
 import DiaryBookReportWidgets from "./DiaryBookReportWidgets";
 
@@ -26,6 +29,33 @@ const DiaryBookReportDrawer: React.FC<DiaryBookReportDrawerProps> = ({
     queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
     enabled: !!diaryBookId,
   });
+
+  const [statistics, setStatistics] = useState<DiaryBookStatistics | null>(
+    null
+  );
+  const [isStatisticsFetching, setIsStatisticsFetching] = useState(false);
+
+  useEffect(() => {
+    if (open && diaryBookId) {
+      const fetchStatistics = async () => {
+        setIsStatisticsFetching(true);
+        try {
+          const today = new Date();
+          const month = `${today.getFullYear()}-${String(
+            today.getMonth() + 1
+          ).padStart(2, "0")}`;
+          const data = await fetchDiaryBookStatistics(diaryBookId, month);
+          setStatistics(data);
+        } catch (error) {
+          console.error("Failed to fetch statistics:", error);
+          setStatistics(null);
+        } finally {
+          setIsStatisticsFetching(false);
+        }
+      };
+      fetchStatistics();
+    }
+  }, [open, diaryBookId]);
 
   return (
     <Drawer open={open} onOpenChange={setIsOpen}>
@@ -68,10 +98,34 @@ const DiaryBookReportDrawer: React.FC<DiaryBookReportDrawerProps> = ({
             AI가 이번달의 일기들을 분석한 결과를 알려드릴게요
           </div>
           <div className={"mt-8 flex flex-col gap-6"}>
-            <DiaryBookReportWidgets.WhatIsOurDiaryBookWidget />
-            <DiaryBookReportWidgets.DiaryEmotionWeatherForecastWidget />
-            <DiaryBookReportWidgets.MonthlyAttendanceRankingWidget />
-            <DiaryBookReportWidgets.PopularDiariesWidget />
+            {(isDiaryBookFetching || isStatisticsFetching) && (
+              <div>로딩 중...</div>
+            )}
+            {(!diaryBook || !statistics) &&
+              !(isDiaryBookFetching || isStatisticsFetching) && (
+                <div>데이터를 불러오는데 실패했습니다.</div>
+              )}
+            {diaryBook &&
+              statistics &&
+              !(isDiaryBookFetching || isStatisticsFetching) && (
+                <>
+                  <DiaryBookReportWidgets.WhatIsOurDiaryBookWidget
+                    diaryBookName={diaryBook.title}
+                    oneLineSummary={statistics.oneLineSummary}
+                  />
+                  <DiaryBookReportWidgets.DiaryEmotionWeatherForecastWidget
+                    emotionWeather={statistics.emotionWeather}
+                    emotionWeatherReason={statistics.emotionWeatherReason}
+                  />
+                  <DiaryBookReportWidgets.MonthlyAttendanceRankingWidget
+                    attendanceRanking={statistics.attendanceRanking}
+                  />
+                  <DiaryBookReportWidgets.PopularDiariesWidget
+                    commentRanking={statistics.commentRanking}
+                    reactionRanking={statistics.reactionRanking}
+                  />
+                </>
+              )}
           </div>
         </div>
       </DrawerContent>
