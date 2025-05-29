@@ -3,11 +3,11 @@ import React from "react";
 
 const PRESET_COLORS = [
   "bg-black",
-  "bg-red-500",
-  "bg-yellow-300",
+  "bg-red-400",
+  "bg-yellow-200",
   "bg-green-400",
-  "bg-blue-500",
-  "bg-pink-500",
+  "bg-blue-300",
+  "bg-pink-300",
   "bg-gray-600",
   "bg-white",
 ];
