@@ -273,6 +273,7 @@ const CreateDiaryPage = () => {
               className={
                 "w-full flex items-center justify-center gap-4 text-sm relative bg-white border rounded-md py-2 shadow"
               }
+              onClick={handleUploadButtonClick}
             >
               <MdUpload className={"text-base"} /> 사진 업로드
             </div>
