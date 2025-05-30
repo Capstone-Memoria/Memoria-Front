@@ -41,7 +41,7 @@ const DiaryBookReportPage: React.FC = () => {
         <div className={"flex-grow text-lg font-semibold"}>분석 보고서</div>
       </Page.Header>
       <Page.Content className={""}>
-        <div className={"p-6"}>
+        <div className={"p-4"}>
           <div className={"flex justify-between items-center"}>
             <div className={"text-xl font-semibold"}>
               <span className={"text-green-500"}>{diaryBook?.title}</span>의
@@ -86,6 +86,7 @@ const DiaryBookReportPage: React.FC = () => {
                   <DiaryBookReportWidgets.WhatIsOurDiaryBookWidget
                     diaryBookName={diaryBook.title}
                     oneLineSummary={statistics.oneLineSummary}
+                    longSummary={statistics.longSummary}
                   />
                   <DiaryBookReportWidgets.DiaryEmotionWeatherForecastWidget
                     emotionWeather={statistics.emotionWeather}

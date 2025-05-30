@@ -105,9 +105,12 @@ const DiaryListPanel = ({
 
   return (
     <>
-      <DiaryBookReportWidget
-        onClick={() => navigate(`/diary-book/${diaryBookId}/report`)}
-      />
+      {filteredDiaryList.length > 0 && (
+        <DiaryBookReportWidget
+          onClick={() => navigate(`/diary-book/${diaryBookId}/report`)}
+          diaryBookId={diaryBookId}
+        />
+      )}
       <div className={"flex flex-col gap-4 mt-5"}>
         {isDiaryListLoading &&
         filteredDiaryList.length === 0 &&

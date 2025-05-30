@@ -50,22 +50,26 @@ const BaseDiaryBookReportWidget: React.FC<BaseDiaryBookReportWidgetProps> = ({
 interface WhatIsOurDiaryBookWidgetProps {
   diaryBookName?: string;
   oneLineSummary?: string;
+  longSummary?: string;
 }
 
 const WhatIsOurDiaryBookWidget: React.FC<WhatIsOurDiaryBookWidgetProps> = ({
   diaryBookName,
   oneLineSummary,
+  longSummary,
 }) => {
   return (
     <BaseDiaryBookReportWidget
-      title={"이번달 일기장은?"}
+      title={"이번달 일기장 요약"}
       className={"text-center"}
     >
       {diaryBookName && oneLineSummary ? (
-        <>
-          <span className={"text-green-500"}>{diaryBookName}</span>
-          <span>{`은 "${oneLineSummary}"같습니다.`}</span>
-        </>
+        <div className={"flex flex-col gap-4"}>
+          <div className={"text-left font-semibold"}>{oneLineSummary}</div>
+          <div className={"text-left text-gray-500 text-sm"}>
+            <span className={"break-keep"}>{longSummary}</span>
+          </div>
+        </div>
       ) : (
         "데이터를 불러오는 중입니다..."
       )}
@@ -109,7 +113,7 @@ const EmotionIcon: React.FC<{ weather?: EmotionWeather }> = ({ weather }) => {
       imageSrc = cloudyImage; // 기본값으로 흐린 날씨 이미지 사용 또는 다른 기본 이미지 설정
       break;
   }
-  return <img src={imageSrc} alt={weather} className={"size-24"} />;
+  return <img src={imageSrc} alt={weather} className={"size-32"} />;
 };
 
 const getEmotionWeatherText = (weather?: EmotionWeather): string => {
@@ -141,7 +145,7 @@ const DiaryEmotionWeatherForecastWidget: React.FC<
   return (
     <BaseDiaryBookReportWidget title={"우리 일기장의 감정 날씨는?"}>
       <div className={"flex flex-col items-center gap-3"}>
-        <div className={"size-24"}>
+        <div className={""}>
           {emotionWeather ? (
             <EmotionIcon weather={emotionWeather} />
           ) : (
