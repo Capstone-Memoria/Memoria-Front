@@ -20,7 +20,7 @@ import CoverExampleImg6 from "@/assets/images/coverimage6.png";
 import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
-import { ModifyingSticker, Sticker } from "@/models/Sticker";
+import { ModifyingSticker } from "@/models/Sticker";
 import DiaryDecorateDialog from "../components/stickers/DiaryDecorateDialog";
 
 const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
@@ -162,7 +162,6 @@ const CreateDiaryPage = () => {
 
   // DiaryDecorateDialog에서 저장 버튼 클릭 시 호출될 함수
   const handleSaveWithStickers = async (stickers: ModifyingSticker[]) => {
-
     tryCreateDiaryBookWithStickers(stickers);
   };
 
