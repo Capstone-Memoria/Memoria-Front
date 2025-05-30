@@ -8,6 +8,7 @@ export interface Diary {
   content: string;
   diaryBookId: number;
   summary?: string;
+  emotion?: string;
   createdAt: DateTime;
   createdBy?: User;
   lastModifiedAt?: DateTime;

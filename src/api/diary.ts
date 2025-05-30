@@ -8,6 +8,7 @@ interface CreateDiaryRequest {
   title: string;
   content: string;
   images?: File[];
+  emotion?: string;
   desiredCharacterId?: number;
   isAICommentEnabled: boolean;
   isAIMusicEnabled: boolean;
@@ -34,6 +35,10 @@ export const createDiary = async (
       "desiredCharacterId",
       request.desiredCharacterId.toString()
     );
+  }
+
+  if (request.emotion) {
+    formData.append("emotion", request.emotion);
   }
 
   if (request.images) {
