@@ -38,7 +38,7 @@ export const createDiary = async (
   }
 
   if (request.emotion) {
-    formData.append("emotion", request.emotion);
+    formData.append("emotion", request.emotion.toUpperCase());
   }
 
   if (request.images) {
@@ -80,6 +80,7 @@ export const fetchDiaryList = async (
 interface UpdateDiaryRequest {
   title?: string;
   content?: string;
+  emotion?: string;
   toDeleteImageIds?: string[]; // Array of image UUIDs to delete
   toAddImages?: File[]; // Array of new image files
 }
@@ -95,6 +96,9 @@ export const updateDiary = async (
   }
   if (request.content !== undefined) {
     formData.append("content", request.content);
+  }
+  if (request.emotion !== undefined) {
+    formData.append("emotion", request.emotion.toUpperCase());
   }
   if (request.toDeleteImageIds) {
     request.toDeleteImageIds.forEach((id) => {

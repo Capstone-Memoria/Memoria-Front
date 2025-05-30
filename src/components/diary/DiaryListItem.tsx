@@ -23,6 +23,14 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
     return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join(" ");
   }, [item.content]);
 
+  // 이미지 경로 생성 함수
+  const getEmotionImagePath = (emotionName: string) => {
+    return new URL(
+      `../../assets/images/emotions/${emotionName}.png`,
+      import.meta.url
+    ).href;
+  };
+
   const handleDiaryClick = () => {
     navigate(`/diary-book/${item.diaryBookId}/diary/${item.id}`);
   };
@@ -44,7 +52,16 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
         }
       />
       <div className={"py-2 px-3 flex flex-col w-full "}>
-        <div className={"font-medium"}>{item.title}</div>
+        <div className={"flex items-center gap-1"}>
+          <div className={"font-medium"}>{item.title}</div>
+          {item.emotion && (
+            <img
+              src={getEmotionImagePath(item.emotion.toLowerCase())}
+              alt={item.emotion}
+              className={"w-4 h-4 object-contain"}
+            />
+          )}
+        </div>
         <div className={"text-xs text-gray-500 overflow-hidden"}>{summary}</div>
         <div className={"flex-1"} />
         <div className={"flex justify-between w-full"}>
