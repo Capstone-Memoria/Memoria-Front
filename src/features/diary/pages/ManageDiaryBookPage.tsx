@@ -359,36 +359,52 @@ const ManageDiaryBookPage = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <div className={"flex-1"} />
-        <div className={"flex justify-center pb-8"}>
+        <div className={"flex-1 mb-4"} />
+        <div className={"flex pb-8"}>
           <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DrawerTrigger asChild>
-              <Button
-                variant={"text"}
-                className={"p-0 text-sm text-red-400 border-b border-b-red-400"}
-              >
+              <Button variant={"text"} className={"p-0 text-sm text-red-400"}>
                 일기장 삭제하기
               </Button>
             </DrawerTrigger>
-            <DrawerContent className={"pb-8 px-5 gap-13 text-center"}>
-              <div className={"flex flex-col gap-2 p-4"}>
-                정말 일기장을 삭제 하시겠습니까?
-              </div>
-              <div className={"grid grid-cols-2 gap-x-7"}>
-                <Button
-                  variant={"danger"}
-                  onClick={handleDelete}
-                  className={"flex items-center justify-center"}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? <Spinner className={"text-white"} /> : "네"}
-                </Button>
-                <Button
-                  variant={"secondary"}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  취소
-                </Button>
+            <DrawerContent className={""}>
+              <div className={"flex flex-col items-center px-4 py-6"}>
+                <div className={"text-center mb-4"}>
+                  <p className={"text-lg font-medium mb-3"}>
+                    일기장을 삭제하시겠습니까?
+                  </p>
+                  <p className={"text-xs text-gray-500 text-center mb-6"}>
+                    삭제한 일기장은 복구할 수 없으며, 모든 일기도 함께
+                    삭제됩니다.
+                  </p>
+                </div>
+                <div className={"flex gap-3 w-full"}>
+                  <Button
+                    onClick={() => setIsMenuOpen(false)}
+                    variant={"text"}
+                    className={
+                      "flex-1 rounded-lg border-gray-200 bg-gray-200 border"
+                    }
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    onClick={handleDelete}
+                    variant={"danger"}
+                    className={"flex-1"}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <div
+                        className={"flex justify-center items-center w-full"}
+                      >
+                        <Spinner className={"text-white"} />
+                      </div>
+                    ) : (
+                      "삭제"
+                    )}
+                  </Button>
+                </div>
               </div>
             </DrawerContent>
           </Drawer>

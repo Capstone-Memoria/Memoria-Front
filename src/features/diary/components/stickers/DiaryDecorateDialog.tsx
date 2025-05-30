@@ -1,4 +1,5 @@
 import "@/assets/css/transitions.css";
+import LoadingOverlay from "@/components/base/LoadingOverlay";
 import DiaryCover, { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import TextStickerEditDrawer from "@/features/diary/components/stickers/TextStickerEditDrawer";
 import { cn } from "@/lib/utils";
@@ -45,9 +46,17 @@ const DiaryDecorateDialog = ({
   const [editingStickerUuid, setEditingStickerUuid] = useState<string | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const canvasSize = useElementSize(canvasRef);
   const bodySize = useElementSize(document.body);
+
+  // 컴포넌트가 언마운트되거나 open 상태가 변경될 때 로딩 상태를 초기화
+  useEffect(() => {
+    if (!open) {
+      setIsLoading(false);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -266,8 +275,29 @@ const DiaryDecorateDialog = ({
   };
 
   const handleSave = () => {
-    onSave?.(stickers);
-    onOpenChange(false);
+    setIsLoading(true);
+
+    // 실제 API를 통해 저장 - onSave 콜백 사용
+    if (onSave) {
+      // onSave 함수 호출 - CreateDiaryPage에서는 useMutation의 mutate 함수가 전달됨
+      // 이 함수는 내부적으로 API 호출을 처리하고 navigate('/main')을 수행함
+      // 성공하면 페이지가 이동하고, 실패하면 alert가 표시됨
+      onSave(stickers);
+
+      // 실패 시에도 로딩 상태를 제거하기 위해 타임아웃 설정
+      // 일반적으로 API 호출이 실패하면 5초 이내에 응답이 오므로,
+      // 10초가 지나도 응답이 없으면 로딩 상태를 해제하여 사용자가 다시 시도할 수 있게 함
+      const timeoutId = setTimeout(() => {
+        setIsLoading(false);
+      }, 10000);
+
+      // 클린업 함수 (컴포넌트가 언마운트되면 타임아웃 제거)
+      return () => clearTimeout(timeoutId);
+    } else {
+      // onSave가 없는 경우 (API 연결이 없는 경우)
+      setIsLoading(false);
+      onOpenChange(false);
+    }
   };
 
   // 현재 편집 중인 텍스트 스티커 찾기
@@ -288,8 +318,22 @@ const DiaryDecorateDialog = ({
         open ? "translate-x-0" : "translate-x-full"
       )}
     >
+      <LoadingOverlay
+        isLoading={isLoading}
+        message={
+          "잠시만 기다려주세요.\n메모리아가 여러분의 일기장을 만드는 중입니다."
+        }
+        tip={
+          <>
+            하루에 한 번 일기 쓰는 습관이
+            <br />
+            정서적 안정에 긍정적인 영향을 준다는 사실, 알고 계셨나요?
+          </>
+        }
+      />
+
       <div
-        className={`fixed inset-0 z-50 flex flex-col overflow-hidden h-full`}
+        className={`fixed inset-0 z-40 flex flex-col overflow-hidden h-full transition-opacity duration-300 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"}`}
       >
         <div className={"bg-white"}>
           <div className={"flex justify-between items-center p-4"}>
