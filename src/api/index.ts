@@ -1,3 +1,4 @@
+import * as admin from "./admin";
 import * as ai from "./ai";
 import * as aiCharacter from "./ai-character";
 import * as auth from "./auth";
@@ -24,4 +25,5 @@ export default {
   invitation,
   aiCharacter,
   statistics,
+  admin,
 };

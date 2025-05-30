@@ -1,15 +1,3 @@
 {
-  "mcpServers": {
-    "My API Spec (npx)": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-openapi-schema-explorer@latest",
-        "https://memoria.myunghyun.me/v3/api-docs",
-        "--output-format",
-        "json"
-      ],
-      "env": {}
-    }
-  }
+  "mcpServers": {}
 }
