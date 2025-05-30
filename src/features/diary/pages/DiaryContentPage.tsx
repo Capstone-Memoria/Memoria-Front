@@ -178,7 +178,9 @@ const DiaryContentPage = () => {
                           <Image
                             imageClassName={"object-contain"}
                             imageId={image.id}
-                            className={"h-48 w-fit overflow-hidden absolute"}
+                            className={
+                              "h-48 w-fit overflow-hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                            }
                           />
                         </div>
                       </CarouselItem>
