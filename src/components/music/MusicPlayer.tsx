@@ -80,6 +80,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         "border p-4 rounded-md flex items-center gap-4 bg-white shadow-lg relative overflow-hidden",
         className
       )}
+      onClick={() => {
+        if (isMusicLoaded) {
+          togglePlayPause();
+        }
+      }}
       {...props}
     >
       {!isMusicLoaded ? (
@@ -114,17 +119,19 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         // 음악 재생 UI
         <>
           <IoMusicalNotes className={"size-5"} />
-          <div className={"flex-1 flex flex-col"}>
-            <div className={"text-sm"}>AI가 자동으로 생성한 음악이에요</div>
+          <div className={"flex-1 flex flex-col gap-2"}>
+            <div className={"text-sm text-gray-700"}>
+              AI가 자동으로 생성한 음악이에요
+            </div>
             {/* 진행률 표시 */}
             {musicFileId && (
               <div
                 className={
-                  "mt-1 w-full h-1 bg-white/30 rounded overflow-hidden"
+                  "mt-1 w-full h-[2px] bg-gray-200 rounded overflow-hidden"
                 }
               >
                 <div
-                  className={"h-full bg-white"}
+                  className={"h-full relative bg-black"}
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -132,7 +139,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
           </div>
           <div>
             <button
-              onClick={togglePlayPause}
               className={
                 "size-7 flex items-center justify-center rounded-full bg-white/30 hover:bg-white/40 transition-colors"
               }

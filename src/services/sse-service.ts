@@ -5,8 +5,14 @@ import { useNotificationStore } from "@/stores/NotificationStore";
 import { EventSourcePolyfill } from "event-source-polyfill";
 
 let eventSource: EventSourcePolyfill | null = null;
+let queryClient: any = null; // React Query 클라이언트 저장
 
 const SSE_URL = "/api/notification/subscribe"; // 실제 서버의 SSE 엔드포인트로 변경
+
+// QueryClient를 설정하는 함수
+export const setQueryClient = (client: any): void => {
+  queryClient = client;
+};
 
 export const connectSSE = (): void => {
   // 이미 연결되어 있거나 연결 시도 중이면 중복 실행 방지
@@ -46,6 +52,11 @@ export const connectSSE = (): void => {
         const newNotification: Notification = JSON.parse(event.data);
         console.log("New SSE event Notification received:", newNotification);
         addNotification(newNotification); // 스토어에 알림 추가
+
+        // React Query 캐시 무효화하여 알림 개수 즉시 업데이트
+        if (queryClient) {
+          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        }
       } catch (error) {
         console.error("Error parsing SSE event data:", error);
         // 파싱 오류에 대한 처리 (예: 오류 알림을 스토어에 추가)

@@ -45,7 +45,7 @@ const EditDiaryPage = () => {
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
         size: 10,
-        page: 1,
+        page: 0,
       }),
   });
 

@@ -26,7 +26,7 @@ const MainPage = () => {
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
         size: 10,
-        page: 1, // TODO: pagination
+        page: 0, // TODO: pagination
       }),
   });
 
@@ -58,9 +58,7 @@ const MainPage = () => {
     if (!selectedDiaryBook) return;
 
     try {
-      await api.diaryBook.updateDiaryBook(Number(selectedDiaryBook.id), {
-        isPinned: !selectedDiaryBook.isPinned,
-      });
+      await api.diaryBook.togglePinDiaryBook(Number(selectedDiaryBook.id));
       // 데이터 리프레시를 위해 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
     } catch (e) {

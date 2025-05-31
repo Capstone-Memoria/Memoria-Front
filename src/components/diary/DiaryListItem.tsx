@@ -19,8 +19,8 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
     //content에서 HTML 태그 제거, 텍스트만 추출.
     const text = content.replace(/<[^>]*>?/g, "");
     //text에서 세 줄 추출, 텍스트만 추출
-    const lines = text.split("\n").slice(0, 1);
-    return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join(" ");
+    const lines = text.split("\n").slice(0, 3);
+    return lines.map((line) => line.replace(/<[^>]*>?/g, "")).join("\n");
   }, [item.content]);
 
   // 이미지 경로 생성 함수

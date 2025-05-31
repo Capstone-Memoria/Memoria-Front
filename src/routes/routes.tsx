@@ -1,3 +1,4 @@
+import AdminPage from "@/features/admin/AdminPage";
 import CreateDiaryPage from "@/features/diary/pages/CreateDiaryBookPage";
 import DiaryBookMemberPage from "@/features/diary/pages/DiaryBookMemberPage";
 import DiaryBookReportPage from "@/features/diary/pages/DiaryBookReportPage";
@@ -78,6 +79,10 @@ export const routes: ContextRoutes = {
     {
       path: "/diary-book/:diaryBookId/report",
       element: <DiaryBookReportPage />,
+    },
+    {
+      path: "/admin",
+      element: <AdminPage />,
     },
     {
       path: "/*",

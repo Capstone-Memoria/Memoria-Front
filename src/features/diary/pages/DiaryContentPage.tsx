@@ -3,6 +3,7 @@ import Button from "@/components/base/Button";
 import Image from "@/components/base/Image";
 import Modal from "@/components/base/Modal";
 import Preview from "@/components/base/Preview";
+import { BorderBeam } from "@/components/magicui/border-beam";
 import MusicPlayer from "@/components/music/MusicPlayer";
 import Page from "@/components/page/Page";
 import {
@@ -176,7 +177,9 @@ const DiaryContentPage = () => {
                           }}
                         >
                           <Image
-                            imageClassName={"object-fill blur-3xl"}
+                            imageClassName={
+                              "object-fill blur-3xl transform-gpu"
+                            }
                             imageId={image.id}
                             className={
                               "size-full absolute rounded-md overflow-hidden top-0 left-0"
@@ -186,7 +189,9 @@ const DiaryContentPage = () => {
                           <Image
                             imageClassName={"object-contain"}
                             imageId={image.id}
-                            className={"h-48 w-fit overflow-hidden absolute"}
+                            className={
+                              "h-full w-full bg-transparent overflow-hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                            }
                           />
                         </div>
                       </CarouselItem>
@@ -210,9 +215,21 @@ const DiaryContentPage = () => {
                 (diary.images.length === 0 && (
                   <div
                     className={
-                      "h-48 w-full gap-4 flex flex-col justify-center items-center bg-gray-200 rounded-md overflow-hidden"
+                      "h-48 w-full gap-4 flex flex-col justify-center items-center bg-white shadow-lg border rounded-md overflow-hidden relative"
                     }
                   >
+                    <BorderBeam
+                      duration={6}
+                      size={80}
+                      className={"from-transparent via-red-500 to-transparent"}
+                    />
+                    <BorderBeam
+                      duration={6}
+                      delay={3}
+                      size={80}
+                      className={"from-transparent via-blue-500 to-transparent"}
+                    />
+
                     <RiImageCircleAiFill
                       className={"text-5xl text-gray-400 animate-pulse"}
                     />
@@ -266,7 +283,9 @@ const DiaryContentPage = () => {
               </div>
 
               <LayoutGroup>
-                <MusicPlayer musicFileId={diary.musicFile?.id} />
+                {diary.aiMusicEnabled && (
+                  <MusicPlayer musicFileId={diary.musicFile?.id} />
+                )}
 
                 {/* 일기 내용 */}
                 <motion.div

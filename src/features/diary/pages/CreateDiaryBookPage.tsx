@@ -105,7 +105,7 @@ const CreateDiaryPage = () => {
       coverColor: "bg-gray-500", // 기본 색상 설정
     }));
 
-    setDiaryCoverItems((prevItems) => [...prevItems, ...newCoverItems]);
+    setDiaryCoverItems((prevItems) => [...newCoverItems, ...prevItems]);
 
     fileInputRef.current.value = "";
   };
@@ -273,6 +273,7 @@ const CreateDiaryPage = () => {
               className={
                 "w-full flex items-center justify-center gap-4 text-sm relative bg-white border rounded-md py-2 shadow"
               }
+              onClick={handleUploadButtonClick}
             >
               <MdUpload className={"text-base"} /> 사진 업로드
             </div>

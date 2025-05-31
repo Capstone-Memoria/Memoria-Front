@@ -61,7 +61,6 @@ export const fetchDiaryBookById = async (diaryBookId: number) => {
 
 interface DiaryBookUpdateRequest {
   title?: string;
-  isPinned?: boolean;
   coverImage?: File;
   spineColor?: string;
 }
@@ -72,8 +71,6 @@ export const updateDiaryBook = async (
 ) => {
   const formData = new FormData();
   if (request.title !== undefined) formData.append("title", request.title);
-  if (request.isPinned !== undefined)
-    formData.append("isPinned", request.isPinned.toString());
   if (request.coverImage !== undefined)
     formData.append("coverImage", request.coverImage);
   if (request.spineColor !== undefined)
@@ -198,5 +195,12 @@ export const updateStickers = async (
     }
   );
 
+  return response.data;
+};
+
+export const togglePinDiaryBook = async (diaryBookId: number) => {
+  const response = await server.patch<DiaryBook>(
+    `/api/diary-book/${diaryBookId}/pin`
+  );
   return response.data;
 };

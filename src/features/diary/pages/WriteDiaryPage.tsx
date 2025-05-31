@@ -85,7 +85,11 @@ const WriteDiaryPage = () => {
   // 일기장 목록 조회
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
-    queryFn: () => api.diaryBook.fetchMyDiaryBook({ size: 10, page: 1 }),
+    queryFn: () =>
+      api.diaryBook.fetchMyDiaryBook({
+        size: 10,
+        page: 0, // TODO: pagination
+      }),
   });
 
   // AI 캐릭터 목록 조회

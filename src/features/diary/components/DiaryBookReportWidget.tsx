@@ -1,15 +1,31 @@
+import api from "@/api";
 import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import React, { HTMLAttributes } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import { MdAutoAwesome } from "react-icons/md";
 
-type DiaryBookReportWidgetProps = HTMLAttributes<HTMLDivElement>;
+interface DiaryBookReportWidgetProps extends HTMLAttributes<HTMLDivElement> {
+  diaryBookId: number;
+}
 
 const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
   className,
+  diaryBookId,
   ...props
 }) => {
+  const { data: statistics, isFetching: isStatisticsFetching } = useQuery({
+    queryKey: ["fetchDiaryBookStatistics", diaryBookId],
+    queryFn: () =>
+      api.statistics.fetchDiaryBookStatistics(
+        diaryBookId,
+        DateTime.now().toFormat("yyyy-MM")
+      ),
+    enabled: !!diaryBookId,
+  });
+
   return (
     <div
       {...props}
@@ -23,10 +39,8 @@ const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
       <div className={"flex "}>
         <div className={"flex flex-col gap-1 flex-1"}>
           <div className={"flex items-center gap-2"}>
-            <MdAutoAwesome />
-            <div className={"font-semibold "}>
-              친구들과 함께하는 도란도란 일기장
-            </div>
+            <MdAutoAwesome className={"basis-[48px]"} />
+            <div className={"font-semibold "}>{statistics?.oneLineSummary}</div>
           </div>
         </div>
       </div>

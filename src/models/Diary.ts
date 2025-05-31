@@ -34,6 +34,7 @@ export interface Diary {
   images?: AttachedFile[];
   reactions?: Reaction[];
   musicFile?: AttachedFile;
+  aiMusicEnabled: boolean;
 }
 
 interface ReactionId {
