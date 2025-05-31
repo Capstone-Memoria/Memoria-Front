@@ -55,9 +55,7 @@ const MainPage = () => {
     if (!selectedDiaryBook) return;
 
     try {
-      await api.diaryBook.updateDiaryBook(Number(selectedDiaryBook.id), {
-        isPinned: !selectedDiaryBook.isPinned,
-      });
+      await api.diaryBook.togglePinDiaryBook(Number(selectedDiaryBook.id));
       // 데이터 리프레시를 위해 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
     } catch (e) {
