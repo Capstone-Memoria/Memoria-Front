@@ -49,6 +49,12 @@ const AdminPage = () => {
     queryFn: api.admin.getAllAiNodes,
   });
 
+  const { data: queueStatus } = useQuery({
+    queryKey: ["getAiNodeQueueStatus"],
+    queryFn: api.admin.getAiNodeQueueStatus,
+    refetchInterval: 1000,
+  });
+
   // Mutations
   const createMutation = useMutation({
     mutationFn: api.admin.createAiNode,
@@ -226,6 +232,33 @@ const AdminPage = () => {
                 </p>
               </div>
               <MdPowerSettingsNew className={"text-green-500 text-xl"} />
+            </div>
+          </div>
+          <div className={"bg-white p-4 rounded-lg shadow-sm border"}>
+            <div className={"flex items-center justify-between"}>
+              <div>
+                <p className={"text-sm text-gray-600"}>이미지 큐</p>
+                <p className={"text-2xl font-bold text-gray-900"}>
+                  {queueStatus?.imageNodeQueueSize ?? "N/A"}
+                </p>
+              </div>
+              <FaImage className={"text-sky-500 text-xl"} />
+            </div>
+          </div>
+          <div className={"bg-white p-4 rounded-lg shadow-sm border"}>
+            <div className={"flex items-center justify-between"}>
+              <div>
+                <p className={"text-sm text-gray-600"}>음악 큐 (Pending)</p>
+                <p className={"text-2xl font-bold text-gray-900"}>
+                  {queueStatus?.musicNodeQueueSize ?? "N/A"}
+                  {queueStatus?.musicNodePendingJobsCount !== undefined && (
+                    <span className={"text-sm text-yellow-600 ml-1"}>
+                      ({queueStatus.musicNodePendingJobsCount})
+                    </span>
+                  )}
+                </p>
+              </div>
+              <FaMusic className={"text-purple-500 text-xl"} />
             </div>
           </div>
         </div>

@@ -36,3 +36,16 @@ export const deleteAiNode = async (id: number) => {
 
   return response.data;
 };
+
+export interface QueueStatus {
+  imageNodeQueueSize: number;
+  musicNodeQueueSize: number;
+  musicNodePendingJobsCount: number;
+}
+
+export const getAiNodeQueueStatus = async () => {
+  const response = await server.get<QueueStatus>(
+    "/api/ai/config/nodes/queue-status"
+  );
+  return response.data;
+};
