@@ -104,7 +104,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
       {open && (
         <motion.div
           className={cn(
-            "fixed inset-0 z-50 bg-black/60 flex items-center justify-center backdrop-blur-lg touch-none"
+            "absolute w-full h-full left-0 top-0 z-50 bg-black/60 flex items-center justify-center backdrop-blur-lg touch-none"
           )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -118,7 +118,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className={"flex items-center justify-center"}
+            className={"w-full h-full"}
           >
             {imageMutation.isPending && !loadedImage && (
               <div className={"text-white"}>
@@ -127,7 +127,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
             )}
             {!imageMutation.isPending && loadedImage && (
               <img
-                className={cn({
+                className={cn("object-contain size-full", {
                   "transition-transform duration-300": !isTouching,
                 })}
                 style={{
@@ -154,7 +154,7 @@ const Preview: React.FC<PreviewProps> = ({ imageId, open, setIsOpen }) => {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.getElementById("root")!
+    document.body
   );
 };
 
