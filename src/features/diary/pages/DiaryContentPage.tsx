@@ -3,6 +3,7 @@ import Button from "@/components/base/Button";
 import Image from "@/components/base/Image";
 import Modal from "@/components/base/Modal";
 import Preview from "@/components/base/Preview";
+import { BorderBeam } from "@/components/magicui/border-beam";
 import MusicPlayer from "@/components/music/MusicPlayer";
 import Page from "@/components/page/Page";
 import {
@@ -206,9 +207,21 @@ const DiaryContentPage = () => {
                 (diary.images.length === 0 && (
                   <div
                     className={
-                      "h-48 w-full gap-4 flex flex-col justify-center items-center bg-gray-200 rounded-md overflow-hidden"
+                      "h-48 w-full gap-4 flex flex-col justify-center items-center bg-white shadow-lg border rounded-md overflow-hidden relative"
                     }
                   >
+                    <BorderBeam
+                      duration={6}
+                      size={80}
+                      className={"from-transparent via-red-500 to-transparent"}
+                    />
+                    <BorderBeam
+                      duration={6}
+                      delay={3}
+                      size={80}
+                      className={"from-transparent via-blue-500 to-transparent"}
+                    />
+
                     <RiImageCircleAiFill
                       className={"text-5xl text-gray-400 animate-pulse"}
                     />
