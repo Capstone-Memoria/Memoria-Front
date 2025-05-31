@@ -1,7 +1,6 @@
 import api from "@/api";
 import Tiptap from "@/components/editor/Tiptap";
 
-import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Page from "@/components/page/Page";
 import {
@@ -18,7 +17,16 @@ import { EmotionType } from "@/models/Diary";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/react";
-import { BoldIcon, ItalicIcon } from "lucide-react";
+import {
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  BoldIcon,
+  ImageIcon,
+  ItalicIcon,
+  Keyboard,
+  KeyboardOff,
+} from "lucide-react";
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
@@ -53,9 +61,6 @@ const WriteDiaryPage = () => {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-
-  // 초기 뷰포트 높이 저장
-  const initialViewportHeightRef = useRef<number>(window.innerHeight);
 
   // 이미지 관련 상태
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
@@ -123,28 +128,11 @@ const WriteDiaryPage = () => {
     }
   }, [diaryBookId, selectedEmotion]);
 
-  // 초기 뷰포트 높이 설정
-  useEffect(() => {
-    initialViewportHeightRef.current = window.innerHeight;
-
-    const handleOrientationChange = () => {
-      setTimeout(() => {
-        initialViewportHeightRef.current = window.innerHeight;
-      }, 300);
-    };
-
-    window.addEventListener("orientationchange", handleOrientationChange);
-
-    return () => {
-      window.removeEventListener("orientationchange", handleOrientationChange);
-    };
-  }, []);
-
-  // 키보드 및 에디터 포커스 관리
+  // 키보드 및 에디터 포커스 관리 - VisualViewport API 활용
   useEffect(() => {
     const editorNode = editorContainerRef.current;
-    let resizeTimeoutId: number | null = null;
 
+    // 에디터 포커스 이벤트 핸들러
     const handleFocusIn = (event: FocusEvent) => {
       if ((event.target as HTMLElement)?.closest?.(".ProseMirror")) {
         setIsEditorFocused(true);
@@ -163,70 +151,44 @@ const WriteDiaryPage = () => {
       }, 100);
     };
 
-    const handleVisualViewportResize = () => {
+    // VisualViewport 리사이즈 핸들러
+    const handleVisualViewportResize = (event: Event) => {
       if (!window.visualViewport) return;
 
-      const currentViewportHeight = window.visualViewport.height;
-      const heightDifference =
-        initialViewportHeightRef.current - currentViewportHeight;
+      // window.innerHeight와 visualViewport.height의 차이로 키보드 높이 계산
+      const resizeHeight = window.innerHeight - window.visualViewport.height;
 
-      if (heightDifference > 100) {
+      if (resizeHeight > 100) {
         // 키보드가 열린 상태로 설정
         if (!isKeyboardOpen) {
           setIsKeyboardOpen(true);
         }
-
-        // 키보드 높이를 기기별로 계산
-        // heightDifference는 실제 키보드 높이보다 크게 감지될 수 있음
-        // 플랫폼 및 브라우저별 보정 계수 적용
-        const adjustedKeyboardHeight = isIOS
-          ? heightDifference * 0.8 // iOS는 약 80%의 보정 계수 적용
-          : heightDifference * 0.85; // Android는 약 85%의 보정 계수 적용
-
-        setKeyboardHeight(adjustedKeyboardHeight);
+        setKeyboardHeight(resizeHeight);
 
         if (!isEditorFocused && editorRef.current?.isFocused) {
           setIsEditorFocused(true);
         }
-
-        // 키보드가 열릴 때 현재 선택된 위치가 가려지지 않도록 스크롤 자동 조정
-        setTimeout(() => {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            if (range) {
-              const rect = range.getBoundingClientRect();
-
-              // 커서 위치가 키보드나 하단바에 가려질 경우 스크롤 조정
-              if (rect.bottom > window.innerHeight - heightDifference - 100) {
-                window.scrollBy({
-                  top:
-                    rect.bottom - (window.innerHeight - heightDifference - 150),
-                  behavior: "smooth",
-                });
-              }
-            }
-          }
-        }, 100);
       } else {
         if (isKeyboardOpen) setIsKeyboardOpen(false);
         setKeyboardHeight(0);
       }
     };
 
-    const debouncedResizeHandler = () => {
-      if (resizeTimeoutId) clearTimeout(resizeTimeoutId);
-      resizeTimeoutId = window.setTimeout(handleVisualViewportResize, 50);
-    };
-
+    // 이벤트 리스너 등록
     if (editorNode) {
       editorNode.addEventListener("focusin", handleFocusIn);
       editorNode.addEventListener("focusout", handleFocusOut);
     }
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", debouncedResizeHandler);
-      handleVisualViewportResize(); // 초기 상태 체크
+      window.visualViewport.addEventListener(
+        "resize",
+        handleVisualViewportResize
+      );
+      // 초기 상태 확인
+      handleVisualViewportResize({
+        currentTarget: window.visualViewport,
+      } as unknown as Event);
     }
 
     // 메타 태그 설정
@@ -243,6 +205,22 @@ const WriteDiaryPage = () => {
       );
     }
 
+    // VirtualKeyboard API 사용 (지원하는 브라우저에서만)
+    if ("virtualKeyboard" in navigator) {
+      // TypeScript에서 VirtualKeyboard API를 인식하지 못하므로 타입을 정의합니다
+      interface VirtualKeyboard {
+        overlaysContent: boolean;
+      }
+
+      interface NavigatorWithVirtualKeyboard extends Navigator {
+        virtualKeyboard: VirtualKeyboard;
+      }
+
+      (
+        navigator as NavigatorWithVirtualKeyboard
+      ).virtualKeyboard.overlaysContent = true;
+    }
+
     return () => {
       if (editorNode) {
         editorNode.removeEventListener("focusin", handleFocusIn);
@@ -251,10 +229,9 @@ const WriteDiaryPage = () => {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener(
           "resize",
-          debouncedResizeHandler
+          handleVisualViewportResize
         );
       }
-      if (resizeTimeoutId) clearTimeout(resizeTimeoutId);
     };
   }, [isKeyboardOpen, isEditorFocused]);
 
@@ -286,6 +263,11 @@ const WriteDiaryPage = () => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
+    // 현재 에디터의 상태와 커서 위치 저장
+    const currentEditor = editorRef.current;
+    const wasEditorFocused = currentEditor?.isFocused;
+    const cursorPosition = currentEditor?.state.selection.from;
+
     setUploadedImages((prev) => [...prev, ...files]);
 
     const newImagePreviews = files.map((file) => ({
@@ -298,6 +280,13 @@ const WriteDiaryPage = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+
+    // 약간의 지연 후에 에디터의 상태와 커서 위치 복원
+    setTimeout(() => {
+      if (currentEditor && wasEditorFocused && cursorPosition) {
+        currentEditor.commands.focus(cursorPosition);
+      }
+    }, 100);
   };
 
   // 이미지 제거 핸들러
@@ -402,18 +391,6 @@ const WriteDiaryPage = () => {
       setKeyboardHeight(DEFAULT_KEYBOARD_HEIGHT - 5);
     }
   };
-
-  // 에디터 컨테이너 하단 패딩 계산
-  const editorContainerPaddingBottom = useMemo(() => {
-    if (isKeyboardOpen && isEditorFocused) {
-      // 툴바 높이를 포함한 패딩 계산
-      const toolbarHeight = 60; // 툴바의 높이 (고정값 또는 동적으로 계산 가능)
-      // 툴바가 완전히 키보드 위에 위치하도록 추가 여백 적용
-      const extraPadding = 10;
-      return `${keyboardHeight + toolbarHeight + extraPadding}px`;
-    }
-    return "80px";
-  }, [isKeyboardOpen, isEditorFocused, keyboardHeight]);
 
   // 감정 드로어가 열릴 때 하단바를 숨김
   useEffect(() => {
@@ -527,7 +504,10 @@ const WriteDiaryPage = () => {
                   className={"flex-1 rounded-lg mt-1"}
                   ref={editorContainerRef}
                   style={{
-                    paddingBottom: editorContainerPaddingBottom,
+                    paddingBottom:
+                      isKeyboardOpen && isEditorFocused
+                        ? `${keyboardHeight + 70}px`
+                        : "80px",
                     transition: "padding-bottom 0.2s ease-out",
                   }}
                 >
@@ -543,37 +523,98 @@ const WriteDiaryPage = () => {
           </div>
         </CSSTransition>
       </SwitchTransition>
-      <Toolbar
-        variant={"fixed"}
+
+      {/* 하단 툴바 - 항상 페이지 하단에 고정 */}
+      <div
+        className={"fixed left-0 right-0 z-50"}
         style={{
-          bottom: isKeyboardOpen
-            ? `${isIOS ? keyboardHeight * 0.4 : keyboardHeight * 0.2}px`
-            : "0px",
+          bottom: isIOS
+            ? `calc(${keyboardHeight * 1.1}px)` // iOS에서는 10% 더 올림
+            : `calc(${keyboardHeight * 1.2}px)`, // Android에서는 20% 더 올림
           transition: "bottom 0.3s ease-out",
-          zIndex: 50, // 확실하게 상위 레이어로 표시
+          backgroundColor: "white",
+          borderTop: "1px solid #eaeaea",
+          boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.05)",
         }}
       >
-        <ToolbarGroup>
-          <Button data-style={"ghost"}>
-            <BoldIcon className={"tiptap-button-icon"} />
-          </Button>
-          <Button data-style={"ghost"}>
-            <ItalicIcon className={"tiptap-button-icon"} />
-          </Button>
-        </ToolbarGroup>
+        <Toolbar
+          variant={"fixed"}
+          style={{
+            width: "100%",
+          }}
+          onTouchMove={(e) => e.preventDefault()}
+          onWheel={(e) => e.stopPropagation()}
+        >
+          <ToolbarGroup>
+            <button className={"p-2 rounded"} onClick={handleImageUploadClick}>
+              <ImageIcon className={"w-4 h-4"} />
+            </button>
+          </ToolbarGroup>
 
-        <ToolbarSeparator />
+          <ToolbarSeparator />
 
-        <ToolbarGroup>
-          <Button data-style={"ghost"}>Format</Button>
-        </ToolbarGroup>
+          <ToolbarGroup>
+            <button
+              className={`p-2 rounded ${editorRef.current?.isActive("bold") ? "bg-gray-200" : ""}`}
+              onClick={() =>
+                editorRef.current?.chain().focus().toggleBold().run()
+              }
+            >
+              <BoldIcon className={"w-4 h-4"} />
+            </button>
+            <button
+              className={`p-2 rounded ${editorRef.current?.isActive("italic") ? "bg-gray-200" : ""}`}
+              onClick={() =>
+                editorRef.current?.chain().focus().toggleItalic().run()
+              }
+            >
+              <ItalicIcon className={"w-4 h-4"} />
+            </button>
+          </ToolbarGroup>
 
-        <div className={"flex-1"} />
+          <ToolbarSeparator />
 
-        <ToolbarGroup>
-          <Button data-style={"primary"}>Save</Button>
-        </ToolbarGroup>
-      </Toolbar>
+          <ToolbarGroup>
+            <button
+              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}`}
+              onClick={() =>
+                editorRef.current?.chain().focus().setTextAlign("left").run()
+              }
+            >
+              <AlignLeftIcon className={"w-4 h-4"} />
+            </button>
+            <button
+              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}`}
+              onClick={() =>
+                editorRef.current?.chain().focus().setTextAlign("center").run()
+              }
+            >
+              <AlignCenterIcon className={"w-4 h-4"} />
+            </button>
+            <button
+              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}`}
+              onClick={() =>
+                editorRef.current?.chain().focus().setTextAlign("right").run()
+              }
+            >
+              <AlignRightIcon className={"w-4 h-4"} />
+            </button>
+          </ToolbarGroup>
+
+          <div className={"flex-1"} />
+
+          <ToolbarGroup>
+            <button className={"p-2 rounded"} onClick={toggleKeyboard}>
+              {isKeyboardOpen ? (
+                <KeyboardOff className={"w-4 h-4"} />
+              ) : (
+                <Keyboard className={"w-4 h-4"} />
+              )}
+            </button>
+          </ToolbarGroup>
+        </Toolbar>
+      </div>
+
       <DiaryBookDrawer
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
