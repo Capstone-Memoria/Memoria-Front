@@ -241,7 +241,9 @@ const DiaryContentPage = () => {
               </div>
 
               <LayoutGroup>
-                <MusicPlayer musicFileId={diary.musicFile?.id} />
+                {diary.aiMusicEnabled && (
+                  <MusicPlayer musicFileId={diary.musicFile?.id} />
+                )}
 
                 {/* 일기 내용 */}
                 <motion.div

@@ -220,9 +220,9 @@ const AdminPage = () => {
           <div className={"bg-white p-4 rounded-lg shadow-sm border"}>
             <div className={"flex items-center justify-between"}>
               <div>
-                <p className={"text-sm text-gray-600"}>활성 노드</p>
-                <p className={"text-2xl font-bold text-green-600"}>
-                  {nodes.filter((node) => node.available).length}
+                <p className={"text-sm text-gray-600"}>작업중인 노드</p>
+                <p className={"text-2xl font-bold text-yellow-600"}>
+                  {nodes.filter((node) => !node.available).length}
                 </p>
               </div>
               <MdPowerSettingsNew className={"text-green-500 text-xl"} />
@@ -298,10 +298,10 @@ const AdminPage = () => {
                               "text-xs px-2 py-1 rounded-full",
                               node.available
                                 ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
+                                : "bg-yellow-100 text-yellow-700"
                             )}
                           >
-                            {node.available ? "활성" : "비활성"}
+                            {node.available ? "활성" : "작업중..."}
                           </span>
                         </div>
                         <p
