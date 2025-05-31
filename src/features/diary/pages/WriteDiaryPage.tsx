@@ -1,17 +1,24 @@
 import api from "@/api";
-import Input from "@/components/base/Input";
 import Tiptap from "@/components/editor/Tiptap";
+
+import Button from "@/components/base/Button";
+import Input from "@/components/base/Input";
 import Page from "@/components/page/Page";
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from "@/components/tiptap-ui-primitive/toolbar";
 import DiaryBookDrawer from "@/features/diary/components/DiaryBookDrawer";
 import DiaryBookSelectButton from "@/features/diary/components/DiaryBookSelectButton";
 import EmotionDrawer from "@/features/diary/components/EmotionDrawer";
 import ImageSlider from "@/features/diary/components/ImageSlider";
 import WriteDiaryPageHeader from "@/features/diary/components/WriteDiaryPageHeader";
-import WriteDiaryToolbar from "@/features/diary/components/WriteDiaryToolbar";
 import { EmotionType } from "@/models/Diary";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/react";
+import { BoldIcon, ItalicIcon } from "lucide-react";
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
@@ -169,8 +176,14 @@ const WriteDiaryPage = () => {
           setIsKeyboardOpen(true);
         }
 
-        // 키보드 높이로 하단바 위치 설정 (약간의 여백 추가)
-        setKeyboardHeight(heightDifference + 5);
+        // 키보드 높이를 기기별로 계산
+        // heightDifference는 실제 키보드 높이보다 크게 감지될 수 있음
+        // 플랫폼 및 브라우저별 보정 계수 적용
+        const adjustedKeyboardHeight = isIOS
+          ? heightDifference * 0.8 // iOS는 약 80%의 보정 계수 적용
+          : heightDifference * 0.85; // Android는 약 85%의 보정 계수 적용
+
+        setKeyboardHeight(adjustedKeyboardHeight);
 
         if (!isEditorFocused && editorRef.current?.isFocused) {
           setIsEditorFocused(true);
@@ -393,8 +406,11 @@ const WriteDiaryPage = () => {
   // 에디터 컨테이너 하단 패딩 계산
   const editorContainerPaddingBottom = useMemo(() => {
     if (isKeyboardOpen && isEditorFocused) {
-      const toolbarApproxHeight = 60;
-      return `${keyboardHeight + toolbarApproxHeight}px`;
+      // 툴바 높이를 포함한 패딩 계산
+      const toolbarHeight = 60; // 툴바의 높이 (고정값 또는 동적으로 계산 가능)
+      // 툴바가 완전히 키보드 위에 위치하도록 추가 여백 적용
+      const extraPadding = 10;
+      return `${keyboardHeight + toolbarHeight + extraPadding}px`;
     }
     return "80px";
   }, [isKeyboardOpen, isEditorFocused, keyboardHeight]);
@@ -453,7 +469,7 @@ const WriteDiaryPage = () => {
                   <div className={"text-black text-base"}>{today}</div>
                   <div
                     className={
-                      "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 cursor-pointer ml-auto"
+                      "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 ml-auto"
                     }
                     onClick={() => setIsEmotionDrawerOpen(true)}
                   >
@@ -522,54 +538,42 @@ const WriteDiaryPage = () => {
                     onEditorReady={handleEditorReady}
                   />
                 </div>
-
-                {/* 하단 툴바 */}
-                <WriteDiaryToolbar
-                  isKeyboardOpen={isKeyboardOpen}
-                  isEditorFocused={isEditorFocused}
-                  keyboardHeight={keyboardHeight}
-                  editor={editorRef.current}
-                >
-                  <WriteDiaryToolbar.ButtonGroup>
-                    <WriteDiaryToolbar.ImageButton
-                      onClick={handleImageUploadClick}
-                      editor={editorRef.current}
-                    />
-                    <WriteDiaryToolbar.BoldButton
-                      onClick={() => {}}
-                      editor={editorRef.current}
-                    />
-                    <WriteDiaryToolbar.ItalicButton
-                      onClick={() => {}}
-                      editor={editorRef.current}
-                    />
-                    <WriteDiaryToolbar.Divider />
-                    <WriteDiaryToolbar.AlignButton
-                      onClick={() => {}}
-                      alignment={"left"}
-                      editor={editorRef.current}
-                    />
-                    <WriteDiaryToolbar.AlignButton
-                      onClick={() => {}}
-                      alignment={"center"}
-                      editor={editorRef.current}
-                    />
-                    <WriteDiaryToolbar.AlignButton
-                      onClick={() => {}}
-                      alignment={"right"}
-                      editor={editorRef.current}
-                    />
-                  </WriteDiaryToolbar.ButtonGroup>
-                  <WriteDiaryToolbar.KeyboardButton
-                    onClick={toggleKeyboard}
-                    isKeyboardOpen={isKeyboardOpen}
-                  />
-                </WriteDiaryToolbar>
               </div>
             )}
           </div>
         </CSSTransition>
       </SwitchTransition>
+      <Toolbar
+        variant={"fixed"}
+        style={{
+          bottom: isKeyboardOpen
+            ? `${isIOS ? keyboardHeight * 0.4 : keyboardHeight * 0.2}px`
+            : "0px",
+          transition: "bottom 0.3s ease-out",
+          zIndex: 50, // 확실하게 상위 레이어로 표시
+        }}
+      >
+        <ToolbarGroup>
+          <Button data-style={"ghost"}>
+            <BoldIcon className={"tiptap-button-icon"} />
+          </Button>
+          <Button data-style={"ghost"}>
+            <ItalicIcon className={"tiptap-button-icon"} />
+          </Button>
+        </ToolbarGroup>
+
+        <ToolbarSeparator />
+
+        <ToolbarGroup>
+          <Button data-style={"ghost"}>Format</Button>
+        </ToolbarGroup>
+
+        <div className={"flex-1"} />
+
+        <ToolbarGroup>
+          <Button data-style={"primary"}>Save</Button>
+        </ToolbarGroup>
+      </Toolbar>
       <DiaryBookDrawer
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
