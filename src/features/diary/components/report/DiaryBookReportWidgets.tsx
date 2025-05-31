@@ -15,16 +15,6 @@ import {
 } from "@/models/DiaryBookStatistics";
 import { HTMLAttributes } from "react";
 import { MdFilterDrama } from "react-icons/md";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 interface BaseDiaryBookReportWidgetProps
   extends HTMLAttributes<HTMLDivElement> {
@@ -178,25 +168,53 @@ interface MonthlyAttendanceRankingWidgetProps {
 const MonthlyAttendanceRankingWidget: React.FC<
   MonthlyAttendanceRankingWidgetProps
 > = ({ attendanceRanking }) => {
-  const data =
-    attendanceRanking?.map((item) => ({
-      name: item.userNickname,
-      출석: item.diaryCount,
-    })) || [];
+  const sortedRanking = attendanceRanking
+    ?.slice() // 원본 배열 변경 방지를 위해 복사본 사용
+    .sort((a, b) => b.diaryCount - a.diaryCount); // 출석 횟수 내림차순 정렬
 
   return (
     <BaseDiaryBookReportWidget title={"한달간 일기장 출석 랭킹"}>
-      {data.length > 0 ? (
-        <ResponsiveContainer width={"100%"} height={300}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray={"3 3"} />
-            <XAxis dataKey={"name"} />
-            <YAxis orientation={"right"} width={25} />
-            <Tooltip />
-            <Legend />
-            <Bar barSize={10} dataKey={"출석"} fill={"#8884d8"} />
-          </BarChart>
-        </ResponsiveContainer>
+      {sortedRanking && sortedRanking.length > 0 ? (
+        <div className={"space-y-3"}>
+          {sortedRanking.map((item, index) => (
+            <div
+              key={item.userNickname}
+              className={`flex items-center justify-between rounded-lg shadow-sm hover:bg-gray-100 transition-colors duration-150 border ${
+                index < 3 ? "p-3 bg-gray-50" : "p-2 bg-white"
+              }`}
+            >
+              <div className={"flex items-center space-x-3"}>
+                <span
+                  className={`flex items-center justify-center rounded-full font-semibold text-white ${
+                    index === 0
+                      ? "bg-yellow-400 size-8"
+                      : index === 1
+                        ? "bg-blue-400 size-8"
+                        : index === 2
+                          ? "bg-orange-400 size-8"
+                          : "bg-gray-300 size-6 text-sm"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <span
+                  className={`font-medium ${
+                    index < 3 ? "text-gray-700" : "text-gray-600 text-sm"
+                  }`}
+                >
+                  {item.userNickname}
+                </span>
+              </div>
+              <span
+                className={`text-sm ${
+                  index < 3 ? "text-gray-600" : "text-gray-500 text-xs"
+                }`}
+              >
+                {item.diaryCount}회 출석
+              </span>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className={"text-center text-gray-500"}>
           출석 데이터를 불러오는 중이거나 데이터가 없습니다.
