@@ -42,7 +42,7 @@ const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
       setNotifications(
         notifications.map((notification) =>
           notification.id === id
-            ? { ...notification, isRead: true }
+            ? { ...notification, read: true }
             : notification
         )
       );
