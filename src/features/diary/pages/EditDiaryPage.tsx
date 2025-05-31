@@ -18,8 +18,6 @@ const EditDiaryPage = () => {
     diaryId: string;
   }>();
 
-  
-
   const [diaryTitle, setDiaryTitle] = useState("");
   const [content, setContent] = useState("");
   const [toAddImages, setToAddImages] = useState<File[]>([]);
@@ -38,7 +36,7 @@ const EditDiaryPage = () => {
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
         size: 10,
-        page: 1,
+        page: 0,
       }),
   });
 

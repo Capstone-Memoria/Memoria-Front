@@ -40,20 +40,19 @@ const DiaryListPanel = ({
     isFetchingNextPage, // 다음 페이지 로딩 상태
   } = useInfiniteQuery({
     queryKey: ["fetchDiaryList", diaryBookId, searchQuery], // searchQuery 추가
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = 0 }) =>
       api.diary.fetchDiaryList(diaryBookId, {
         page: pageParam,
         size: PAGE_SIZE,
       }),
-    initialPageParam: 1,
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       // lastPage는 API 응답 전체 (Page<Diary>)
       // lastPage.last는 boolean 값으로, 마지막 페이지인지 여부
-      return lastPage.last
-        ? undefined
-        : (lastPage.pageable.pageNumber == 0
-            ? 1
-            : lastPage.pageable.pageNumber) + 1;
+      if (lastPage.last) {
+        return undefined;
+      }
+      return lastPage.pageable.pageNumber + 1;
     },
   });
 

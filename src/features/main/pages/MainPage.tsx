@@ -25,7 +25,7 @@ const MainPage = () => {
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
         size: 10,
-        page: 1, // TODO: pagination
+        page: 0, // TODO: pagination
       }),
   });
 

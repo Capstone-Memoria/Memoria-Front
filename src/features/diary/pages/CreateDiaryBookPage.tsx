@@ -105,7 +105,7 @@ const CreateDiaryPage = () => {
       coverColor: "bg-gray-500", // 기본 색상 설정
     }));
 
-    setDiaryCoverItems((prevItems) => [...prevItems, ...newCoverItems]);
+    setDiaryCoverItems((prevItems) => [...newCoverItems, ...prevItems]);
 
     fileInputRef.current.value = "";
   };

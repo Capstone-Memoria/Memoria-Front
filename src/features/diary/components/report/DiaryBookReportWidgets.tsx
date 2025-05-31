@@ -50,7 +50,7 @@ const WhatIsOurDiaryBookWidget: React.FC<WhatIsOurDiaryBookWidgetProps> = ({
 }) => {
   return (
     <BaseDiaryBookReportWidget
-      title={"이번달 일기장 요약"}
+      title={"우리 일기장에 대해서"}
       className={"text-center"}
     >
       {diaryBookName && oneLineSummary ? (
