@@ -39,7 +39,7 @@ const DiaryBookReportWidget: React.FC<DiaryBookReportWidgetProps> = ({
       <div className={"flex "}>
         <div className={"flex flex-col gap-1 flex-1"}>
           <div className={"flex items-center gap-2"}>
-            <MdAutoAwesome />
+            <MdAutoAwesome className={"basis-[48px]"} />
             <div className={"font-semibold "}>{statistics?.oneLineSummary}</div>
           </div>
         </div>
