@@ -181,7 +181,7 @@ const DiaryContentPage = () => {
                             imageClassName={"object-contain"}
                             imageId={image.id}
                             className={
-                              "h-48 w-fit overflow-hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+                              "h-48 w-fit bg-transparent overflow-hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
                             }
                           />
                         </div>
