@@ -1,22 +1,19 @@
 import api from "@/api";
-import Tiptap from "@/components/editor/Tiptap";
 
 import Input from "@/components/base/Input";
+import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
-} from "@/components/tiptap-ui-primitive/toolbar";
 import DiaryBookDrawer from "@/features/diary/components/DiaryBookDrawer";
 import DiaryBookSelectButton from "@/features/diary/components/DiaryBookSelectButton";
 import EmotionDrawer from "@/features/diary/components/EmotionDrawer";
 import ImageSlider from "@/features/diary/components/ImageSlider";
 import WriteDiaryPageHeader from "@/features/diary/components/WriteDiaryPageHeader";
+import WriteDiaryToolbar from "@/features/diary/components/WriteDiaryToolbar";
 import { EmotionType } from "@/models/Diary";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/react";
+
 import {
   AlignCenterIcon,
   AlignLeftIcon,
@@ -27,6 +24,7 @@ import {
   Keyboard,
   KeyboardOff,
 } from "lucide-react";
+
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
@@ -164,6 +162,7 @@ const WriteDiaryPage = () => {
           setIsKeyboardOpen(true);
         }
         setKeyboardHeight(resizeHeight);
+
 
         if (!isEditorFocused && editorRef.current?.isFocused) {
           setIsEditorFocused(true);
@@ -446,7 +445,7 @@ const WriteDiaryPage = () => {
                   <div className={"text-black text-base"}>{today}</div>
                   <div
                     className={
-                      "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 ml-auto"
+                      "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 cursor-pointer ml-auto"
                     }
                     onClick={() => setIsEmotionDrawerOpen(true)}
                   >
@@ -518,103 +517,54 @@ const WriteDiaryPage = () => {
                     onEditorReady={handleEditorReady}
                   />
                 </div>
+
+                {/* 하단 툴바 */}
+                <WriteDiaryToolbar
+                  isKeyboardOpen={isKeyboardOpen}
+                  isEditorFocused={isEditorFocused}
+                  keyboardHeight={keyboardHeight}
+                  editor={editorRef.current}
+                >
+                  <WriteDiaryToolbar.ButtonGroup>
+                    <WriteDiaryToolbar.ImageButton
+                      onClick={handleImageUploadClick}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.BoldButton
+                      onClick={() => {}}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.ItalicButton
+                      onClick={() => {}}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.Divider />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"left"}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"center"}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"right"}
+                      editor={editorRef.current}
+                    />
+                  </WriteDiaryToolbar.ButtonGroup>
+                  <WriteDiaryToolbar.KeyboardButton
+                    onClick={toggleKeyboard}
+                    isKeyboardOpen={isKeyboardOpen}
+                  />
+                </WriteDiaryToolbar>
               </div>
             )}
           </div>
         </CSSTransition>
       </SwitchTransition>
-
-      {/* 하단 툴바 - 항상 페이지 하단에 고정 */}
-      <div
-        className={"fixed left-0 right-0 z-50"}
-        style={{
-          bottom: isIOS
-            ? `calc(${keyboardHeight * 1.1}px)` // iOS에서는 10% 더 올림
-            : `calc(${keyboardHeight * 1.2}px)`, // Android에서는 20% 더 올림
-          transition: "bottom 0.3s ease-out",
-          backgroundColor: "white",
-          borderTop: "1px solid #eaeaea",
-          boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <Toolbar
-          variant={"fixed"}
-          style={{
-            width: "100%",
-          }}
-          onTouchMove={(e) => e.preventDefault()}
-          onWheel={(e) => e.stopPropagation()}
-        >
-          <ToolbarGroup>
-            <button className={"p-2 rounded"} onClick={handleImageUploadClick}>
-              <ImageIcon className={"w-4 h-4"} />
-            </button>
-          </ToolbarGroup>
-
-          <ToolbarSeparator />
-
-          <ToolbarGroup>
-            <button
-              className={`p-2 rounded ${editorRef.current?.isActive("bold") ? "bg-gray-200" : ""}`}
-              onClick={() =>
-                editorRef.current?.chain().focus().toggleBold().run()
-              }
-            >
-              <BoldIcon className={"w-4 h-4"} />
-            </button>
-            <button
-              className={`p-2 rounded ${editorRef.current?.isActive("italic") ? "bg-gray-200" : ""}`}
-              onClick={() =>
-                editorRef.current?.chain().focus().toggleItalic().run()
-              }
-            >
-              <ItalicIcon className={"w-4 h-4"} />
-            </button>
-          </ToolbarGroup>
-
-          <ToolbarSeparator />
-
-          <ToolbarGroup>
-            <button
-              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}`}
-              onClick={() =>
-                editorRef.current?.chain().focus().setTextAlign("left").run()
-              }
-            >
-              <AlignLeftIcon className={"w-4 h-4"} />
-            </button>
-            <button
-              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}`}
-              onClick={() =>
-                editorRef.current?.chain().focus().setTextAlign("center").run()
-              }
-            >
-              <AlignCenterIcon className={"w-4 h-4"} />
-            </button>
-            <button
-              className={`p-2 rounded ${editorRef.current?.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}`}
-              onClick={() =>
-                editorRef.current?.chain().focus().setTextAlign("right").run()
-              }
-            >
-              <AlignRightIcon className={"w-4 h-4"} />
-            </button>
-          </ToolbarGroup>
-
-          <div className={"flex-1"} />
-
-          <ToolbarGroup>
-            <button className={"p-2 rounded"} onClick={toggleKeyboard}>
-              {isKeyboardOpen ? (
-                <KeyboardOff className={"w-4 h-4"} />
-              ) : (
-                <Keyboard className={"w-4 h-4"} />
-              )}
-            </button>
-          </ToolbarGroup>
-        </Toolbar>
-      </div>
-
       <DiaryBookDrawer
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}

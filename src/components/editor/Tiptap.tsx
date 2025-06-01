@@ -1,8 +1,9 @@
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
-import { Editor, EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useState } from "react";
+import Toolbar from "./Toolbar";
 
 interface TiptapProps {
   content?: string; // HTML 형식의 초기 콘텐츠
@@ -84,6 +85,19 @@ const Tiptap: React.FC<TiptapProps> = ({
       <div className={"h-full cursor-text"} onClick={handleWrapperClick}>
         <EditorContent editor={editor} />
       </div>
+      <BubbleMenu
+        editor={editor}
+        tippyOptions={{
+          duration: 100,
+          placement: "bottom",
+          offset: [0, 8],
+        }}
+        className={
+          "bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-2"
+        }
+      >
+        <Toolbar editor={editor} />
+      </BubbleMenu>
     </div>
   );
 };
