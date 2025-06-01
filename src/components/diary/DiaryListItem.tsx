@@ -76,7 +76,7 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
                 <img
                   src={getEmotionImagePath(item.emotion.toLowerCase())}
                   alt={item.emotion}
-                  className={"w-5 h-5 object-contain"}
+                  className={"size-6 object-contain"}
                 />
               </div>
             )}

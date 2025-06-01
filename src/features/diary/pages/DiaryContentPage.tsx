@@ -261,7 +261,7 @@ const DiaryContentPage = () => {
                     <img
                       src={getEmotionImagePath(diary.emotion.toLowerCase())}
                       alt={diary.emotion}
-                      className={"w-8 h-8 object-contain"}
+                      className={"size-10 object-contain"}
                     />
                   </div>
                 </div>
