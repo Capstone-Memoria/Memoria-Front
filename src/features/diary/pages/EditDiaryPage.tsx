@@ -7,6 +7,7 @@ import EmotionDrawer from "@/features/diary/components/EmotionDrawer";
 import ImageUploader from "@/features/diary/components/ImageUploader";
 import { EmotionType } from "@/models/Diary";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import {
@@ -32,6 +33,7 @@ const EditDiaryPage = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
     null
   );
+  const [diaryDate, setDiaryDate] = useState<DateTime | null>(null);
 
   /* Server-State */
   const { data: diaryData, isLoading: isDiaryLoading } = useQuery({
@@ -56,6 +58,13 @@ const EditDiaryPage = () => {
       setContent(diaryData.content);
       if (diaryData.emotion) {
         setSelectedEmotion(diaryData.emotion as EmotionType);
+      }
+      if (diaryData.createdAt) {
+        const diaryDateTime =
+          typeof diaryData.createdAt === "string"
+            ? DateTime.fromISO(diaryData.createdAt)
+            : diaryData.createdAt;
+        setDiaryDate(diaryDateTime);
       }
     }
   }, [diaryData]);
@@ -254,6 +263,8 @@ const EditDiaryPage = () => {
         onOpenChange={setIsEmotionDrawerOpen}
         onSelectEmotion={handleEmotionSelect}
         selectedEmotion={selectedEmotion}
+        date={diaryDate || undefined}
+        isEditMode={true}
       />
     </Page.Container>
   );

@@ -255,18 +255,14 @@ const DiaryContentPage = () => {
                 <div className={"flex justify-center items-center mt-2"}>
                   <div
                     className={
-                      "flex items-center gap-1 py-1 px-2 rounded-full bg-gray-50"
+                      "flex items-center justify-center py-1 px-2 rounded-full bg-gray-50"
                     }
                   >
                     <img
                       src={getEmotionImagePath(diary.emotion.toLowerCase())}
                       alt={diary.emotion}
-                      className={"w-5 h-5 object-contain"}
+                      className={"w-8 h-8 object-contain"}
                     />
-                    <span className={"text-xs text-gray-600"}>
-                      {diary.emotion.charAt(0).toUpperCase() +
-                        diary.emotion.slice(1).toLowerCase()}
-                    </span>
                   </div>
                 </div>
               )}

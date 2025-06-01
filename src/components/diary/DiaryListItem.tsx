@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Diary } from "@/models/Diary";
 import { Dot } from "lucide-react";
 import { HTMLAttributes, useMemo } from "react";
-import { IoMdHeart } from "react-icons/io";
+import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import Image from "../base/Image";
 
@@ -54,26 +54,32 @@ const DiaryListItem: React.FC<DiaryListItemProps> = ({ item, ...props }) => {
       <div className={"py-2 px-3 flex flex-col w-full "}>
         <div className={"flex items-center gap-1"}>
           <div className={"font-medium"}>{item.title}</div>
-          {item.emotion && (
-            <img
-              src={getEmotionImagePath(item.emotion.toLowerCase())}
-              alt={item.emotion}
-              className={"w-4 h-4 object-contain"}
-            />
-          )}
         </div>
         <div className={"text-xs text-gray-500 overflow-hidden"}>{summary}</div>
         <div className={"flex-1"} />
         <div className={"flex justify-between w-full"}>
           <div className={"flex gap-2 text-gray-600"}>
             <div className={"flex items-center gap-1 text-xs"}>
-              <IoMdHeart className={"text-xs"} />
+              {item.reactionCount && item.reactionCount > 0 ? (
+                <IoMdHeart className={"text-xs text-red-500"} />
+              ) : (
+                <IoMdHeartEmpty className={"text-xs"} />
+              )}
               <div>{item.reactionCount ?? 0}</div>
             </div>
             <div className={"flex justify-center items-center gap-1 text-xs"}>
               <CommentIcon className={"size-xs"} />
               <div>{item.commentCount ?? 0}</div>
             </div>
+            {item.emotion && (
+              <div className={"flex items-center gap-1 text-xs"}>
+                <img
+                  src={getEmotionImagePath(item.emotion.toLowerCase())}
+                  alt={item.emotion}
+                  className={"w-5 h-5 object-contain"}
+                />
+              </div>
+            )}
           </div>
           <div className={"text-xs text-gray-600 flex items-center"}>
             <div>{item.createdBy?.nickName}</div>

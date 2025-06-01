@@ -213,8 +213,8 @@ const WriteDiaryPage = () => {
     setContent(newContent);
   }, []);
 
-  // 오늘 날짜
-  const today = DateTime.now().toLocaleString(DateTime.DATE_MED);
+  // 오늘 날짜 요일까지.
+  const today = DateTime.now().setLocale("ko").toFormat("yyyy.MM.dd cccc");
 
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
@@ -373,6 +373,7 @@ const WriteDiaryPage = () => {
         onOpenChange={setIsEmotionDrawerOpen}
         onSelectEmotion={handleEmotionSelect}
         selectedEmotion={selectedEmotion}
+        isEditMode={false}
       />
     </Page.Container>
   );

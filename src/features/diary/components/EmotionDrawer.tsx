@@ -24,6 +24,8 @@ interface EmotionDrawerProps {
   onOpenChange: Dispatch<SetStateAction<boolean>>;
   onSelectEmotion: (emotionType: EmotionType) => void;
   selectedEmotion: EmotionType | null;
+  date?: DateTime; // 선택적 날짜 파라미터
+  isEditMode?: boolean; // 수정 모드 여부
 }
 
 const EmotionDrawer = ({
@@ -31,7 +33,14 @@ const EmotionDrawer = ({
   onOpenChange,
   onSelectEmotion,
   selectedEmotion,
+  date,
+  isEditMode = false,
 }: EmotionDrawerProps) => {
+  // 현재 날짜와 요일 (한국어 로케일 적용)
+  const now = date ? date.setLocale("ko") : DateTime.now().setLocale("ko");
+  const formattedDate = now.toFormat("yyyy.MM.dd");
+  const formattedDayOfWeek = now.toFormat("cccc");
+
   // 감정 선택 핸들러
   const handleSelectEmotion = (
     emotionName: string,
@@ -58,11 +67,13 @@ const EmotionDrawer = ({
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent className={"px-5 pb-10 flex flex-col items-center"}>
-        {/* 0000.00.00 토요일 형식*/}
+        {/* 날짜와 요일 표시 */}
         <div className={"text-xs pt-5 text-gray-400"}>
-          {DateTime.now().toFormat("yyyy.MM.dd")} {DateTime.now().toFormat("")}
+          {formattedDate} {formattedDayOfWeek}
         </div>
-        <div className={"pb-5"}>오늘은 어떤 하루였나요?</div>
+        <div className={"pb-5 mt-1"}>
+          {isEditMode ? `이날의 감정은 어땠나요?` : `오늘은 어떤 하루였나요?`}
+        </div>
         <div className={"w-full space-y-4 px-2"}>
           {emotionRows.map((row, rowIndex) => (
             <div key={rowIndex} className={"grid grid-cols-3 gap-4"}>
