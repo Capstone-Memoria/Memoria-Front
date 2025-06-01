@@ -116,10 +116,10 @@ const MainPage = () => {
       <div className={"px-4 py-6"}>
         <div className={"my-6 flex items-center justify-between"}>
           <div>
-            <p className={"font-semibold text-xl"}>
+            <p className={"font-semibold text-xl md:text-2xl"}>
               {authStore.context?.user?.nickName} 님의 책장,
             </p>
-            <p className={"font-regular text-gray-1 text-sm"}>
+            <p className={"font-regular text-gray-1 text-sm md:text-base"}>
               {filteredDiaryBooks.length}권의 일기장
             </p>
           </div>

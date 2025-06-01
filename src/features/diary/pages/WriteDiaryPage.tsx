@@ -454,11 +454,11 @@ const WriteDiaryPage = () => {
                       <img
                         src={getEmotionImagePath(selectedEmotion)}
                         alt={"선택된 감정"}
-                        className={"size-7 object-contain"}
+                        className={"size-8 md:size-9 object-contain"}
                       />
                     ) : (
                       <MdOutlineAddReaction
-                        className={"size-5 text-gray-500"}
+                        className={"size-6 md:size-7 text-gray-500"}
                       />
                     )}
                   </div>

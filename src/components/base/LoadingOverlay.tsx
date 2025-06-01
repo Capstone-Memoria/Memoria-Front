@@ -29,18 +29,26 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     >
       <div
         ref={nodeRef}
-        className={"fixed inset-0 z-[9999] flex flex-col py-30 bg-white p-4"}
+        className={
+          "fixed inset-0 z-[9999] flex flex-col py-30 md:py-40 md:px-10 bg-white p-4"
+        }
       >
-        <div className={"max-w-md w-full flex flex-col"}>
-          <p className={"text-black mb-3 font-medium whitespace-pre-line"}>
+        <div className={"w-full flex flex-col"}>
+          <p
+            className={
+              "text-black md:text-xl mb-3 font-medium whitespace-pre-line"
+            }
+          >
             {message}
           </p>
 
           <div className={"mb-30"}>
-            <p className={"text-sm text-gray-4 whitespace-pre-line"}>{tip}</p>
+            <p className={"text-sm md:text-lg text-gray-4 whitespace-pre-line"}>
+              {tip}
+            </p>
           </div>
 
-          <div className={"flex justify-center w-full"}>
+          <div className={"flex justify-center w-full md:mt-20"}>
             <LoadingSpinner size={spinnerSize} color={spinnerColor} />
           </div>
         </div>
