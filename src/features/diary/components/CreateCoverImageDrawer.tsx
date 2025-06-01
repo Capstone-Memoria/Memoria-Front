@@ -9,12 +9,14 @@ interface CreateCoverImageDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  onImageCreate?: (imageBase64: string) => void;
 }
 
 export const CreateCoverImageDrawer = ({
   open,
   onOpenChange,
   children,
+  onImageCreate,
 }: CreateCoverImageDrawerProps) => {
   const [currentPanel, setCurrentPanel] = useState<"keyword" | "preview">(
     "keyword"
@@ -35,6 +37,9 @@ export const CreateCoverImageDrawer = ({
     mutationFn: (description: string) => api.ai.generateCoverImage(description),
     onSuccess: (data) => {
       setCurrentImageBase64(data);
+      if (onImageCreate) {
+        onImageCreate(data);
+      }
     },
     onError: () => {
       setIsError(true);
