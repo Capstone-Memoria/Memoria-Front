@@ -2,9 +2,10 @@ import api from "@/api";
 import Input from "@/components/base/Input";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiMore2Fill } from "react-icons/ri";
@@ -16,6 +17,7 @@ const ViewDiaryListPage = () => {
   /* Properties */
   const navigate = useNavigate();
   const { diaryBookId } = useParams();
+  const authStore = useAuthStore();
 
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,23 +35,31 @@ const ViewDiaryListPage = () => {
     queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
   });
 
+  const isOwner = useMemo(() => {
+    if (!data) return false;
+    return data.owner.email === authStore.context?.user?.email;
+  }, [data, authStore.context?.user?.email]);
+
   /* UI */
   const menuItems = [
-    {
-      label: "일기장 관리",
-      onClick: () => navigate(`/diary-book/${diaryBookId}/manage`),
-    },
-    {
-      label: "일기장 멤버 관리",
-      onClick: () => navigate(`/diary-book/${diaryBookId}/members`),
-    },
+    ...(isOwner
+      ? [
+          {
+            label: "일기장 관리",
+            onClick: () => navigate(`/diary-book/${diaryBookId}/manage`),
+          },
+          {
+            label: "일기장 멤버 관리",
+            onClick: () => navigate(`/diary-book/${diaryBookId}/members`),
+          },
+        ]
+      : []),
     {
       label: "분석 보고서 보기",
       onClick: () => navigate(`/diary-book/${diaryBookId}/report`),
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
-
       onClick: async () => {
         if (!diaryBookId) {
           console.error("Diary book ID is missing!");

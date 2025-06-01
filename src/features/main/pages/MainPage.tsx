@@ -36,6 +36,11 @@ const MainPage = () => {
     null
   );
 
+  const isOwner = useMemo(() => {
+    if (!selectedDiaryBook || !authStore.context?.user) return false;
+    return selectedDiaryBook.owner.email === authStore.context.user.email;
+  }, [selectedDiaryBook, authStore.context?.user]);
+
   const filteredDiaryBooks = useMemo(() => {
     if (tab === "all") {
       return data?.content ?? [];
@@ -81,15 +86,20 @@ const MainPage = () => {
 
   const menuItems = selectedDiaryBook
     ? [
-        {
-          label: "일기장 관리",
-          onClick: () => navigate(`/diary-book/${selectedDiaryBook.id}/manage`),
-        },
-        {
-          label: "일기장 멤버 관리",
-          onClick: () =>
-            navigate(`/diary-book/${selectedDiaryBook.id}/members`),
-        },
+        ...(isOwner
+          ? [
+              {
+                label: "일기장 관리",
+                onClick: () =>
+                  navigate(`/diary-book/${selectedDiaryBook.id}/manage`),
+              },
+              {
+                label: "일기장 멤버 관리",
+                onClick: () =>
+                  navigate(`/diary-book/${selectedDiaryBook.id}/members`),
+              },
+            ]
+          : []),
         {
           label: selectedDiaryBook.isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
           onClick: handlePinToggle,
