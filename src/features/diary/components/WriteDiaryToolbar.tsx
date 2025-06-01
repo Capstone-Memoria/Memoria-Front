@@ -108,7 +108,22 @@ const BoldButton: React.FC<BoldButtonProps> = ({
   isActive,
   editor,
 }) => {
-  const isButtonActive = editor ? editor.isActive("bold") : isActive;
+  const [internalIsActive, setInternalIsActive] = React.useState(false);
+
+  React.useEffect(() => {
+    if (editor) {
+      const updateButtonState = () => {
+        setInternalIsActive(editor.isActive("bold"));
+      };
+      editor.on("transaction", updateButtonState);
+      // Initial state
+      updateButtonState();
+      return () => {
+        editor.off("transaction", updateButtonState);
+      };
+    }
+    setInternalIsActive(!!isActive);
+  }, [editor, isActive]);
 
   const handleClick = () => {
     if (editor) {
@@ -123,7 +138,7 @@ const BoldButton: React.FC<BoldButtonProps> = ({
       onClick={handleClick}
       className={cn(
         "text-gray-600 flex items-center justify-center w-10 h-10 rounded-md hover:bg-gray-100 toolbar-button",
-        isButtonActive ? "bg-gray-100" : "",
+        internalIsActive ? "bg-gray-100" : "",
         className
       )}
       disabled={
@@ -149,7 +164,22 @@ const ItalicButton: React.FC<ItalicButtonProps> = ({
   isActive,
   editor,
 }) => {
-  const isButtonActive = editor ? editor.isActive("italic") : isActive;
+  const [internalIsActive, setInternalIsActive] = React.useState(false);
+
+  React.useEffect(() => {
+    if (editor) {
+      const updateButtonState = () => {
+        setInternalIsActive(editor.isActive("italic"));
+      };
+      editor.on("transaction", updateButtonState);
+      // Initial state
+      updateButtonState();
+      return () => {
+        editor.off("transaction", updateButtonState);
+      };
+    }
+    setInternalIsActive(!!isActive);
+  }, [editor, isActive]);
 
   const handleClick = () => {
     if (editor) {
@@ -164,7 +194,7 @@ const ItalicButton: React.FC<ItalicButtonProps> = ({
       onClick={handleClick}
       className={cn(
         "text-gray-600 flex items-center justify-center w-10 h-10 rounded-md hover:bg-gray-100 toolbar-button",
-        isButtonActive ? "bg-gray-100" : "",
+        internalIsActive ? "bg-gray-100" : "",
         className
       )}
       disabled={
@@ -190,9 +220,24 @@ const AlignButton: React.FC<AlignButtonProps> = ({
   alignment,
   editor,
 }) => {
-  const isAlignActive = editor
-    ? editor.isActive({ textAlign: alignment })
-    : false;
+  const [internalIsActive, setInternalIsActive] = React.useState(false);
+
+  React.useEffect(() => {
+    if (editor) {
+      const updateButtonState = () => {
+        setInternalIsActive(editor.isActive({ textAlign: alignment }));
+      };
+      editor.on("transaction", updateButtonState);
+      // Initial state
+      updateButtonState();
+      return () => {
+        editor.off("transaction", updateButtonState);
+      };
+    }
+    // If editor is not available, we assume it's not active, or rely on external prop if provided.
+    // For this component, we'll default to false if no editor.
+    setInternalIsActive(false);
+  }, [editor, alignment]);
 
   const handleClick = () => {
     if (editor) {
@@ -233,7 +278,7 @@ const AlignButton: React.FC<AlignButtonProps> = ({
       onClick={handleClick}
       className={cn(
         "text-gray-600 flex items-center justify-center w-10 h-10 rounded-md hover:bg-gray-100 toolbar-button",
-        isAlignActive ? "bg-gray-100" : "",
+        internalIsActive ? "bg-gray-100" : "",
         className
       )}
       title={getAlignmentTitle()}

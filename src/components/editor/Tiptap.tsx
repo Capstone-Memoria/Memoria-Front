@@ -37,7 +37,7 @@ const Tiptap: React.FC<TiptapProps> = ({
     content,
     editorProps: {
       attributes: {
-        class: "prose focus:outline-none min-h-[200px]",
+        class: "prose focus:outline-none min-h-[200px] max-w-none",
       },
     },
     onUpdate: ({ editor }) => {
@@ -81,7 +81,7 @@ const Tiptap: React.FC<TiptapProps> = ({
   }
 
   return (
-    <div className={"relative h-full"}>
+    <div className={"relative h-full w-full"}>
       <div className={"h-full cursor-text"} onClick={handleWrapperClick}>
         <EditorContent editor={editor} />
       </div>

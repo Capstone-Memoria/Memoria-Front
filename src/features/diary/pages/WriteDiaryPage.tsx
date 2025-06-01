@@ -316,6 +316,9 @@ const WriteDiaryPage = () => {
                   ref={editorContainerRef}
                 >
                   <Tiptap
+                    onEditorReady={(editor) => {
+                      editorRef.current = editor;
+                    }}
                     content={content}
                     placeholder={"입력하세요."}
                     onContentUpdate={handleContentUpdate}
@@ -330,6 +333,7 @@ const WriteDiaryPage = () => {
                     />
                     <WriteDiaryToolbar.BoldButton
                       onClick={() => {}}
+                      isActive={editorRef.current?.isActive("bold")}
                       editor={editorRef.current}
                     />
                     <WriteDiaryToolbar.ItalicButton
