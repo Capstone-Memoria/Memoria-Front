@@ -1,7 +1,10 @@
 import { type TextAlignment } from "@/features/diary/pages/WriteDiaryPage";
+import { useVisualViewport } from "@/hooks/useVisualViewport";
 import { cn } from "@/lib/utils/className";
+import { useScroll, useWindowScroll } from "@reactuses/core";
 import { Editor } from "@tiptap/react";
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   FiAlignCenter,
   FiAlignLeft,
@@ -15,21 +18,16 @@ import { MdKeyboard } from "react-icons/md";
 
 type Props = {
   className?: string;
-  isKeyboardOpen: boolean;
-  isEditorFocused: boolean;
-  keyboardHeight: number;
-  editor?: Editor | null;
 };
 
 const WriteDiaryToolbar: React.FC<React.PropsWithChildren<Props>> = ({
   className,
   children,
-  isKeyboardOpen,
-  isEditorFocused,
-  keyboardHeight,
-  editor,
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
+  useVisualViewport();
+  const scrolled = useWindowScroll();
+  const bodyScroll = useScroll(document.body);
 
   // 하단 툴바에서 스크롤을 방지하는 로직
   useEffect(() => {
@@ -54,25 +52,21 @@ const WriteDiaryToolbar: React.FC<React.PropsWithChildren<Props>> = ({
     };
   }, []);
 
-  return (
+  return createPortal(
     <div
       ref={toolbarRef}
       className={cn(
-        "flex items-center justify-between py-3 px-4 border-t border-gray-200 bg-white shadow-top",
+        "flex items-center justify-between h-[60px] py-3 px-4 border-t border-gray-200 bg-white shadow-top",
+        "absolute left-0 right-0 z-10",
         className
       )}
       style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: isKeyboardOpen && isEditorFocused ? `${keyboardHeight}px` : 0,
-        zIndex: 50,
-        transition: "bottom 0.2s ease-out",
-        touchAction: "none",
+        top: `calc(var(--viewport-height) - 60px + ${scrolled.y + bodyScroll[1]}px)`,
       }}
     >
       {children}
-    </div>
+    </div>,
+    document.body
   );
 };
 

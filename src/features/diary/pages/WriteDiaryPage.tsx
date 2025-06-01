@@ -14,17 +14,6 @@ import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/react";
 
-import {
-  AlignCenterIcon,
-  AlignLeftIcon,
-  AlignRightIcon,
-  BoldIcon,
-  ImageIcon,
-  ItalicIcon,
-  Keyboard,
-  KeyboardOff,
-} from "lucide-react";
-
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
@@ -58,7 +47,6 @@ const WriteDiaryPage = () => {
   // 키보드 및 에디터 포커스 상태
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   // 이미지 관련 상태
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
@@ -125,114 +113,6 @@ const WriteDiaryPage = () => {
       setIsEmotionDrawerOpen(true);
     }
   }, [diaryBookId, selectedEmotion]);
-
-  // 키보드 및 에디터 포커스 관리 - VisualViewport API 활용
-  useEffect(() => {
-    const editorNode = editorContainerRef.current;
-
-    // 에디터 포커스 이벤트 핸들러
-    const handleFocusIn = (event: FocusEvent) => {
-      if ((event.target as HTMLElement)?.closest?.(".ProseMirror")) {
-        setIsEditorFocused(true);
-      }
-    };
-
-    const handleFocusOut = (event: FocusEvent) => {
-      setTimeout(() => {
-        const activeEl = document.activeElement;
-        if (
-          !editorNode?.contains(activeEl) &&
-          !activeEl?.closest(".toolbar-button")
-        ) {
-          setIsEditorFocused(false);
-        }
-      }, 100);
-    };
-
-    // VisualViewport 리사이즈 핸들러
-    const handleVisualViewportResize = (event: Event) => {
-      if (!window.visualViewport) return;
-
-      // window.innerHeight와 visualViewport.height의 차이로 키보드 높이 계산
-      const resizeHeight = window.innerHeight - window.visualViewport.height;
-
-      if (resizeHeight > 100) {
-        // 키보드가 열린 상태로 설정
-        if (!isKeyboardOpen) {
-          setIsKeyboardOpen(true);
-        }
-        setKeyboardHeight(resizeHeight);
-
-
-        if (!isEditorFocused && editorRef.current?.isFocused) {
-          setIsEditorFocused(true);
-        }
-      } else {
-        if (isKeyboardOpen) setIsKeyboardOpen(false);
-        setKeyboardHeight(0);
-      }
-    };
-
-    // 이벤트 리스너 등록
-    if (editorNode) {
-      editorNode.addEventListener("focusin", handleFocusIn);
-      editorNode.addEventListener("focusout", handleFocusOut);
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener(
-        "resize",
-        handleVisualViewportResize
-      );
-      // 초기 상태 확인
-      handleVisualViewportResize({
-        currentTarget: window.visualViewport,
-      } as unknown as Event);
-    }
-
-    // 메타 태그 설정
-    const viewportMeta = document.querySelector('meta[name="viewport"]');
-    if (
-      viewportMeta &&
-      !viewportMeta
-        .getAttribute("content")
-        ?.includes("interactive-widget=resizes-content")
-    ) {
-      viewportMeta.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height, interactive-widget=resizes-content"
-      );
-    }
-
-    // VirtualKeyboard API 사용 (지원하는 브라우저에서만)
-    if ("virtualKeyboard" in navigator) {
-      // TypeScript에서 VirtualKeyboard API를 인식하지 못하므로 타입을 정의합니다
-      interface VirtualKeyboard {
-        overlaysContent: boolean;
-      }
-
-      interface NavigatorWithVirtualKeyboard extends Navigator {
-        virtualKeyboard: VirtualKeyboard;
-      }
-
-      (
-        navigator as NavigatorWithVirtualKeyboard
-      ).virtualKeyboard.overlaysContent = true;
-    }
-
-    return () => {
-      if (editorNode) {
-        editorNode.removeEventListener("focusin", handleFocusIn);
-        editorNode.removeEventListener("focusout", handleFocusOut);
-      }
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener(
-          "resize",
-          handleVisualViewportResize
-        );
-      }
-    };
-  }, [isKeyboardOpen, isEditorFocused]);
 
   // 선택된 일기장
   const selectedDiaryBook = useMemo(() => {
@@ -328,43 +208,6 @@ const WriteDiaryPage = () => {
     setSettings(newSettings);
   };
 
-  // 에디터 준비 콜백
-  const handleEditorReady = useCallback((currentEditor: Editor) => {
-    editorRef.current = currentEditor;
-
-    // DOM 이벤트 방식으로 키보드 이벤트 처리
-    const editorDOM = currentEditor.view.dom;
-    editorDOM.addEventListener("keydown", (event) => {
-      // 엔터 키가 눌렸을 때
-      if (event.key === "Enter") {
-        // 약간의 지연 후에 현재 커서 위치로 스크롤 조정
-        setTimeout(() => {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            if (range) {
-              // 현재 커서 위치의 DOM 요소를 가져옴
-              const rect = range.getBoundingClientRect();
-
-              // 커서가 화면 아래쪽에 있으면 그쪽으로 스크롤
-              if (rect.bottom > window.innerHeight - 200) {
-                // 부드럽게 커서 위치로 스크롤
-                window.scrollBy({
-                  top: Math.min(100, rect.bottom - (window.innerHeight - 200)),
-                  behavior: "smooth",
-                });
-              }
-            }
-          }
-        }, 50); // 약간의 지연을 두어 DOM이 업데이트된 후 스크롤 처리
-      }
-    });
-
-    if (currentEditor.isFocused) {
-      setIsEditorFocused(true);
-    }
-  }, []);
-
   // 에디터 내용 업데이트
   const handleContentUpdate = useCallback((newContent: string) => {
     setContent(newContent);
@@ -372,37 +215,6 @@ const WriteDiaryPage = () => {
 
   // 오늘 날짜
   const today = DateTime.now().toLocaleString(DateTime.DATE_MED);
-
-  // 키보드 토글 함수
-  const toggleKeyboard = () => {
-    if (isKeyboardOpen) {
-      editorRef.current?.commands.blur();
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-      setIsKeyboardOpen(false);
-      setIsEditorFocused(false);
-      setKeyboardHeight(0);
-    } else {
-      editorRef.current?.chain().focus("end").run();
-      setIsEditorFocused(true);
-      setIsKeyboardOpen(true);
-      setKeyboardHeight(DEFAULT_KEYBOARD_HEIGHT - 5);
-    }
-  };
-
-  // 감정 드로어가 열릴 때 하단바를 숨김
-  useEffect(() => {
-    if (isEmotionDrawerOpen) {
-      // 감정 드로어가 열리면 키보드를 닫고 하단바를 숨김
-      if (isKeyboardOpen) {
-        editorRef.current?.commands.blur();
-        setIsKeyboardOpen(false);
-        setIsEditorFocused(false);
-        setKeyboardHeight(0);
-      }
-    }
-  }, [isEmotionDrawerOpen, isKeyboardOpen]);
 
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
@@ -502,33 +314,19 @@ const WriteDiaryPage = () => {
                 <div
                   className={"flex-1 rounded-lg mt-1"}
                   ref={editorContainerRef}
-                  style={{
-                    paddingBottom:
-                      isKeyboardOpen && isEditorFocused
-                        ? `${keyboardHeight + 70}px`
-                        : "80px",
-                    transition: "padding-bottom 0.2s ease-out",
-                  }}
                 >
                   <Tiptap
                     content={content}
                     placeholder={"입력하세요."}
                     onContentUpdate={handleContentUpdate}
-                    onEditorReady={handleEditorReady}
                   />
                 </div>
 
                 {/* 하단 툴바 */}
-                <WriteDiaryToolbar
-                  isKeyboardOpen={isKeyboardOpen}
-                  isEditorFocused={isEditorFocused}
-                  keyboardHeight={keyboardHeight}
-                  editor={editorRef.current}
-                >
+                <WriteDiaryToolbar>
                   <WriteDiaryToolbar.ButtonGroup>
                     <WriteDiaryToolbar.ImageButton
                       onClick={handleImageUploadClick}
-                      editor={editorRef.current}
                     />
                     <WriteDiaryToolbar.BoldButton
                       onClick={() => {}}
@@ -555,10 +353,6 @@ const WriteDiaryPage = () => {
                       editor={editorRef.current}
                     />
                   </WriteDiaryToolbar.ButtonGroup>
-                  <WriteDiaryToolbar.KeyboardButton
-                    onClick={toggleKeyboard}
-                    isKeyboardOpen={isKeyboardOpen}
-                  />
                 </WriteDiaryToolbar>
               </div>
             )}
