@@ -1,8 +1,10 @@
 import api from "@/api";
+import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
+import Spinner from "@/components/base/Spinner";
 import Page from "@/components/page/Page";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { IoCalendarOutline, IoSearch } from "react-icons/io5";
@@ -16,6 +18,7 @@ const ViewDiaryListPage = () => {
   /* Properties */
   const navigate = useNavigate();
   const { diaryBookId } = useParams();
+  const queryClient = useQueryClient();
 
   /* States */
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +26,8 @@ const ViewDiaryListPage = () => {
   const [isSearching, setIsSearching] = useState(false); // 검색 입력 필드 표시 상태 추가
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 추가
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list"); // 뷰 모드 상태 추가
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   /* Refs */
   const headerContentRef = useRef<HTMLDivElement>(null); // Ref for header content
@@ -33,6 +38,23 @@ const ViewDiaryListPage = () => {
     queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
   });
 
+  const handleDiaryDelete = async () => {
+    if (!diaryBookId) return;
+
+    setIsDeleting(true);
+    try {
+      await api.diaryBook.deleteDiaryBook(Number(diaryBookId));
+      queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
+      setIsDeleteModalOpen(false);
+      navigate("/main", { replace: true });
+    } catch (e) {
+      console.error("일기장 삭제 실패", e);
+      alert("일기장 삭제에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   /* UI */
   const menuItems = [
     {
@@ -42,10 +64,6 @@ const ViewDiaryListPage = () => {
     {
       label: "일기장 멤버 관리",
       onClick: () => navigate(`/diary-book/${diaryBookId}/members`),
-    },
-    {
-      label: "분석 보고서 보기",
-      onClick: () => navigate(`/diary-book/${diaryBookId}/report`),
     },
     {
       label: isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
@@ -60,11 +78,19 @@ const ViewDiaryListPage = () => {
         try {
           await api.diaryBook.togglePinDiaryBook(Number(diaryBookId));
           setIsPinned(!isPinned);
+          queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
         } catch (e) {
           console.error("즐겨찾기 업데이트 실패", e);
         } finally {
           setIsMenuOpen(false);
         }
+      },
+    },
+    {
+      label: "일기장 삭제",
+      onClick: () => {
+        setIsDeleteModalOpen(true);
+        setIsMenuOpen(false);
       },
     },
   ];
@@ -172,7 +198,7 @@ const ViewDiaryListPage = () => {
                               setIsMenuOpen(false);
                             }}
                             className={
-                              "text-center text-base font-normal hover:bg-gray-100 w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0"
+                              "text-center text-base font-normal w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0 last:text-red-500"
                             }
                           >
                             {item.label}
@@ -222,6 +248,47 @@ const ViewDiaryListPage = () => {
           )}
         </AnimatePresence>
       </Page.Content>
+
+      {/* 일기장 삭제 확인 드로어 */}
+      <Drawer open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DrawerContent className={""}>
+          <div className={"flex flex-col items-center px-4 py-6"}>
+            <div className={"text-center mb-4"}>
+              <p className={"text-lg font-medium mb-3"}>
+                일기장을 삭제하시겠습니까?
+              </p>
+              <p className={"text-xs text-gray-500 text-center mb-6"}>
+                삭제한 일기장은 복구할 수 없으며, 모든 일기도 함께 삭제됩니다.
+              </p>
+            </div>
+            <div className={"flex gap-3 w-full"}>
+              <Button
+                onClick={() => setIsDeleteModalOpen(false)}
+                variant={"text"}
+                className={
+                  "flex-1 rounded-lg border-gray-200 bg-gray-200 border"
+                }
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleDiaryDelete}
+                variant={"danger"}
+                className={"flex-1"}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <div className={"flex justify-center items-center w-full"}>
+                    <Spinner className={"text-white"} />
+                  </div>
+                ) : (
+                  "삭제"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </Page.Container>
   );
 };

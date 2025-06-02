@@ -174,18 +174,33 @@ const DiaryBookMemberPage = () => {
 
   const handleCopyLink = () => {
     if (inviteLink) {
-      navigator.clipboard
-        .writeText(inviteLink)
-        .then(() => {
-          setIsLinkCopied(true);
-          setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
-        })
-        .catch((err) => {
-          setAlertMsg({
-            title: "링크 복사에 실패했습니다.",
-            description: err.message,
+      try {
+        // 대체 복사 방법 (보다 안정적)
+        const textArea = document.createElement("textarea");
+        textArea.value = inviteLink;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        // 상태 업데이트
+        setIsLinkCopied(true);
+        setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
+      } catch (err) {
+        // 실패 시 원래 방식으로 시도
+        navigator.clipboard
+          .writeText(inviteLink)
+          .then(() => {
+            setIsLinkCopied(true);
+            setTimeout(() => setIsLinkCopied(false), 2000);
+          })
+          .catch((error) => {
+            setAlertMsg({
+              title: "링크 복사에 실패했습니다.",
+              description: error.message,
+            });
           });
-        });
+      }
     }
   };
 
@@ -346,7 +361,7 @@ const DiaryBookMemberPage = () => {
 
         {/* Invite via Link Card */}
         <div className={"mb-6 rounded-md bg-white p-4"}>
-          <p className={"mb-4"}>멤버 초대 (링크)</p>
+          <p className={"mb-4"}>멤버 초대 링크</p>
           {isGeneratingInvite && inviteLink ? ( // Show link section if generated
             <div className={"flex flex-col gap-4"}>
               <div
@@ -357,7 +372,7 @@ const DiaryBookMemberPage = () => {
                   variant={"text"}
                   size={"sm"}
                   onClick={handleCopyLink}
-                  title={"링크 복사"} // ESLint 오류 수정: 중괄호 사용
+                  title={"링크 복사"}
                 >
                   <IoMdCopy className={"size-5"} />
                 </Button>
@@ -419,7 +434,7 @@ const DiaryBookMemberPage = () => {
         </div>
 
         {/* Direct Invite Card */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
+        <div className={"mb-6 rounded-md bg-white p-4"}>
           <p className={"mb-4"}>멤버 직접 초대</p>
           <p className={"text-sm text-gray-500 mb-4"}>
             이메일 주소를 입력하여 멤버를 직접 초대하세요.
