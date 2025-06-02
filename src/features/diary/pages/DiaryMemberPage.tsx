@@ -84,7 +84,7 @@ const DiaryMemberPage = () => {
     <Page.Container>
       <DefaultHeader logoType={"back"} />
       <Page.Content className={"px-6 py-4"}>
-        <h1 className={"text-xl font-medium mb-6"}>멤버 관리</h1>
+        <h1 className={"text-xl font-medium mb-6"}>일기장 멤버 관리</h1>
 
         {/* 멤버 목록 카드 */}
         <Card className={"mb-6"}>
@@ -158,8 +158,8 @@ const DiaryMemberPage = () => {
                 className={"flex items-center gap-2 bg-gray-100 p-3 rounded-md"}
               >
                 <span className={"text-sm flex-1 break-all"}>{inviteLink}</span>
-                <Button variant={"text"} size={"sm"} onClick={handleCopyLink}>
-                  <IoMdCopy />
+                <Button variant={"text"} onClick={handleCopyLink}>
+                  <IoMdCopy className={"size-5"} />
                 </Button>
               </div>
               {linkCopied && (
