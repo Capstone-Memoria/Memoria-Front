@@ -56,12 +56,12 @@ const WriteDiaryToolbar: React.FC<React.PropsWithChildren<Props>> = ({
     <div
       ref={toolbarRef}
       className={cn(
-        "flex items-center justify-between h-[60px] py-3 px-4 border-t border-gray-200 bg-white shadow-top",
+        "flex items-center justify-between h-[55px] py-3 px-4 border-t border-gray-200 bg-white shadow-top",
         "absolute left-0 right-0 z-10",
         className
       )}
       style={{
-        top: `calc(var(--viewport-height) - 60px + ${scrolled.y + bodyScroll[1]}px)`,
+        top: `calc(var(--viewport-height) - 55px + ${scrolled.y + bodyScroll[1]}px)`,
       }}
     >
       {children}

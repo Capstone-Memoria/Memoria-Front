@@ -216,6 +216,82 @@ const WriteDiaryPage = () => {
   // 오늘 날짜 요일까지.
   const today = DateTime.now().setLocale("ko").toFormat("yyyy.MM.dd cccc");
 
+  // 키보드 상태 토글 함수
+  const toggleKeyboard = useCallback(() => {
+    if (isKeyboardOpen) {
+      // 키보드가 열려있으면 닫기
+      editorRef.current?.commands.blur();
+      setIsKeyboardOpen(false);
+      setIsEditorFocused(false);
+
+      // 모바일 환경에서 키보드를 확실히 닫기 위해 액티브 요소의 포커스를 해제
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    } else {
+      // 키보드가 닫혀있으면 열기
+      editorRef.current?.commands.focus();
+      setIsKeyboardOpen(true);
+      setIsEditorFocused(true);
+    }
+  }, [isKeyboardOpen]);
+
+  // 에디터 포커스 상태 관리
+  useEffect(() => {
+    if (editorRef.current) {
+      const editor = editorRef.current;
+
+      const handleFocus = () => {
+        setIsEditorFocused(true);
+        setIsKeyboardOpen(true);
+      };
+
+      const handleBlur = () => {
+        setIsEditorFocused(false);
+      };
+
+      editor.on("focus", handleFocus);
+      editor.on("blur", handleBlur);
+
+      return () => {
+        editor.off("focus", handleFocus);
+        editor.off("blur", handleBlur);
+      };
+    }
+  }, []);
+
+  // 모바일 환경에서 화상 키보드 상태 감지
+  useEffect(() => {
+    // 화면 크기 변화 감지로 키보드 표시 여부 추정
+    const handleResize = () => {
+      // 현재 내부 화면 높이
+      const currentInnerHeight = window.innerHeight;
+
+      // visualViewport API가 지원되는 경우(모던 브라우저)
+      if (window.visualViewport) {
+        const isKeyboardLikelyVisible =
+          window.visualViewport.height < currentInnerHeight * 0.75;
+        if (isKeyboardLikelyVisible !== isKeyboardOpen) {
+          setIsKeyboardOpen(isKeyboardLikelyVisible);
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      }
+    };
+  }, [isKeyboardOpen]);
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <WriteDiaryPageHeader
@@ -355,6 +431,12 @@ const WriteDiaryPage = () => {
                       onClick={() => {}}
                       alignment={"right"}
                       editor={editorRef.current}
+                    />
+                  </WriteDiaryToolbar.ButtonGroup>
+                  <WriteDiaryToolbar.ButtonGroup className={"ml-auto"}>
+                    <WriteDiaryToolbar.KeyboardButton
+                      onClick={toggleKeyboard}
+                      isKeyboardOpen={isKeyboardOpen || isEditorFocused}
                     />
                   </WriteDiaryToolbar.ButtonGroup>
                 </WriteDiaryToolbar>
