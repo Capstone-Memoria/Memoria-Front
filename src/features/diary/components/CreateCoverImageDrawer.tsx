@@ -37,14 +37,17 @@ export const CreateCoverImageDrawer = ({
     mutationFn: (description: string) => api.ai.generateCoverImage(description),
     onSuccess: (data) => {
       setCurrentImageBase64(data);
-      if (onImageCreate) {
-        onImageCreate(data);
-      }
     },
     onError: () => {
       setIsError(true);
     },
   });
+
+  const handleConfirmImage = () => {
+    if (currentImageBase64 && onImageCreate) {
+      onImageCreate(currentImageBase64);
+    }
+  };
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -66,6 +69,7 @@ export const CreateCoverImageDrawer = ({
               onBack={() => setCurrentPanel("keyword")}
               imageBase64={currentImageBase64}
               isError={isError}
+              onConfirm={handleConfirmImage}
             />
           </div>
         </div>

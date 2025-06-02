@@ -129,16 +129,19 @@ const CreateDiaryPage = () => {
 
   const handleUploadButtonClick = () => fileInputRef.current?.click();
 
-  const handleAIImageCreate = (imageBase64: string) => {
+  // CreateCoverImageDrawer에서 이미지가 확정되었을 때 호출될 함수
+  const handleAICoverImageCreated = (imageBase64: string) => {
     const filename = `ai-cover-${Date.now()}.png`; // 파일명 생성
     try {
-      const imageFile = base64ToFile(imageBase64, filename);
+      const mimeType = "image/png";
+      const imageBase64WithSchema = `data:${mimeType};base64,${imageBase64}`;
+      const imageFile = base64ToFile(imageBase64WithSchema, filename);
       const newCoverItem: DiaryCoverItem = {
         type: "file",
         image: imageFile,
       };
 
-      setDiaryCoverItems((prevItems) => [...prevItems, newCoverItem]);
+      setDiaryCoverItems((prevItems) => [newCoverItem, ...prevItems]);
       setCreateCoverDrawerOpen(false); // 드로어를 닫습니다.
     } catch (error) {
       console.error("AI 이미지 변환 중 오류 발생:", error);
@@ -259,7 +262,7 @@ const CreateDiaryPage = () => {
             <CreateCoverImageDrawer
               open={createCoverDrawerOpen}
               onOpenChange={setCreateCoverDrawerOpen}
-              onImageCreate={handleAIImageCreate} // AI 이미지 생성 콜백 전달
+              onImageCreate={handleAICoverImageCreated} // AI 이미지 생성 및 확정 시 호출될 콜백 전달
             >
               <div
                 className={
