@@ -1,6 +1,7 @@
 import api from "@/api";
 import MemoriaLogo from "@/assets/images/MemoriaLogo.svg";
 import Button from "@/components/base/Button";
+import Dialog from "@/components/base/Dialog";
 import Input from "@/components/base/Input";
 import Spinner from "@/components/base/Spinner";
 import Page from "@/components/page/Page";
@@ -32,6 +33,11 @@ const RegisterPage = () => {
     }));
   };
 
+  const [pwdErrorMessage, setPwdErrorMessage] = useState<string | undefined>(
+    undefined
+  );
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
   const {
     mutate: tryRegister,
     isPending,
@@ -39,13 +45,9 @@ const RegisterPage = () => {
   } = useMutation({
     mutationFn: () => api.auth.register(formData),
     onSuccess: () => {
-      navigate("/login", { replace: true });
+      setShowSuccessDialog(true);
     },
   });
-
-  const [pwdErrorMessage, setPwdErrorMessage] = useState<string | undefined>(
-    undefined
-  );
 
   const handleRegister = () => {
     if (formData.password !== formData.confirmPassword) {
@@ -140,6 +142,35 @@ const RegisterPage = () => {
           )}
         </Button>
       </Page.Content>
+
+      {/* 회원가입 성공 다이얼로그 */}
+      <Dialog
+        open={showSuccessDialog}
+        title={"회원가입 완료!"}
+        description={
+          "회원가입이 성공적으로 완료되었습니다.\n로그인 화면으로 이동합니다."
+        }
+        onConfirm={() => {
+          setShowSuccessDialog(false);
+          navigate("/login", {
+            replace: true,
+            state: {
+              fromRegister: true,
+              email: formData.email,
+            },
+          });
+        }}
+        onClose={() => {
+          setShowSuccessDialog(false);
+          navigate("/login", {
+            replace: true,
+            state: {
+              fromRegister: true,
+              email: formData.email,
+            },
+          });
+        }}
+      />
     </Page.Container>
   );
 };

@@ -15,7 +15,15 @@ const LoginPage = () => {
   const { context } = useAuthStore();
   const user = context?.user;
 
-  /* 3️⃣  로그인 완료 시 자동 복귀 */
+  /* 3️⃣  회원가입에서 온 경우 바로 LoginPanel로 이동 */
+  useEffect(() => {
+    const state = location.state as { fromRegister?: boolean; email?: string };
+    if (state?.fromRegister) {
+      setStep(1);
+    }
+  }, [location.state]);
+
+  /* 4️⃣  로그인 완료 시 자동 복귀 */
   useEffect(() => {
     if (user) {
       const from = (location.state as { from?: string })?.from || "/main";
@@ -39,6 +47,7 @@ const LoginPage = () => {
           className={"w-screen"}
           onNext={handleNext}
           onPrev={handlePrev}
+          initialEmail={(location.state as { email?: string })?.email}
         />
       </div>
     </div>

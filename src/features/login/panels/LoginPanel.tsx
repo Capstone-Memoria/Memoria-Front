@@ -12,14 +12,15 @@ import { useNavigate } from "react-router-dom";
 interface LoginPanelProps extends HTMLAttributes<HTMLDivElement> {
   onNext?: () => void;
   onPrev?: () => void;
+  initialEmail?: string;
 }
 
 const LoginPanel: React.FC<LoginPanelProps> = ({
-  onNext,
   onPrev,
+  initialEmail,
   ...props
 }: LoginPanelProps) => {
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>(initialEmail || "");
   const [password, setPassword] = useState<string>("");
   const authStore = useAuthStore();
   const navigate = useNavigate();
@@ -80,8 +81,8 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
         />
       </div>
       <div className={"flex-1 min-h-24"} />
-      <Button size={"xl"} onClick={handleLogin}>
-        로그인
+      <Button size={"xl"} onClick={handleLogin} disabled={isPending}>
+        {isPending ? "로그인 중..." : "로그인"}
       </Button>
     </div>
   );
