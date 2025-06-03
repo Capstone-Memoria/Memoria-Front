@@ -1,14 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ReactionType } from "@/models/Diary";
-import {
-  FaHandHoldingHeart,
-  FaHeart,
-  FaLaugh,
-  FaSadCry,
-  FaSmile,
-  FaSurprise,
-  FaThumbsUp,
-} from "react-icons/fa";
+import { FaHeart, FaSadCry, FaSurprise, FaThumbsUp } from "react-icons/fa";
 import { FaHandsClapping } from "react-icons/fa6";
 
 interface ReactionHoverIconProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,25 +30,10 @@ const ReactionIconMap: Record<ReactionType, ReactionIconMapProps> = {
     color: "text-red-500",
     backgroundColor: "bg-red-100",
   },
-  [ReactionType.SMILE]: {
-    icon: <FaSmile />,
-    color: "text-yellow-500",
-    backgroundColor: "bg-yellow-100",
-  },
   [ReactionType.SAD]: {
     icon: <FaSadCry />,
     color: "text-sky-500",
     backgroundColor: "bg-sky-100",
-  },
-  [ReactionType.HUG]: {
-    icon: <FaHandHoldingHeart />,
-    color: "text-pink-500",
-    backgroundColor: "bg-pink-100",
-  },
-  [ReactionType.LAUGH]: {
-    icon: <FaLaugh />,
-    color: "text-yellow-500",
-    backgroundColor: "bg-yellow-100",
   },
   [ReactionType.WOW]: {
     icon: <FaSurprise />,
