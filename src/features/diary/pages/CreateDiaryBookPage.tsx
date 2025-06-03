@@ -20,6 +20,7 @@ import CoverExampleImg6 from "@/assets/images/coverimage6.png";
 import ColorPicker from "@/components/base/ColorPicker";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import DiaryCoverCarousel from "@/components/diary/DiaryCoverCarousel";
+
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { ModifyingSticker } from "@/models/Sticker";
 import DiaryDecorateDialog from "../components/stickers/DiaryDecorateDialog";
