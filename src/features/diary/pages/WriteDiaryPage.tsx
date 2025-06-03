@@ -1,34 +1,77 @@
 import api from "@/api";
+
 import Input from "@/components/base/Input";
 import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
 import DiaryBookDrawer from "@/features/diary/components/DiaryBookDrawer";
 import DiaryBookSelectButton from "@/features/diary/components/DiaryBookSelectButton";
-import ImageUploader from "@/features/diary/components/ImageUploader";
+import EmotionDrawer from "@/features/diary/components/EmotionDrawer";
+import ImageSlider from "@/features/diary/components/ImageSlider";
 import WriteDiaryPageHeader from "@/features/diary/components/WriteDiaryPageHeader";
+import WriteDiaryToolbar from "@/features/diary/components/WriteDiaryToolbar";
+import { EmotionType } from "@/models/Diary";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Dot } from "lucide-react";
+import type { Editor } from "@tiptap/react";
+
 import { DateTime } from "luxon";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
+import { MdOutlineAddReaction } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import SettingsBar, { Settings } from "../components/write-diary/SettingsBar";
+
+// 텍스트 정렬 상태 타입
+export type TextAlignment = "left" | "center" | "right";
 
 const WriteDiaryPage = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
   const [searchParams] = useSearchParams();
   const diaryBookId = searchParams.get("diaryBookId");
-
-  // 저장 회색으로 보이다가 제목 입력하면 검정색으로.
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [diaryTitle, setDiaryTitle] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<Editor | null>(null);
 
+  // 상태 관리
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEmotionDrawerOpen, setIsEmotionDrawerOpen] = useState(false);
+  const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
+    null
+  );
+  const [diaryTitle, setDiaryTitle] = useState("");
   const [content, setContent] = useState("");
+
+  // 키보드 및 에디터 포커스 상태
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [isEditorFocused, setIsEditorFocused] = useState(false);
+
+  // 이미지 관련 상태
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<
+    Array<{ url: string; file: File }>
+  >([]);
+
+  // iOS 여부 감지
+  const isIOS = useMemo(() => {
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as unknown as { MSStream: unknown }).MSStream
+    );
+  }, []);
+
+  // 기본 키보드 높이
+  const DEFAULT_KEYBOARD_HEIGHT = useMemo(() => (isIOS ? 380 : 330), [isIOS]);
+
+  // 이미지 경로 생성 함수
+  const getEmotionImagePath = (emotionName: string) => {
+    return new URL(
+      `../../../assets/images/emotions/${emotionName.toLowerCase()}.png`,
+      import.meta.url
+    ).href;
+  };
 
   // 설정 상태 관리
   const [settings, setSettings] = useState<Settings>({
@@ -37,6 +80,7 @@ const WriteDiaryPage = () => {
     musicCreationEnabled: true,
   });
 
+  // 일기장 목록 조회
   const { data, isLoading } = useQuery({
     queryKey: ["fetchMyDiaryBook"],
     queryFn: () =>
@@ -56,30 +100,89 @@ const WriteDiaryPage = () => {
     enabled: !!diaryBookId,
   });
 
+  // 저장 버튼 활성화 여부
   const canSubmit = useMemo(() => {
     return !!diaryTitle && diaryTitle.trim() !== "";
   }, [diaryTitle]);
 
+  // 초기 드로어 표시 설정
   useEffect(() => {
     if (diaryBookId === null) {
       setIsMenuOpen(true);
+    } else if (!selectedEmotion) {
+      setIsEmotionDrawerOpen(true);
     }
-  }, []);
+  }, [diaryBookId, selectedEmotion]);
 
+  // 선택된 일기장
   const selectedDiaryBook = useMemo(() => {
     return data?.content.find((diary) => diary.id === Number(diaryBookId));
   }, [data, diaryBookId]);
 
+  // 일기장 드로어 열기
   const openDrawer = () => {
     setIsMenuOpen(true);
   };
 
+  // 감정 선택 핸들러
+  const handleEmotionSelect = (emotionType: EmotionType) => {
+    setSelectedEmotion(emotionType);
+    setIsEmotionDrawerOpen(false);
+  };
+
+  // 이미지 업로드 핸들러
+  const handleImageUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 파일 변경 핸들러
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
+    // 현재 에디터의 상태와 커서 위치 저장
+    const currentEditor = editorRef.current;
+    const wasEditorFocused = currentEditor?.isFocused;
+    const cursorPosition = currentEditor?.state.selection.from;
+
+    setUploadedImages((prev) => [...prev, ...files]);
+
+    const newImagePreviews = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    setImagePreviewUrls((prev) => [...prev, ...newImagePreviews]);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // 약간의 지연 후에 에디터의 상태와 커서 위치 복원
+    setTimeout(() => {
+      if (currentEditor && wasEditorFocused && cursorPosition) {
+        currentEditor.commands.focus(cursorPosition);
+      }
+    }, 100);
+  };
+
+  // 이미지 제거 핸들러
+  const handleRemoveImage = (index: number) => {
+    URL.revokeObjectURL(imagePreviewUrls[index].url);
+    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // 일기 저장
   const submitMutation = useMutation({
     mutationFn: () =>
       api.diary.createDiary(Number(diaryBookId), {
         title: diaryTitle,
         content: content,
         images: uploadedImages,
+        emotion: selectedEmotion || undefined,
         desiredCharacterId: settings.useRandomAICharacter
           ? undefined
           : settings.aiCharacter?.id,
@@ -100,14 +203,94 @@ const WriteDiaryPage = () => {
 
   const isSubmitting = submitMutation.isPending;
 
-  const handleImagesChange = ({ addedImages }: { addedImages: File[] }) => {
-    setUploadedImages(addedImages);
-  };
-
   // 설정 변경 핸들러
   const handleSettingsChange = (newSettings: Settings) => {
     setSettings(newSettings);
   };
+
+  // 에디터 내용 업데이트
+  const handleContentUpdate = useCallback((newContent: string) => {
+    setContent(newContent);
+  }, []);
+
+  // 오늘 날짜 요일까지.
+  const today = DateTime.now().setLocale("ko").toFormat("yyyy.MM.dd cccc");
+
+  // 키보드 상태 토글 함수
+  const toggleKeyboard = useCallback(() => {
+    if (isKeyboardOpen) {
+      // 키보드가 열려있으면 닫기
+      editorRef.current?.commands.blur();
+      setIsKeyboardOpen(false);
+      setIsEditorFocused(false);
+
+      // 모바일 환경에서 키보드를 확실히 닫기 위해 액티브 요소의 포커스를 해제
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    } else {
+      // 키보드가 닫혀있으면 열기
+      editorRef.current?.commands.focus();
+      setIsKeyboardOpen(true);
+      setIsEditorFocused(true);
+    }
+  }, [isKeyboardOpen]);
+
+  // 에디터 포커스 상태 관리
+  useEffect(() => {
+    if (editorRef.current) {
+      const editor = editorRef.current;
+
+      const handleFocus = () => {
+        setIsEditorFocused(true);
+        setIsKeyboardOpen(true);
+      };
+
+      const handleBlur = () => {
+        setIsEditorFocused(false);
+      };
+
+      editor.on("focus", handleFocus);
+      editor.on("blur", handleBlur);
+
+      return () => {
+        editor.off("focus", handleFocus);
+        editor.off("blur", handleBlur);
+      };
+    }
+  }, []);
+
+  // 모바일 환경에서 화상 키보드 상태 감지
+  useEffect(() => {
+    // 화면 크기 변화 감지로 키보드 표시 여부 추정
+    const handleResize = () => {
+      // 현재 내부 화면 높이
+      const currentInnerHeight = window.innerHeight;
+
+      // visualViewport API가 지원되는 경우(모던 브라우저)
+      if (window.visualViewport) {
+        const isKeyboardLikelyVisible =
+          window.visualViewport.height < currentInnerHeight * 0.75;
+        if (isKeyboardLikelyVisible !== isKeyboardOpen) {
+          setIsKeyboardOpen(isKeyboardLikelyVisible);
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      }
+    };
+  }, [isKeyboardOpen]);
 
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
@@ -123,7 +306,7 @@ const WriteDiaryPage = () => {
           classNames={"fade"}
           nodeRef={nodeRef}
         >
-          <div ref={nodeRef} className={"flex-1 flex flex-col"}>
+          <div ref={nodeRef} className={"flex-1 flex flex-col relative"}>
             {isSubmitting ? (
               <div
                 className={
@@ -138,38 +321,125 @@ const WriteDiaryPage = () => {
                 </div>
               </div>
             ) : (
-              <div className={"flex flex-col py-6 px-4 flex-1 gap-4"}>
+              <div className={"flex flex-col py-6 px-4 flex-1 gap-2"}>
                 <DiaryBookSelectButton
                   isLoading={isLoading}
                   selectedDiaryBookTitle={selectedDiaryBook?.title}
                   onClick={openDrawer}
                 />
-                <div className={"flex flex-col gap-2"}>
-                  <Input
-                    className={"w-full text-2xl"}
-                    placeholder={"일기 제목"}
-                    onChange={(e) => setDiaryTitle(e.target.value)}
-                  />
+
+                {/* 날짜와 감정 선택 영역 */}
+                <div className={"flex items-center mt-2"}>
+                  <div className={"text-black text-base"}>{today}</div>
+                  <div
+                    className={
+                      "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 cursor-pointer ml-auto"
+                    }
+                    onClick={() => setIsEmotionDrawerOpen(true)}
+                  >
+                    {selectedEmotion ? (
+                      <img
+                        src={getEmotionImagePath(selectedEmotion)}
+                        alt={"선택된 감정"}
+                        className={"size-8 md:size-9 object-contain"}
+                      />
+                    ) : (
+                      <MdOutlineAddReaction
+                        className={"size-6 md:size-7 text-gray-500"}
+                      />
+                    )}
+                  </div>
                 </div>
+
+                {/* 일기 제목 입력 */}
+                <Input
+                  className={"w-full text-xl"}
+                  placeholder={"일기 제목"}
+                  value={diaryTitle}
+                  onChange={(e) => setDiaryTitle(e.target.value)}
+                />
+
+                {/* AI 설정 바 */}
                 <SettingsBar
                   settings={settings}
                   onChange={handleSettingsChange}
                   aiCharacters={aiCharacters}
                   isLoadingCharacters={isLoadingCharacters}
+                  diaryBookId={diaryBookId ? Number(diaryBookId) : undefined}
                 />
-                <div className={"flex items-center text-gray-500"}>
-                  <div>{DateTime.now().toLocaleString(DateTime.DATE_MED)}</div>
-                  <Dot />
-                  <div>{authStore.context?.user?.nickName}</div>
-                </div>
-                <ImageUploader onImagesChange={handleImagesChange} />
-                <div className={"flex-1 rounded-lg"}>
+
+                {/* 이미지 슬라이더 - 이미지가 있을 때만 표시 */}
+                {imagePreviewUrls.length > 0 && (
+                  <ImageSlider
+                    images={imagePreviewUrls}
+                    onRemoveImage={handleRemoveImage}
+                  />
+                )}
+
+                {/* 이미지 업로드 input (숨김) */}
+                <input
+                  type={"file"}
+                  accept={"image/*"}
+                  multiple
+                  onChange={handleFileChange}
+                  className={"hidden"}
+                  ref={fileInputRef}
+                />
+
+                {/* 에디터 */}
+                <div
+                  className={"flex-1 rounded-lg mt-1"}
+                  ref={editorContainerRef}
+                >
                   <Tiptap
+                    onEditorReady={(editor) => {
+                      editorRef.current = editor;
+                    }}
                     content={content}
-                    placeholder={"오늘은 무슨일이 있었나요?"}
-                    onContentUpdate={(content) => setContent(content)}
+                    placeholder={"입력하세요."}
+                    onContentUpdate={handleContentUpdate}
                   />
                 </div>
+
+                {/* 하단 툴바 */}
+                <WriteDiaryToolbar>
+                  <WriteDiaryToolbar.ButtonGroup>
+                    <WriteDiaryToolbar.ImageButton
+                      onClick={handleImageUploadClick}
+                    />
+                    <WriteDiaryToolbar.BoldButton
+                      onClick={() => {}}
+                      isActive={editorRef.current?.isActive("bold")}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.ItalicButton
+                      onClick={() => {}}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.Divider />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"left"}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"center"}
+                      editor={editorRef.current}
+                    />
+                    <WriteDiaryToolbar.AlignButton
+                      onClick={() => {}}
+                      alignment={"right"}
+                      editor={editorRef.current}
+                    />
+                  </WriteDiaryToolbar.ButtonGroup>
+                  <WriteDiaryToolbar.ButtonGroup className={"ml-auto"}>
+                    <WriteDiaryToolbar.KeyboardButton
+                      onClick={toggleKeyboard}
+                      isKeyboardOpen={isKeyboardOpen || isEditorFocused}
+                    />
+                  </WriteDiaryToolbar.ButtonGroup>
+                </WriteDiaryToolbar>
               </div>
             )}
           </div>
@@ -180,7 +450,15 @@ const WriteDiaryPage = () => {
         setIsMenuOpen={setIsMenuOpen}
         selectedDiaryBookId={selectedDiaryBook?.id}
       />
+      <EmotionDrawer
+        isOpen={isEmotionDrawerOpen}
+        onOpenChange={setIsEmotionDrawerOpen}
+        onSelectEmotion={handleEmotionSelect}
+        selectedEmotion={selectedEmotion}
+        isEditMode={false}
+      />
     </Page.Container>
   );
 };
+
 export default WriteDiaryPage;

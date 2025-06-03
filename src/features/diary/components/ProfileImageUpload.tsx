@@ -1,6 +1,5 @@
 import Image from "@/components/base/Image";
 import { useEffect, useRef, useState } from "react";
-import { MdOutlineAddAPhoto } from "react-icons/md";
 
 interface ProfileImageUploadProps {
   currentImageId?: string;
@@ -52,7 +51,11 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
             className={"size-full object-cover"}
           />
         ) : (
-          <Image imageId={currentImageId} className={"size-full"} />
+          <Image
+            imageId={currentImageId}
+            className={"size-full"}
+            imageClassName={"size-full object-cover"}
+          />
         )}
       </div>
       <input

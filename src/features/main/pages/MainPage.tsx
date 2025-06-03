@@ -1,5 +1,6 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
+import Spinner from "@/components/base/Spinner";
 import DiaryBookComponent from "@/components/diary/DiaryBook";
 import DiaryWriteButton from "@/components/diary/DiaryWriteButton";
 import DefaultHeader from "@/components/layout/DefaultHeader";
@@ -32,9 +33,16 @@ const MainPage = () => {
   /* States */
   const [tab, setTab] = useState<"all" | "pinned">("all");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [selectedDiaryBook, setSelectedDiaryBook] = useState<DiaryBook | null>(
     null
   );
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isOwner = useMemo(() => {
+    if (!selectedDiaryBook || !authStore.context?.user) return false;
+    return selectedDiaryBook.owner.email === authStore.context.user.email;
+  }, [selectedDiaryBook, authStore.context?.user]);
 
   const filteredDiaryBooks = useMemo(() => {
     if (tab === "all") {
@@ -65,34 +73,49 @@ const MainPage = () => {
     }
   };
 
-  const handleDiaryExit = async () => {
+  const handleDeleteConfirm = () => {
+    setIsMenuOpen(false);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDiaryDelete = async () => {
     if (!selectedDiaryBook) return;
 
+    setIsDeleting(true);
     try {
-      // TODO: 다이어리 탈퇴 API 구현 필요
-      // await api.diaryBook.exitDiaryBook(Number(selectedDiaryBook.id));
-      // 데이터 리프레시를 위해 쿼리 무효화
+      await api.diaryBook.deleteDiaryBook(Number(selectedDiaryBook.id));
       queryClient.invalidateQueries({ queryKey: ["fetchMyDiaryBook"] });
-      setIsMenuOpen(false);
+      setIsDeleteConfirmOpen(false);
     } catch (e) {
-      console.error("다이어리 탈퇴 실패", e);
+      console.error("일기장 삭제 실패", e);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const menuItems = selectedDiaryBook
     ? [
-        {
-          label: "일기장 관리",
-          onClick: () => navigate(`/diary-book/${selectedDiaryBook.id}/manage`),
-        },
-        {
-          label: "일기장 멤버 관리",
-          onClick: () =>
-            navigate(`/diary-book/${selectedDiaryBook.id}/members`),
-        },
+        ...(isOwner
+          ? [
+              {
+                label: "일기장 관리",
+                onClick: () =>
+                  navigate(`/diary-book/${selectedDiaryBook.id}/manage`),
+              },
+              {
+                label: "일기장 멤버 관리",
+                onClick: () =>
+                  navigate(`/diary-book/${selectedDiaryBook.id}/members`),
+              },
+            ]
+          : []),
         {
           label: selectedDiaryBook.isPinned ? "즐겨찾기 해제" : "즐겨찾기 추가",
           onClick: handlePinToggle,
+        },
+        {
+          label: "일기장 삭제",
+          onClick: handleDeleteConfirm,
         },
       ]
     : [];
@@ -103,10 +126,10 @@ const MainPage = () => {
       <div className={"px-4 py-6"}>
         <div className={"my-6 flex items-center justify-between"}>
           <div>
-            <p className={"font-semibold text-xl"}>
+            <p className={"font-semibold text-xl md:text-2xl"}>
               {authStore.context?.user?.nickName} 님의 책장,
             </p>
-            <p className={"font-regular text-gray-1 text-sm"}>
+            <p className={"font-regular text-gray-1 text-sm md:text-base"}>
               {filteredDiaryBooks.length}권의 일기장
             </p>
           </div>
@@ -226,15 +249,56 @@ const MainPage = () => {
                 key={index}
                 onClick={() => {
                   item.onClick();
-                  setIsMenuOpen(false);
                 }}
-                className={
-                  "text-center text-base font-normal w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0"
-                }
+                className={cn(
+                  "text-center text-base font-normal w-full px-4 pt-4 pb-5 border-b border-gray-400 last:border-b-0",
+                  item.label === "일기장 삭제" && "text-red-500"
+                )}
               >
                 {item.label}
               </button>
             ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* 일기장 삭제 확인 드로어 */}
+      <Drawer open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DrawerContent className={""}>
+          <div className={"flex flex-col items-center px-4 py-6"}>
+            <div className={"text-center mb-4"}>
+              <p className={"text-lg font-medium mb-3"}>
+                일기장을 삭제하시겠습니까?
+              </p>
+              <p className={"text-xs text-gray-500 text-center mb-6"}>
+                삭제한 일기장은 복구할 수 없으며, 모든 일기도 함께 삭제됩니다.
+              </p>
+            </div>
+            <div className={"flex gap-3 w-full"}>
+              <Button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                variant={"text"}
+                className={
+                  "flex-1 rounded-lg border-gray-200 bg-gray-200 border"
+                }
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleDiaryDelete}
+                variant={"danger"}
+                className={"flex-1"}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <div className={"flex justify-center items-center w-full"}>
+                    <Spinner className={"text-white"} />
+                  </div>
+                ) : (
+                  "삭제"
+                )}
+              </Button>
+            </div>
           </div>
         </DrawerContent>
       </Drawer>

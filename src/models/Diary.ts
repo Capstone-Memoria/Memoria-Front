@@ -2,12 +2,29 @@ import { DateTime } from "luxon";
 import { AttachedFile } from "./AttachedFile";
 import { User } from "./User";
 
+// 서버에서 사용하는 감정 타입 정의
+export enum EmotionType {
+  HAPPY = "HAPPY",
+  SAD = "SAD",
+  ANGRY = "ANGRY",
+  DISGUSTED = "DISGUSTED",
+  RELAXED = "RELAXED",
+  BORED = "BORED",
+  LOVING = "LOVING",
+  KIND = "KIND",
+  AMBITIOUS = "AMBITIOUS",
+  SUPERSAD = "SUPERSAD",
+  BAD = "BAD",
+  SICK = "SICK",
+}
+
 export interface Diary {
   id: number;
   title: string;
   content: string;
   diaryBookId: number;
   summary?: string;
+  emotion?: EmotionType | string;
   createdAt: DateTime;
   createdBy?: User;
   lastModifiedAt?: DateTime;
