@@ -201,7 +201,7 @@ const DiaryBookMemberPage = () => {
             title: "링크 복사에 실패했습니다.",
             description: err.message,
           });
-      }
+        });
     }
   };
 
