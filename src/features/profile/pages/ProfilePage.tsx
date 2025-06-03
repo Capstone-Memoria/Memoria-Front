@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { DirectInvaitation } from "@/models/DiaryBook";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
@@ -130,6 +130,18 @@ const ProfilePage = () => {
     queryFn: fetchInvitations,
     enabled: !!authStore.context?.user, // 사용자가 로그인했을 때만 실행
   });
+
+  // 프로필 페이지에 진입했을 때 현재 초대 개수를 localStorage에 저장
+  // 이를 통해 사용자가 초대를 확인했다고 간주하여 뱃지가 사라지게 함
+  useEffect(() => {
+    if (invitations && !isLoadingInvitations) {
+      const currentInvitationCount = invitations.length;
+      localStorage.setItem(
+        "lastCheckedInvitationCount",
+        currentInvitationCount.toString()
+      );
+    }
+  }, [invitations, isLoadingInvitations]);
 
   const { mutate: acceptInvite } = useMutation({
     mutationFn: (invitationId: number) => directInviteAccept(invitationId),
