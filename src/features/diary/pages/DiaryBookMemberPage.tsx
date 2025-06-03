@@ -241,13 +241,13 @@ const DiaryBookMemberPage = () => {
   return (
     <Page.Container>
       <DefaultHeader logoType={"back"} />
-      <Page.Content className={"px-6 py-18"}>
+      <Page.Content className={"px-6 py-8"}>
         <h1 className={"text-xl font-medium mb-6"}>
-          {diaryBook?.title} 일기장 멤버 관리
+          {diaryBook?.title} | 멤버 관리
         </h1>
 
         {/* ── Member List Card ───────────────────────────────────────────────── */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
+        <div className={"mb-6 rounded-md bg-white p-4"}>
           <div className={"flex justify-between items-center mb-4"}>
             <p>멤버 목록</p>
             {amIAdmin && (
@@ -261,7 +261,7 @@ const DiaryBookMemberPage = () => {
                     removeMemberMutation.isPending
                   }
                   className={
-                    "text-sm text-gray-600 underline underline-offset-4"
+                    "text-xs text-gray-600 underline underline-offset-4"
                   }
                 >
                   {isEditMode ? "완료" : "관리자 변경"}
@@ -271,7 +271,7 @@ const DiaryBookMemberPage = () => {
                 <button
                   onClick={() => setShowAdminHelp(!showAdminHelp)}
                   className={
-                    "w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs font-bold text-gray-600"
+                    "size-4 rounded-full border border-gray-400 flex items-center justify-center text-xs font-bold text-gray-600"
                   }
                 >
                   ?
@@ -408,8 +408,8 @@ const DiaryBookMemberPage = () => {
         {/* ──────────────────────────────────────────────────────────────────────── */}
 
         {/* Invite via Link Card */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
-          <h2 className={"text-lg font-medium mb-4"}>멤버 초대 (링크)</h2>
+        <div className={"mb-6 rounded-md bg-white p-4"}>
+          <p className={"mb-4"}>멤버 초대 링크</p>
           {isGeneratingInvite && inviteLink ? (
             <div className={"flex flex-col gap-4"}>
               <div
@@ -434,6 +434,7 @@ const DiaryBookMemberPage = () => {
                 <Button
                   variant={"secondary"}
                   size={"sm"}
+                  className={"text-xs rounded-md"}
                   onClick={() => {
                     setIsGeneratingInvite(false);
                     setInviteLink(null);

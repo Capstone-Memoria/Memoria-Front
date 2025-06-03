@@ -63,7 +63,7 @@ const Dialog = ({
               {cancelLabel}
             </Button>
             <Button
-              className={"flex-1 text-green-500 text-lg"}
+              className={"flex-1 text-red-500 text-lg"}
               size={"sm"}
               variant={"text"}
               onClick={onConfirm}
