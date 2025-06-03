@@ -1,4 +1,5 @@
 import Button from "@/components/base/Button";
+import ColorPicker from "@/components/base/ColorPicker";
 import React, { ChangeEvent, HTMLAttributes, useRef, useState } from "react"; // React 훅 및 이벤트 타입 임포트
 
 // 커버 이미지 예시 임포트
@@ -15,9 +16,12 @@ import { MdUpload } from "react-icons/md";
 
 interface EditDiaryCoverPanelProps extends HTMLAttributes<HTMLDivElement> {
   onCancel?: () => void;
-  onSave?: (selectedCover: DiaryCoverItem | null) => void; // selectedCover를 인자로 추가
-
+  onSave?: (
+    selectedCover: DiaryCoverItem | null,
+    spineColor: string | undefined
+  ) => void; // spineColor 추가
   isSaving?: boolean;
+  initialSpineColor?: string; // 초기 책등 색상 추가
 }
 
 const DIARY_COVER_PRESETS: DiaryCoverItem[] = [
@@ -51,7 +55,7 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
   onCancel,
   onSave,
   isSaving = false,
-  // initialCover, // prop으로 받은 초기 커버
+  initialSpineColor,
   ...props
 }) => {
   const [diaryCoverItems, setDiaryCoverItems] =
@@ -60,6 +64,10 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
   const [selectedCover, setSelectedCover] = useState<DiaryCoverItem | null>(
     DIARY_COVER_PRESETS[0]
   );
+
+  const [selectedSpineColor, setSelectedSpineColor] = useState<
+    string | undefined
+  >(initialSpineColor);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +95,7 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
   const handleUploadButtonClick = () => fileInputRef.current?.click();
 
   const handleSaveClick = () => {
-    onSave?.(selectedCover);
+    onSave?.(selectedCover, selectedSpineColor);
   };
 
   return (
@@ -110,7 +118,20 @@ const EditDiaryCoverPanel: React.FC<EditDiaryCoverPanelProps> = ({
           className={"w-fit py-8"}
           items={diaryCoverItems}
           onSelectChange={setSelectedCover}
+          spineColor={selectedSpineColor}
         />
+
+        {/* 책등 색상 선택 */}
+        <div className={"mt-6"}>
+          <p className={"text-sm font-normal mb-4"}>
+            일기장 책등 색상을 선택해주세요.
+          </p>
+          <ColorPicker
+            selectedColor={selectedSpineColor}
+            onColorSelect={setSelectedSpineColor}
+            className={"justify-center"}
+          />
+        </div>
       </div>
       <div className={"flex gap-8 justify-center mt-5"}>
         <Button

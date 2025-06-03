@@ -52,10 +52,7 @@ export interface Reaction {
 export enum ReactionType {
   LIKE = "LIKE",
   HEART = "HEART",
-  SMILE = "SMILE",
   SAD = "SAD",
-  HUG = "HUG",
-  LAUGH = "LAUGH",
   WOW = "WOW",
   CONGRATS = "CONGRATS",
 }

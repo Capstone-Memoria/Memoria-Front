@@ -27,22 +27,16 @@ const ReactionAddPanel = ({
   // 각 리액션의 DOM 참조
   const likeRef = useRef<HTMLDivElement>(null);
   const heartRef = useRef<HTMLDivElement>(null);
-  const smileRef = useRef<HTMLDivElement>(null);
   const sadRef = useRef<HTMLDivElement>(null);
-  const hugRef = useRef<HTMLDivElement>(null);
   const wowRef = useRef<HTMLDivElement>(null);
   const congratsRef = useRef<HTMLDivElement>(null);
-  const laughRef = useRef<HTMLDivElement>(null);
 
   const reactionRefsMap = {
     [ReactionType.LIKE]: likeRef,
     [ReactionType.HEART]: heartRef,
-    [ReactionType.SMILE]: smileRef,
     [ReactionType.SAD]: sadRef,
-    [ReactionType.HUG]: hugRef,
     [ReactionType.WOW]: wowRef,
     [ReactionType.CONGRATS]: congratsRef,
-    [ReactionType.LAUGH]: laughRef,
   };
 
   // 각 리액션의 상태를 useRef로 관리 (렌더링에 영향을 주지 않음)
@@ -66,9 +60,6 @@ const ReactionAddPanel = ({
   const [currentHovering, setCurrentHovering] = useState<ReactionType | null>(
     null
   );
-
-  // 화면 갱신을 위한 카운터
-  const [renderTrigger, setRenderTrigger] = useState(0);
 
   // 패널이 닫힐 때 리셋
   useEffect(() => {
@@ -99,10 +90,8 @@ const ReactionAddPanel = ({
     });
 
     // 거리 계산 및 호버링 상태 업데이트
-    let currentHoveringReaction: ReactionType | null = null;
     let shortestDistance = Infinity;
     let anyHovering = false;
-    let shouldUpdate = false;
 
     const properties = reactionPropertiesRef.current;
 
@@ -126,10 +115,9 @@ const ReactionAddPanel = ({
             currentTouchPosition.y >= rect.top &&
             currentTouchPosition.y <= rect.bottom;
 
-          // 가장 가까운 아이콘 찾기
+          // 가장 가까운 아이콘 찾기 (현재는 사용하지 않음)
           if (distance < shortestDistance) {
             shortestDistance = distance;
-            currentHoveringReaction = type;
           }
 
           // 상태가 변경되었는지 확인
@@ -145,7 +133,6 @@ const ReactionAddPanel = ({
               isHovering,
               centerPosition,
             };
-            shouldUpdate = true;
           }
 
           if (isHovering) anyHovering = true;
@@ -169,11 +156,6 @@ const ReactionAddPanel = ({
       setCurrentHovering(null);
       onHoveringReactionChange(null);
     }
-
-    // 상태가 변경되었으면 화면 갱신
-    if (shouldUpdate) {
-      setRenderTrigger((prev) => prev + 1);
-    }
   }, [currentTouchPosition, open, onHoveringReactionChange, currentHovering]);
 
   return (
@@ -188,7 +170,7 @@ const ReactionAddPanel = ({
             "absolute top-0 translate-y-[calc(-100%-12px)] left-1/2 -translate-x-1/2"
           }
         >
-          <div className={"flex gap-4"}>
+          <div className={"flex gap-6"}>
             {Object.keys(ReactionType).map((reaction) => {
               const type = reaction as ReactionType;
               const properties = reactionPropertiesRef.current[type];
