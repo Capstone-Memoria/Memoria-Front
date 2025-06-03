@@ -13,6 +13,7 @@ interface LoginPanelProps extends HTMLAttributes<HTMLDivElement> {
   onNext?: () => void;
   onPrev?: () => void;
   initialEmail?: string;
+  onLoginSuccess?: () => void;
 }
 
 const LoginPanel: React.FC<LoginPanelProps> = ({
@@ -37,7 +38,11 @@ const LoginPanel: React.FC<LoginPanelProps> = ({
         accessTokenExpiresAt: data.accessTokenExpiresAt,
         user: data.user,
       });
-      navigate("/main", { replace: true });
+      if (props.onLoginSuccess) {
+        props.onLoginSuccess();
+      } else {
+        navigate("/main", { replace: true });
+      }
     },
   });
 

@@ -111,6 +111,10 @@ export const routes: ContextRoutes = {
       element: <ErrorPage />,
     },
     {
+      path: "/code-invite/:inviteCode",
+      element: <InviteAcceptPage />, // 초대 수락 페이지
+    },
+    {
       path: "/*",
       element: <ErrorPage defaultErrorCode={"404"} />,
     },

@@ -26,12 +26,10 @@ const InviteAcceptPage = () => {
   useEffect(() => {
     /* 로그인 안 돼 있으면 /login 으로 보내고, 로그인 후 다시 돌아오게 함 */
     if (!user) {
-      navigate("/login", {
-        replace: true,
-        state: { from: location.pathname + location.search },
-      });
+      const currentPath = `/code-invite/${inviteCode}` + location.search;
+      navigate(`/login?from=${encodeURIComponent(currentPath)}`);
     }
-  }, [user, navigate, location]);
+  }, []);
 
   /* ──────────────────────────────── 링크에 실어둔 정보 */
   const diaryName = params.get("diaryName") ?? "다이어리";
