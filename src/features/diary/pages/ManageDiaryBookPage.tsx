@@ -1,6 +1,5 @@
 import api from "@/api";
 import Button from "@/components/base/Button";
-import ColorPicker from "@/components/base/ColorPicker";
 import Spinner from "@/components/base/Spinner";
 import { DiaryCoverItem } from "@/components/diary/DiaryCover";
 import Page from "@/components/page/Page";
@@ -76,24 +75,22 @@ const ManageDiaryBookPage = () => {
     },
   });
 
-  const { mutate: tryUpdateStickers, isPending: isStickerSaving } = useMutation(
-    {
-      mutationFn: (stickers: ModifyingSticker[]) => {
-        if (!diaryBookId) throw new Error("Diary ID is missing!");
-        return api.diaryBook.updateStickers(Number(diaryBookId), stickers);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["fetchDiaryBookById", diaryBookId],
-        });
-        setIsDecorateDialogOpen(false); // 성공 시 다이얼로그 닫기
-      },
-      onError: (error) => {
-        console.error("스티커 업데이트 실패:", error);
-        alert("스티커 업데이트에 실패했습니다.");
-      },
-    }
-  );
+  const { mutate: tryUpdateStickers } = useMutation({
+    mutationFn: (stickers: ModifyingSticker[]) => {
+      if (!diaryBookId) throw new Error("Diary ID is missing!");
+      return api.diaryBook.updateStickers(Number(diaryBookId), stickers);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["fetchDiaryBookById", diaryBookId],
+      });
+      setIsDecorateDialogOpen(false); // 성공 시 다이얼로그 닫기
+    },
+    onError: (error) => {
+      console.error("스티커 업데이트 실패:", error);
+      alert("스티커 업데이트에 실패했습니다.");
+    },
+  });
 
   // 아코디언 패널 상태 관리
   const [openedPanel, setOpenedPanel] = useState<string>("");
@@ -163,7 +160,10 @@ const ManageDiaryBookPage = () => {
     });
   };
 
-  const handleEditCoverSave = async (selectedCover: DiaryCoverItem | null) => {
+  const handleEditCoverSave = async (
+    selectedCover: DiaryCoverItem | null,
+    spineColor: string | undefined
+  ) => {
     if (!diaryBookId) {
       console.error("Diary ID is missing!");
       alert("일기장 ID가 없습니다.");
@@ -200,7 +200,7 @@ const ManageDiaryBookPage = () => {
 
     tryUpdateDiaryBook({
       coverImage: coverImageFile,
-      spineColor: selectedSpineColor,
+      spineColor: spineColor,
     });
   };
 
@@ -216,16 +216,6 @@ const ManageDiaryBookPage = () => {
     : {
         type: "empty",
       };
-
-  const handleSpineColorSave = () => {
-    if (!diaryBookId) {
-      console.error("Diary ID is missing!");
-      return;
-    }
-    tryUpdateDiaryBook({
-      spineColor: selectedSpineColor,
-    });
-  };
   return (
     <Page.Container className={"h-full flex flex-col"}>
       <Page.Header className={"grid grid-cols-3 items-center"}>
@@ -270,36 +260,10 @@ const ManageDiaryBookPage = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* 일기장 표지 */}
+          {/* 일기장 표지 및 책등 색상 */}
           <AccordionItem value={"edit-cover"}>
             <AccordionTrigger className={"flex justify-between items-center"}>
-              <div className={"text-base"}>일기장 표지</div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <EditDiaryCoverPanel
-                onCancel={() => {
-                  setOpenedPanel("");
-                }}
-                onSave={handleEditCoverSave}
-                isSaving={isSaving}
-              />
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* 일기장 캐릭터 관리 */}
-          <AccordionItem value={"manage-character"}>
-            <AccordionTrigger className={"flex justify-between items-center"}>
-              <div className={"text-base"}>일기장 캐릭터 관리</div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <CharacterManagePanel diaryBookId={Number(diaryBookId)} />
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* 일기장 책등 색상 */}
-          <AccordionItem value={"edit-spine-color"}>
-            <AccordionTrigger className={"flex justify-between items-center"}>
-              <div className={"text-base"}>일기장 책등 색상</div>
+              <div className={"text-base"}>일기장 표지 및 책등 색상</div>
               <div className={"flex items-center gap-2"}>
                 {isSaving || isDiaryBookFetching ? (
                   <Spinner />
@@ -315,31 +279,25 @@ const ManageDiaryBookPage = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className={"flex flex-col items-center gap-4 p-4"}>
-                <ColorPicker
-                  selectedColor={selectedSpineColor}
-                  onColorSelect={setSelectedSpineColor}
-                />
-                <div className={"flex gap-2 w-full"}>
-                  <Button
-                    variant={"secondary"}
-                    className={"flex-1"}
-                    onClick={() => {
-                      setOpenedPanel("");
-                      if (data) setSelectedSpineColor(data.spineColor);
-                    }}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    className={"flex-1"}
-                    onClick={handleSpineColorSave}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? <Spinner /> : "저장"}
-                  </Button>
-                </div>
-              </div>
+              <EditDiaryCoverPanel
+                onCancel={() => {
+                  setOpenedPanel("");
+                  if (data) setSelectedSpineColor(data.spineColor);
+                }}
+                onSave={handleEditCoverSave}
+                isSaving={isSaving}
+                initialSpineColor={selectedSpineColor}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* 일기장 캐릭터 관리 */}
+          <AccordionItem value={"manage-character"}>
+            <AccordionTrigger className={"flex justify-between items-center"}>
+              <div className={"text-base"}>일기장 캐릭터 관리</div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <CharacterManagePanel diaryBookId={Number(diaryBookId)} />
             </AccordionContent>
           </AccordionItem>
 
