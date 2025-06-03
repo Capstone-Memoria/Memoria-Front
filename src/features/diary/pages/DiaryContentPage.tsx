@@ -93,6 +93,14 @@ const DiaryContentPage = () => {
     };
   }, [carouselApi]);
 
+  /* 이미지 경로 생성 함수 */
+  const getEmotionImagePath = (emotionName: string) => {
+    return new URL(
+      `../../../assets/images/emotions/${emotionName}.png`,
+      import.meta.url
+    ).href;
+  };
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <Page.Header className={"flex justify-between"}>
@@ -241,6 +249,23 @@ const DiaryContentPage = () => {
               <h1 className={"text-xl mt-6 text-center font-medium"}>
                 {diary.title}
               </h1>
+
+              {/* 감정 표시 */}
+              {diary.emotion && (
+                <div className={"flex justify-center items-center mt-2"}>
+                  <div
+                    className={
+                      "flex items-center justify-center py-1 px-2 rounded-full bg-gray-50"
+                    }
+                  >
+                    <img
+                      src={getEmotionImagePath(diary.emotion.toLowerCase())}
+                      alt={diary.emotion}
+                      className={"size-10 object-contain"}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* 작성 정보 */}
               <div

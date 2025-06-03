@@ -66,13 +66,13 @@ const DiaryBook: React.FC<DiaryBookProps> = ({
       </div>
       <div className={"w-full flex justify-between items-start"}>
         <div>
-          <p className={"text-[13px] font-medium"}>{title}</p>
-          <p className={"text-[11px] font-light text-gray-1"}>
+          <p className={"text-[13px] md:text-[15px] font-medium"}>{title}</p>
+          <p className={"text-[11px] md:text-[13px] font-light text-gray-1"}>
             멤버 {memberCount}명
           </p>
         </div>
         <PiDotsThreeCircleFill
-          className={"text-lg mt-0.5 text-gray-400 cursor-pointer"}
+          className={"text-lg md:text-xl mt-0.5 text-gray-400 cursor-pointer"}
           onClick={handleMenuClick}
         />
       </div>
@@ -93,13 +93,16 @@ const DiaryBookPin: React.FC<DiaryBookPinProps> = ({ pinned, onClick }) => {
   return (
     <div
       className={cn(
-        "absolute top-0 left-[6px] rounded-t-[2px] -translate-y-[14px] px-[4px] pt-[3px] pb-[4px] cursor-pointer transition-colors",
+        "absolute top-0 left-[6px] md:left-[10px] rounded-t-[2px] -translate-y-[14px] md:-translate-y-[20px] px-[4px] pt-[3px] pb-[4px] cursor-pointer transition-colors",
         pinned ? "bg-[#FFE539]" : "hidden"
       )}
       onClick={onClick}
     >
       <FaStar
-        className={cn("text-[7px]", pinned ? "fill-gray-2" : "fill-gray-400")}
+        className={cn(
+          "text-[8px] md:text-sm",
+          pinned ? "fill-gray-2" : "fill-gray-400"
+        )}
       />
     </div>
   );

@@ -30,7 +30,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
           className={cn(
             "size-12 flex items-center justify-center rounded-full border-2 border-gray-300 transition-colors",
             {
-              "bg-gray-300": selectedColor === color,
+              "border-black": selectedColor === color,
             }
           )}
         >

@@ -1,5 +1,8 @@
 import { Editor } from "@tiptap/react";
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   Heading1,
   Heading2,
@@ -62,6 +65,28 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         title={"번호 매기기"}
       >
         <ListOrdered size={16} />
+      </button>
+      <div className={"h-4 w-px bg-gray-200 mx-1"} />
+      <button
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        className={`p-2 rounded hover:bg-gray-100 ${editor.isActive({ textAlign: "left" }) ? "bg-gray-100" : ""}`}
+        title={"왼쪽 정렬"}
+      >
+        <AlignLeft size={16} />
+      </button>
+      <button
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        className={`p-2 rounded hover:bg-gray-100 ${editor.isActive({ textAlign: "center" }) ? "bg-gray-100" : ""}`}
+        title={"가운데 정렬"}
+      >
+        <AlignCenter size={16} />
+      </button>
+      <button
+        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        className={`p-2 rounded hover:bg-gray-100 ${editor.isActive({ textAlign: "right" }) ? "bg-gray-100" : ""}`}
+        title={"오른쪽 정렬"}
+      >
+        <AlignRight size={16} />
       </button>
     </>
   );
