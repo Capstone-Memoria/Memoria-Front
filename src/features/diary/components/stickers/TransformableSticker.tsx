@@ -55,7 +55,9 @@ const TransformableSticker = ({
         <img
           src={presetSticker.imageUrl}
           alt={presetSticker.id}
-          className={"w-full h-full object-contain"}
+          className={
+            "w-full h-full object-contain select-none pointer-events-none"
+          }
           draggable={"false"}
         />
       );
@@ -63,7 +65,7 @@ const TransformableSticker = ({
       return (
         <div
           className={
-            "w-full h-full flex items-center justify-center overflow-hidden"
+            "w-full h-full flex items-center justify-center overflow-hidden select-none pointer-events-none"
           }
           style={{
             fontSize: `${(sticker as CustomTextSticker).fontSize}px`,
@@ -90,7 +92,9 @@ const TransformableSticker = ({
         <img
           src={imageUrl}
           alt={"이미지 스티커"}
-          className={"w-full h-full object-contain"}
+          className={
+            "w-full h-full object-contain select-none pointer-events-none"
+          }
           draggable={"false"}
           onLoad={(e) => {
             // File 객체로부터 생성된 URL인 경우에만 revokeObjectURL을 호출합니다.

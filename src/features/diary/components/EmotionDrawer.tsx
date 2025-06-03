@@ -68,10 +68,10 @@ const EmotionDrawer = ({
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent className={"px-5 pb-10 flex flex-col items-center"}>
         {/* 날짜와 요일 표시 */}
-        <div className={"text-xs pt-5 text-gray-400"}>
+        <div className={"text-xs md:text-sm pt-5 text-gray-400"}>
           {formattedDate} {formattedDayOfWeek}
         </div>
-        <div className={"pb-5 mt-1"}>
+        <div className={"pb-5 md:text-lg mt-1"}>
           {isEditMode ? `이날의 감정은 어땠나요?` : `오늘은 어떤 하루였나요?`}
         </div>
         <div className={"w-full space-y-4 px-2"}>
@@ -95,7 +95,9 @@ const EmotionDrawer = ({
                     <img
                       src={getEmotionImagePath(emotion.name)}
                       alt={emotion.label}
-                      className={"size-18 object-contain"}
+                      className={
+                        "size-18 object-contain md:size-24 pointer-events-none"
+                      }
                     />
                   </div>
                 </div>

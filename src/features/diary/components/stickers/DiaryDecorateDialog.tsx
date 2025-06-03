@@ -343,9 +343,9 @@ const DiaryDecorateDialog = ({
                 onClick={() => onOpenChange(false)}
               />
             </button>
-            <h3 className={"text-lg font-medium"}>일기장 꾸미기</h3>
+            <h3 className={"text-lg font-medium select-none"}>일기장 꾸미기</h3>
             <button
-              className={"p-2 rounded-full hover:bg-gray-100"}
+              className={"p-2 rounded-full select-none"}
               onClick={handleSave}
             >
               저장
@@ -368,7 +368,7 @@ const DiaryDecorateDialog = ({
             }}
           >
             <DiaryCover
-              className={"relative z-0"}
+              className={"relative z-0 pointer-events-none select-none"}
               item={
                 selectedCover ?? {
                   type: "empty",
@@ -395,41 +395,28 @@ const DiaryDecorateDialog = ({
         <div className={"bg-white border-t z-50"}>
           <div className={"flex justify-between items-center p-4"}>
             <div className={"flex gap-2"}>
-              <button
-                className={
-                  "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
-                }
-                aria-label={"뒤로가기"}
-              >
+              <button className={"p-2 rounded-full disabled:opacity-50"}>
                 <RiArrowGoBackLine size={20} />
               </button>
-              <button
-                className={
-                  "p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
-                }
-                aria-label={"앞으로가기"}
-              >
+              <button className={"p-2 rounded-full disabled:opacity-50"}>
                 <RiArrowGoForwardLine size={20} />
               </button>
             </div>
             <div className={"flex gap-3 "}>
               <button
                 className={"p-2 rounded-full antialiased"}
-                aria-label={"텍스트 스티커 추가"}
                 onClick={handleAddTextSticker}
               >
                 <RxText className={"text-2xl text-black"} />
               </button>
               <button
                 className={"p-2 rounded-full antialiased"}
-                aria-label={"이미지 스티커 추가"}
                 onClick={handleImageUpload}
               >
                 <RxImage className={"text-2xl text-black"} />
               </button>
               <button
                 className={"p-2 rounded-full antialiased"}
-                aria-label={"스티커 목록 열기"}
                 onClick={() => setStickerDrawerOpen(true)}
               >
                 <GoSmiley className={"text-2xl text-black"} />

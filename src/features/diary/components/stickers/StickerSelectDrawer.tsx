@@ -140,14 +140,14 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className={"h-[39vh] min-h-[45%]"}>
+      <DrawerContent className={"h-[39vh] min-h-[45%] select-none"}>
         <div className={"p-4 px-4"}>
           <div
             className={
               "flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden pb-2 border-b border-gray-200"
             }
           >
-            <div className={"flex gap-3 min-w-max"}>
+            <div className={"flex gap-3 md:gap-6 min-w-max"}>
               {Object.entries(categoryTabs).map(
                 ([category, { icon, image, label }]) => (
                   <div
@@ -155,7 +155,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
                       handleCategoryChange(category as DisplayStickerCategory)
                     }
                     className={cn(
-                      "transition-all flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-md overflow-hidden",
+                      "transition-all flex-shrink-0 flex items-center justify-center size-10 md:size-16 rounded-md overflow-hidden",
                       {
                         "opacity-70": selectedCategory !== category,
                         "opacity-100 border border-green-600 bg-gray-50":
@@ -171,7 +171,9 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
                       <img
                         src={image}
                         alt={label}
-                        className={"object-cover w-full h-full"}
+                        className={
+                          "object-cover w-full h-full pointer-events-none"
+                        }
                       />
                     )}
                   </div>
@@ -191,7 +193,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
               ? stickerCategories[selectedCategory].map((sticker) => (
                   <motion.div
                     key={sticker.id}
-                    className={"size-12"}
+                    className={"size-12 md:size-20"}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
@@ -200,7 +202,7 @@ const StickerSelectDrawer: React.FC<StickerSelectDrawerProps> = ({
                     <img
                       src={sticker.imageUrl}
                       alt={sticker.id}
-                      className={"size-full object-contain"}
+                      className={"size-full object-contain pointer-events-none"}
                     />
                   </motion.div>
                 ))
