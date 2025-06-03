@@ -37,8 +37,8 @@ const ReactionIconMap: Record<ReactionType, ReactionIconMapProps> = {
   },
   [ReactionType.WOW]: {
     icon: <FaSurprise />,
-    color: "text-gray-500",
-    backgroundColor: "bg-gray-100",
+    color: "text-yellow-500",
+    backgroundColor: "bg-yellow-100",
   },
   [ReactionType.CONGRATS]: {
     icon: <FaHandsClapping />,
