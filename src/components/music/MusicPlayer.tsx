@@ -168,7 +168,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         <div className={"flex-1 flex items-center gap-4"}>
           <div className={"flex-1 flex flex-col"}>
             <div className={"text-lg font-medium"}>음악 생성 중</div>
-            <div className={"text-xs"}>AI가 음악을 만들고 있어요</div>
+            <div className={"text-xs text-gray-500"}>
+              AI가 음악을 만드는데 사용량에 따라 5분 이상 걸릴 수 있어요
+            </div>
           </div>
           <div className={"text-2xl text-gray-600"}>
             <MdQueueMusic />
