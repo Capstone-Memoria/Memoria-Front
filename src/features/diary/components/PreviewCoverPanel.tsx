@@ -5,12 +5,14 @@ interface PreviewCoverPanelProps {
   onBack: () => void;
   imageBase64?: string;
   isError?: boolean;
+  onConfirm?: () => void;
 }
 
 export const PreviewCoverPanel = ({
   onBack,
   imageBase64,
   isError,
+  onConfirm,
 }: PreviewCoverPanelProps) => {
   return (
     <div className={"flex flex-col flex-1 gap-4"}>
@@ -58,8 +60,11 @@ export const PreviewCoverPanel = ({
           size={"xl"}
           variant={"blue"}
           onClick={() => {
-            // TODO: 이미지 선택 로직 구현
+            if (onConfirm) {
+              onConfirm();
+            }
           }}
+          disabled={!imageBase64 || isError}
         >
           이 이미지로 선택
         </Button>

@@ -10,10 +10,36 @@ body {
   height: 100%;
 }
 
+/* 그림자 관련 유틸리티 클래스 */
+.shadow-top {
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 기본 플레이스홀더 스타일 (왼쪽 정렬) */
 .tiptap p.is-empty::before {
   color: #adb5bd;
   content: attr(data-placeholder);
   float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 가운데 정렬된 플레이스홀더 */
+.tiptap p[style*="text-align: center"].is-empty::before {
+  content: attr(data-placeholder);
+  color: #adb5bd;
+  float: none;
+  display: block;
+  text-align: center;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 오른쪽 정렬된 플레이스홀더 */
+.tiptap p[style*="text-align: right"].is-empty::before {
+  content: attr(data-placeholder);
+  color: #adb5bd;
+  float: right;
   height: 0;
   pointer-events: none;
 }
@@ -89,6 +115,18 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --animate-shine: shine var(--duration) infinite linear;
+  @keyframes shine {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    to {
+      background-position: 0% 0%;
+    }
+  }
 }
 
 :root {

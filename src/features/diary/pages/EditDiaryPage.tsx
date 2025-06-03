@@ -3,11 +3,17 @@ import Button from "@/components/base/Button";
 import Input from "@/components/base/Input";
 import Tiptap from "@/components/editor/Tiptap";
 import Page from "@/components/page/Page";
+import EmotionDrawer from "@/features/diary/components/EmotionDrawer";
 import ImageUploader from "@/features/diary/components/ImageUploader";
+import { EmotionType } from "@/models/Diary";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
-import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import {
+  MdOutlineAddReaction,
+  MdOutlineKeyboardBackspace,
+} from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 
@@ -23,6 +29,11 @@ const EditDiaryPage = () => {
   const [toAddImages, setToAddImages] = useState<File[]>([]);
   const [toDeleteImageIds, setToDeleteImageIds] = useState<string[]>([]);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const [isEmotionDrawerOpen, setIsEmotionDrawerOpen] = useState(false);
+  const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
+    null
+  );
+  const [diaryDate, setDiaryDate] = useState<DateTime | null>(null);
 
   /* Server-State */
   const { data: diaryData, isLoading: isDiaryLoading } = useQuery({
@@ -36,7 +47,7 @@ const EditDiaryPage = () => {
     queryFn: () =>
       api.diaryBook.fetchMyDiaryBook({
         size: 10,
-        page: 1,
+        page: 0,
       }),
   });
 
@@ -45,6 +56,16 @@ const EditDiaryPage = () => {
     if (diaryData) {
       setDiaryTitle(diaryData.title);
       setContent(diaryData.content);
+      if (diaryData.emotion) {
+        setSelectedEmotion(diaryData.emotion as EmotionType);
+      }
+      if (diaryData.createdAt) {
+        const diaryDateTime =
+          typeof diaryData.createdAt === "string"
+            ? DateTime.fromISO(diaryData.createdAt)
+            : diaryData.createdAt;
+        setDiaryDate(diaryDateTime);
+      }
     }
   }, [diaryData]);
 
@@ -65,6 +86,7 @@ const EditDiaryPage = () => {
       api.diary.updateDiary(Number(diaryBookId), Number(diaryId), {
         title: diaryTitle,
         content: content,
+        emotion: selectedEmotion || undefined,
         toAddImages: toAddImages, // 새로 추가된 이미지
         toDeleteImageIds: toDeleteImageIds, // 삭제될 이미지 ID
       }),
@@ -88,6 +110,19 @@ const EditDiaryPage = () => {
   }) => {
     setToAddImages(addedImages);
     setToDeleteImageIds(deletedImageIds);
+  };
+
+  // 이미지 경로 생성 함수
+  const getEmotionImagePath = (emotionName: string) => {
+    return new URL(
+      `../../../assets/images/emotions/${emotionName.toLowerCase()}.png`,
+      import.meta.url
+    ).href;
+  };
+
+  const handleEmotionSelect = (emotionType: EmotionType) => {
+    setSelectedEmotion(emotionType);
+    setIsEmotionDrawerOpen(false);
   };
 
   return (
@@ -175,6 +210,29 @@ const EditDiaryPage = () => {
                     >
                       {selectedDiaryBook?.title || "일기장 정보 없음"}
                     </div>
+
+                    {/* 감정 선택 영역 */}
+                    <div className={"flex items-center"}>
+                      <div
+                        className={
+                          "flex items-center justify-center w-fit px-1 py-0.5 rounded-md border border-gray-200 cursor-pointer ml-auto"
+                        }
+                        onClick={() => setIsEmotionDrawerOpen(true)}
+                      >
+                        {selectedEmotion ? (
+                          <img
+                            src={getEmotionImagePath(selectedEmotion)}
+                            alt={"선택된 감정"}
+                            className={"size-7 object-contain"}
+                          />
+                        ) : (
+                          <MdOutlineAddReaction
+                            className={"size-5 text-gray-500"}
+                          />
+                        )}
+                      </div>
+                    </div>
+
                     <div className={"flex flex-col gap-2"}>
                       <Input
                         className={"w-full text-2xl"}
@@ -200,6 +258,14 @@ const EditDiaryPage = () => {
           </div>
         </CSSTransition>
       </SwitchTransition>
+      <EmotionDrawer
+        isOpen={isEmotionDrawerOpen}
+        onOpenChange={setIsEmotionDrawerOpen}
+        onSelectEmotion={handleEmotionSelect}
+        selectedEmotion={selectedEmotion}
+        date={diaryDate || undefined}
+        isEditMode={true}
+      />
     </Page.Container>
   );
 };

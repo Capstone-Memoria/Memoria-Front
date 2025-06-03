@@ -174,18 +174,33 @@ const DiaryBookMemberPage = () => {
 
   const handleCopyLink = () => {
     if (inviteLink) {
-      navigator.clipboard
-        .writeText(inviteLink)
-        .then(() => {
-          setIsLinkCopied(true);
-          setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
-        })
-        .catch((err) => {
-          setAlertMsg({
-            title: "링크 복사에 실패했습니다.",
-            description: err.message,
+      try {
+        // 대체 복사 방법 (보다 안정적)
+        const textArea = document.createElement("textarea");
+        textArea.value = inviteLink;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        // 상태 업데이트
+        setIsLinkCopied(true);
+        setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
+      } catch (err) {
+        // 실패 시 원래 방식으로 시도
+        navigator.clipboard
+          .writeText(inviteLink)
+          .then(() => {
+            setIsLinkCopied(true);
+            setTimeout(() => setIsLinkCopied(false), 2000);
+          })
+          .catch((error) => {
+            setAlertMsg({
+              title: "링크 복사에 실패했습니다.",
+              description: error.message,
+            });
           });
-        });
+      }
     }
   };
 
@@ -225,19 +240,18 @@ const DiaryBookMemberPage = () => {
   return (
     <Page.Container>
       <DefaultHeader logoType={"back"} />
-      <Page.Content className={"px-6 py-4"}>
-        <h1 className={"text-xl font-medium mb-6"}>멤버 관리</h1>
+      <Page.Content>
+        <p className={"text-lg font-medium py-5"}>일기장 멤버 관리</p>
 
         {/* Member List Card */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
+        <div className={"mb-6 rounded-md shadow- bg-white p-4"}>
           <div className={"flex justify-between items-center mb-4"}>
-            <h2 className={"text-lg font-medium"}>멤버 목록</h2>
+            <p>멤버 목록</p>
             {amIAdmin && (
               <Button
                 variant={"text"}
-                size={"sm"}
                 onClick={() => setIsEditMode(!isEditMode)}
-                className={"text-gray-600 hover:text-black"}
+                className={"text-black text-xs"}
                 disabled={
                   updatePermissionMutation.isPending ||
                   removeMemberMutation.isPending
@@ -268,7 +282,7 @@ const DiaryBookMemberPage = () => {
                   </div>
                   <div>
                     <div className={"flex items-center gap-1.5"}>
-                      <span className={"font-medium"}>
+                      <span className={"font-medium text-[15px]"}>
                         {member.user.nickName}
                       </span>
                       {member.permission === "ADMIN" && (
@@ -278,7 +292,7 @@ const DiaryBookMemberPage = () => {
                         />
                       )}
                     </div>
-                    <span className={"text-xs text-gray-500"}>
+                    <span className={"text-xs text-gray-400 font-light"}>
                       {member.user.email}
                     </span>
                   </div>
@@ -346,8 +360,8 @@ const DiaryBookMemberPage = () => {
         </div>
 
         {/* Invite via Link Card */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
-          <h2 className={"text-lg font-medium mb-4"}>멤버 초대 (링크)</h2>
+        <div className={"mb-6 rounded-md bg-white p-4"}>
+          <p className={"mb-4"}>멤버 초대 링크</p>
           {isGeneratingInvite && inviteLink ? ( // Show link section if generated
             <div className={"flex flex-col gap-4"}>
               <div
@@ -358,9 +372,9 @@ const DiaryBookMemberPage = () => {
                   variant={"text"}
                   size={"sm"}
                   onClick={handleCopyLink}
-                  title={"링크 복사"} // ESLint 오류 수정: 중괄호 사용
+                  title={"링크 복사"}
                 >
-                  <IoMdCopy />
+                  <IoMdCopy className={"size-5"} />
                 </Button>
               </div>
               {isLinkCopied && (
@@ -375,7 +389,8 @@ const DiaryBookMemberPage = () => {
                   onClick={() => {
                     setIsGeneratingInvite(false);
                     setInviteLink(null);
-                  }} // Close the link section
+                  }}
+                  className={"text-xs rounded-md"}
                 >
                   닫기
                 </Button>
@@ -383,6 +398,7 @@ const DiaryBookMemberPage = () => {
                   size={"sm"}
                   onClick={handleGenerateInvite} // Generate a new link
                   disabled={generateInviteMutation.isPending}
+                  className={"text-xs rounded-md"}
                 >
                   {generateInviteMutation.isPending
                     ? "생성중..."
@@ -396,10 +412,10 @@ const DiaryBookMemberPage = () => {
               <p className={"text-sm text-gray-500 mb-4"}>
                 멤버를 초대하려면 초대 링크를 생성하여 공유하세요.
                 <br />
-                초대 링크는 7일간 유효합니다. (유효기간은 백엔드 설정에 따름)
+                초대 링크는 7일간 유효합니다.
               </p>
               <Button
-                size={"md"}
+                size={"sm"}
                 className={"flex items-center gap-2"}
                 onClick={handleGenerateInvite}
                 disabled={generateInviteMutation.isPending}
@@ -418,8 +434,8 @@ const DiaryBookMemberPage = () => {
         </div>
 
         {/* Direct Invite Card */}
-        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
-          <h2 className={"text-lg font-medium mb-4"}>멤버 직접 초대</h2>
+        <div className={"mb-6 rounded-md bg-white p-4"}>
+          <p className={"mb-4"}>멤버 직접 초대</p>
           <p className={"text-sm text-gray-500 mb-4"}>
             이메일 주소를 입력하여 멤버를 직접 초대하세요.
             <br />
@@ -439,6 +455,7 @@ const DiaryBookMemberPage = () => {
               <Button
                 size={"md"}
                 onClick={handleDirectInvite}
+                className={"text-base rounded-md"}
                 disabled={
                   !directInviteEmail.trim() || directInviteMutation.isPending
                 } // Disable if email is empty or mutation is pending
