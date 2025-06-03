@@ -38,6 +38,7 @@ const WriteDiaryPage = () => {
   // 상태 관리
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEmotionDrawerOpen, setIsEmotionDrawerOpen] = useState(false);
+  const [isLeavingPage, setIsLeavingPage] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
     null
   );
@@ -77,7 +78,7 @@ const WriteDiaryPage = () => {
   const [settings, setSettings] = useState<Settings>({
     aiCharacter: null,
     useRandomAICharacter: true,
-    musicCreationEnabled: true,
+    musicCreationEnabled: false,
   });
 
   // 일기장 목록 조회
@@ -105,76 +106,6 @@ const WriteDiaryPage = () => {
     return !!diaryTitle && diaryTitle.trim() !== "";
   }, [diaryTitle]);
 
-  // 초기 드로어 표시 설정
-  useEffect(() => {
-    if (diaryBookId === null) {
-      setIsMenuOpen(true);
-    } else if (!selectedEmotion) {
-      setIsEmotionDrawerOpen(true);
-    }
-  }, [diaryBookId, selectedEmotion]);
-
-  // 선택된 일기장
-  const selectedDiaryBook = useMemo(() => {
-    return data?.content.find((diary) => diary.id === Number(diaryBookId));
-  }, [data, diaryBookId]);
-
-  // 일기장 드로어 열기
-  const openDrawer = () => {
-    setIsMenuOpen(true);
-  };
-
-  // 감정 선택 핸들러
-  const handleEmotionSelect = (emotionType: EmotionType) => {
-    setSelectedEmotion(emotionType);
-    setIsEmotionDrawerOpen(false);
-  };
-
-  // 이미지 업로드 핸들러
-  const handleImageUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // 파일 변경 핸들러
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(event.target.files || []);
-    if (files.length === 0) return;
-
-    // 현재 에디터의 상태와 커서 위치 저장
-    const currentEditor = editorRef.current;
-    const wasEditorFocused = currentEditor?.isFocused;
-    const cursorPosition = currentEditor?.state.selection.from;
-
-    setUploadedImages((prev) => [...prev, ...files]);
-
-    const newImagePreviews = files.map((file) => ({
-      url: URL.createObjectURL(file),
-      file,
-    }));
-
-    setImagePreviewUrls((prev) => [...prev, ...newImagePreviews]);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-
-    // 약간의 지연 후에 에디터의 상태와 커서 위치 복원
-    setTimeout(() => {
-      if (currentEditor && wasEditorFocused && cursorPosition) {
-        currentEditor.commands.focus(cursorPosition);
-      }
-    }, 100);
-  };
-
-  // 이미지 제거 핸들러
-  const handleRemoveImage = (index: number) => {
-    URL.revokeObjectURL(imagePreviewUrls[index].url);
-    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
   // 일기 저장
   const submitMutation = useMutation({
     mutationFn: () =>
@@ -191,6 +122,7 @@ const WriteDiaryPage = () => {
         isAIMusicEnabled: settings.musicCreationEnabled,
       }),
     onSuccess: () => {
+      setIsLeavingPage(true);
       navigate(`/diary-book/${diaryBookId}`, {
         replace: true,
       });
@@ -198,6 +130,7 @@ const WriteDiaryPage = () => {
   });
 
   const handleSubmit = () => {
+    setIsLeavingPage(true);
     submitMutation.mutate();
   };
 
@@ -292,10 +225,92 @@ const WriteDiaryPage = () => {
     };
   }, [isKeyboardOpen]);
 
+  // 초기 드로어 표시 설정
+  useEffect(() => {
+    // 페이지를 떠나는 중이거나 일기 저장 중/성공 후에는 아무 드로어도 표시하지 않음
+    if (isLeavingPage || isSubmitting || submitMutation.isSuccess) return;
+
+    if (diaryBookId === null) {
+      setIsMenuOpen(true);
+    } else if (!selectedEmotion) {
+      setIsEmotionDrawerOpen(true);
+    }
+  }, [
+    diaryBookId,
+    selectedEmotion,
+    isLeavingPage,
+    isSubmitting,
+    submitMutation.isSuccess,
+  ]);
+
+  // 선택된 일기장
+  const selectedDiaryBook = useMemo(() => {
+    return data?.content.find((diary) => diary.id === Number(diaryBookId));
+  }, [data, diaryBookId]);
+
+  // 일기장 드로어 열기
+  const openDrawer = () => {
+    setIsMenuOpen(true);
+  };
+
+  // 감정 선택 핸들러
+  const handleEmotionSelect = (emotionType: EmotionType) => {
+    setSelectedEmotion(emotionType);
+    setIsEmotionDrawerOpen(false);
+  };
+
+  // 이미지 업로드 핸들러
+  const handleImageUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 파일 변경 핸들러
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
+    // 현재 에디터의 상태와 커서 위치 저장
+    const currentEditor = editorRef.current;
+    const wasEditorFocused = currentEditor?.isFocused;
+    const cursorPosition = currentEditor?.state.selection.from;
+
+    setUploadedImages((prev) => [...prev, ...files]);
+
+    const newImagePreviews = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    setImagePreviewUrls((prev) => [...prev, ...newImagePreviews]);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // 약간의 지연 후에 에디터의 상태와 커서 위치 복원
+    setTimeout(() => {
+      if (currentEditor && wasEditorFocused && cursorPosition) {
+        currentEditor.commands.focus(cursorPosition);
+      }
+    }, 100);
+  };
+
+  // 이미지 제거 핸들러
+  const handleRemoveImage = (index: number) => {
+    URL.revokeObjectURL(imagePreviewUrls[index].url);
+    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <Page.Container className={"h-full flex flex-col overflow-x-hidden"}>
       <WriteDiaryPageHeader
-        onBackClick={() => navigate(-1)}
+        onBackClick={() => {
+          setIsLeavingPage(true);
+          navigate(-1);
+        }}
         canSubmit={canSubmit}
         onSubmitClick={handleSubmit}
       />

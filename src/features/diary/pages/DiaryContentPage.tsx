@@ -286,7 +286,7 @@ const DiaryContentPage = () => {
                 {/* 일기 내용 */}
                 <motion.div
                   layout
-                  className={"mt-6 px-5 font-light"}
+                  className={"mt-6 px-5 font-light diary-content"}
                   dangerouslySetInnerHTML={{ __html: diary.content }}
                 />
               </LayoutGroup>
