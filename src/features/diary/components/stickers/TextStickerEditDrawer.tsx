@@ -26,10 +26,15 @@ const MAX_FONT_SIZE = 96;
 
 // 폰트 옵션
 const FONT_OPTIONS = [
-  { name: "기본", value: "sans-serif" },
-  { name: "명조", value: "serif" },
-  { name: "모노", value: "monospace" },
-  { name: "필기체", value: "cursive" },
+  {
+    name: "기본 고딕",
+    value: "'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif",
+  },
+  {
+    name: "둥근 고딕",
+    value: "'Apple SD Gothic Neo', 'Nanum Gothic', sans-serif",
+  },
+  { name: "명조체", value: "'Batang', 'Times New Roman', serif" },
 ];
 
 const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
@@ -42,7 +47,7 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
     fontStyle: "normal",
     fontSize: DEFAULT_FONT_SIZE,
     color: "#000000",
-    fontFamily: "sans-serif",
+    fontFamily: "'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif",
   },
 }) => {
   const [text, setText] = useState(initialText);
@@ -51,9 +56,42 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
     fontStyle: initialStyle.fontStyle || "normal",
     fontSize: initialStyle.fontSize || DEFAULT_FONT_SIZE,
     color: initialStyle.color || "#000000",
-    fontFamily: initialStyle.fontFamily || "sans-serif",
+    fontFamily:
+      initialStyle.fontFamily ||
+      "'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif",
   });
   const [isDragging, setIsDragging] = useState(false);
+
+  // 텍스트 색상에 따라 적절한 배경색을 계산하는 함수
+  const getContrastBackgroundColor = (textColor: string) => {
+    // hex 색상을 RGB로 변환
+    const hex = textColor.replace("#", "");
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    // 색상의 밝기 계산 (0-255)
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+    // 밝은 색상이면 검정 배경, 어두운 색상이면 하양 배경
+    if (brightness > 128) {
+      // 밝은 텍스트 -> 검정 배경
+      return "#000000";
+    } else {
+      // 어두운 텍스트 -> 하양 배경
+      return "#ffffff";
+    }
+  };
+
+  // 배경색이 어두운지 밝은지 판단하는 함수
+  const isDarkBackground = (textColor: string) => {
+    const hex = textColor.replace("#", "");
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128; // 밝은 텍스트 = 어두운 배경
+  };
 
   const handleSave = () => {
     if (!text.trim()) return;
@@ -258,6 +296,18 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
         .dragging * {
           cursor: grabbing !important;
         }
+
+        .text-preview-input::placeholder {
+          opacity: 0.5;
+        }
+
+        .text-preview-input.dark-bg::placeholder {
+          color: #ffffff;
+        }
+
+        .text-preview-input.light-bg::placeholder {
+          color: #000000;
+        }
       `}</style>
       <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
         <DrawerContent className={"min-h-[350px]"}>
@@ -283,26 +333,45 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
               >
                 <input
                   type={"text"}
-                  className={
-                    "w-full p-3 focus:outline-none bg-transparent text-center resize-none pt-4"
-                  }
+                  className={cn(
+                    "w-full p-3 focus:outline-none text-center resize-none pt-4 text-preview-input",
+                    isDarkBackground(textStyle.color) ? "dark-bg" : "light-bg"
+                  )}
                   style={{
                     fontWeight: textStyle.fontWeight,
                     fontStyle: textStyle.fontStyle,
                     fontSize: `${Math.min(textStyle.fontSize, 48)}px`,
                     fontFamily: textStyle.fontFamily,
                     color: textStyle.color,
+                    backgroundColor: getContrastBackgroundColor(
+                      textStyle.color
+                    ),
                     minHeight: "64px",
                     maxHeight: "120px",
                     lineHeight: "1.2",
+                    transition: "background-color 0.2s ease",
                   }}
-                  placeholder={"텍스트를 입력하세요."}
+                  placeholder={"텍스트 입력"}
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                 />
                 {textStyle.fontSize > 48 && (
-                  <div className={"px-3 pb-2"}>
-                    <span className={"text-xs text-gray-500"}>
+                  <div
+                    className={"px-3 pb-2 border-t border-gray-400"}
+                    style={{
+                      backgroundColor: getContrastBackgroundColor(
+                        textStyle.color
+                      ),
+                    }}
+                  >
+                    <span
+                      className={"text-xs"}
+                      style={{
+                        color: isDarkBackground(textStyle.color)
+                          ? "#ffffff"
+                          : "#000000",
+                      }}
+                    >
                       실제 크기: {textStyle.fontSize}px (미리보기는 최대 48px로
                       제한)
                     </span>
@@ -357,12 +426,14 @@ const TextStickerEditDrawer: React.FC<TextStickerEditDrawerProps> = ({
                     />
                     <button
                       className={cn(
-                        "p-1.5 rounded-md border flex items-center gap-2"
+                        "p-1.5 rounded-md border flex items-center gap-2 md:gap-3"
                       )}
                     >
                       <BiPalette className={"size-5 md:size-6"} />
                       <div
-                        className={"w-3 h-3 rounded-full border border-black"}
+                        className={
+                          "size-4 md:size-5 rounded-full border border-black"
+                        }
                         style={{ backgroundColor: textStyle.color }}
                       ></div>
                     </button>
