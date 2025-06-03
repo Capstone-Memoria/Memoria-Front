@@ -1,3 +1,4 @@
+// src/pages/DiaryBookMemberPage.tsx
 import api from "@/api";
 import Button from "@/components/base/Button";
 import Dialog from "@/components/base/Dialog";
@@ -5,7 +6,7 @@ import Input from "@/components/base/Input";
 import DefaultHeader from "@/components/layout/DefaultHeader";
 import Page from "@/components/page/Page";
 import { cn } from "@/lib/utils";
-import { DiaryBookMemer } from "@/models/DiaryBook"; // Import DiaryBookMemer type
+import { DiaryBookMemer } from "@/models/DiaryBook";
 import { useAuthStore } from "@/stores/AuthenticationStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -16,44 +17,56 @@ import { useNavigate, useParams } from "react-router-dom";
 const DiaryBookMemberPage = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
-  const { diaryBookId } = useParams();
+  const { diaryBookId } = useParams<{ diaryBookId: string }>();
   const queryClient = useQueryClient();
 
-  // State for invite link generation
+  // Invite Link States
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isGeneratingInvite, setIsGeneratingInvite] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
-  // State for direct invite
+  // Admin Help Tooltip
+  const [showAdminHelp, setShowAdminHelp] = useState(false);
+
+  // Direct Invite States
   const [directInviteEmail, setDirectInviteEmail] = useState("");
   const [inviteSuccessMessage, setInviteSuccessMessage] = useState<
     string | null
   >(null);
 
+  // Member Removal Confirmation
   const [memberToRemove, setMemberToRemove] = useState<DiaryBookMemer | null>(
     null
   );
+
+  // Alert Dialog
   const [alertMsg, setAlertMsg] = useState<{
     title: string;
     description?: string;
   } | null>(null);
 
-  // Fetch members query
+  // “관리자 변경” 모드 여부
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // ─── Queries ─────────────────────────────────────────────────────────────────
+
   const {
     data: memberData,
     isLoading: isLoadingMembers,
     error: memberError,
   } = useQuery<DiaryBookMemer[], Error>({
-    // Specify types for useQuery
-    queryKey: ["fetchDiaryBookMembers", diaryBookId], // Include diaryBookId in queryKey
+    queryKey: ["fetchDiaryBookMembers", diaryBookId],
     queryFn: () => api.diaryBook.fetchDiaryMembers(Number(diaryBookId)),
-    enabled: !!diaryBookId, // Only run query if diaryBookId is valid
+    enabled: !!diaryBookId,
   });
 
-  // Edit mode state
-  const [isEditMode, setIsEditMode] = useState(false);
+  const { data: diaryBook } = useQuery({
+    queryKey: ["fetchDiaryBook", diaryBookId],
+    queryFn: () => api.diaryBook.fetchDiaryBookById(Number(diaryBookId)),
+    enabled: !!diaryBookId,
+  });
 
-  // Check if current user is admin
+  // 현재 로그인 사용자가 ADMIN인지
   const amIAdmin = useMemo(() => {
     return memberData?.some(
       (member) =>
@@ -62,98 +75,102 @@ const DiaryBookMemberPage = () => {
     );
   }, [memberData, authStore.context?.user?.email]);
 
-  // --- Mutations ---
+  // ─── Mutations ────────────────────────────────────────────────────────────────
 
-  // Update member permission mutation
-  const updatePermissionMutation = useMutation({
-    mutationFn: api.diaryBook.updateDiaryMemberPermission,
+  // MEMBER → ADMIN
+  const promoteAdminMutation = useMutation({
+    mutationFn: (newAdminId: number) =>
+      api.diaryBook.addDiaryBookAdmin(Number(diaryBookId), newAdminId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookMembers", diaryBookId],
       });
-      setAlertMsg({ title: "권한이 변경되었습니다" }); // Optionally show success message
+      setAlertMsg({ title: "새로운 관리자가 지정되었습니다." });
     },
-    onError: (error) => {
-      setAlertMsg({ title: "권한 변경 실패", description: error.message });
+    onError: (error: Error) => {
+      setAlertMsg({ title: "새 관리자 지정 실패", description: error.message });
     },
   });
 
-  // Remove member mutation
-  const removeMemberMutation = useMutation({
-    mutationFn: ({
-      diaryBookId,
-      memberId,
-    }: {
-      diaryBookId: number;
-      memberId: number;
-    }) => api.diaryBook.diaryMemberDelete(diaryBookId, memberId),
+  // ADMIN → MEMBER (POST remove-admin)
+  const demoteAdminMutation = useMutation({
+    mutationFn: (toRemoveId: number) =>
+      api.diaryBook.removeDiaryBookAdmin(Number(diaryBookId), toRemoveId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["fetchDiaryBookMembers", diaryBookId],
       });
-      setAlertMsg({ title: "멤버를 내보냈습니다" });
+      setAlertMsg({ title: "관리자 권한이 해제되었습니다." });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
+      setAlertMsg({ title: "권한 해제 실패", description: error.message });
+    },
+  });
+
+  // 단순 멤버 추방(삭제)
+  const removeMemberMutation = useMutation({
+    mutationFn: (memberId: number) =>
+      api.diaryBook.diaryMemberDelete(Number(diaryBookId), memberId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["fetchDiaryBookMembers", diaryBookId],
+      });
+      setAlertMsg({ title: "멤버가 내보내졌습니다." });
+    },
+    onError: (error: Error) => {
       setAlertMsg({ title: "멤버 내보내기 실패", description: error.message });
     },
   });
 
-  // Generate invite link mutation
-  // ✅ 수정 부분만 발췌
+  // Invite Link 생성
   const generateInviteMutation = useMutation({
     mutationFn: () => api.invitation.createInviteCode(Number(diaryBookId)),
     onSuccess: (data) => {
       const { inviteCode, diaryBook } = data;
       const inviter = authStore.context!.user!.nickName;
-
       const fullInviteLink =
         `${window.location.origin}/code-invite/${inviteCode}` +
         `?diaryName=${encodeURIComponent(diaryBook.title)}` +
         `&inviter=${encodeURIComponent(inviter)}`;
-
       setInviteLink(fullInviteLink);
       setIsGeneratingInvite(true);
       setIsLinkCopied(false);
     },
+    onError: (error: Error) => {
+      setAlertMsg({ title: "초대 링크 생성 실패", description: error.message });
+    },
   });
 
-  // Direct invite mutation
+  // Direct Invite by Email
   const directInviteMutation = useMutation({
     mutationFn: (email: string) =>
       api.invitation.directInvite(Number(diaryBookId), email),
-    onSuccess: (data, email) => {
+    onSuccess: (_data, email) => {
       setInviteSuccessMessage(`'${email}'님에게 초대 요청을 보냈습니다.`);
-      setDirectInviteEmail(""); // Clear input field
-      setTimeout(() => setInviteSuccessMessage(null), 3000); // Clear message after 3 seconds
+      setDirectInviteEmail("");
+      setTimeout(() => setInviteSuccessMessage(null), 3000);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       setAlertMsg({ title: "직접 초대 실패", description: error.message });
       setInviteSuccessMessage(null);
     },
   });
 
-  // --- Event Handlers ---
+  // ─── Handlers ─────────────────────────────────────────────────────────────────
 
-  const handleToggleAdmin = (memberId: number, currentPermission: string) => {
+  // MEMBER → ADMIN
+  const handlePromoteAdmin = (member: DiaryBookMemer) => {
     if (!amIAdmin) return;
-    const newPermission = currentPermission === "ADMIN" ? "MEMBER" : "ADMIN";
-    updatePermissionMutation.mutate({
-      diaryBookId: Number(diaryBookId),
-      memberId,
-      permission: newPermission,
-    });
+    promoteAdminMutation.mutate(member.id);
   };
 
-  // const handleRemoveMember = (memberId: number) => {
-  //   if (!amIAdmin) return;
-  //   if (window.confirm("정말로 이 멤버를 내보내시겠습니까?")) {
-  //     removeMemberMutation.mutate({
-  //       diaryBookId: Number(diaryBookId),
-  //       memberId,
-  //     });
-  //   }
-  // };
+  // ADMIN → MEMBER (권한 강등)
+  const handleDemoteAdmin = (member: DiaryBookMemer) => {
+    if (!amIAdmin) return;
+    demoteAdminMutation.mutate(member.id);
+  };
 
+  // 멤버 추방용
   const handleRemoveMember = (member: DiaryBookMemer) => {
     if (!amIAdmin) return;
     setMemberToRemove(member);
@@ -161,49 +178,34 @@ const DiaryBookMemberPage = () => {
 
   const confirmRemove = () => {
     if (!memberToRemove) return;
-    removeMemberMutation.mutate({
-      diaryBookId: Number(diaryBookId),
-      memberId: memberToRemove.id,
-    });
+    removeMemberMutation.mutate(memberToRemove.id);
     setMemberToRemove(null);
   };
 
+  // Invite Link 생성
   const handleGenerateInvite = () => {
     generateInviteMutation.mutate();
   };
 
+  // Invite Link 복사
   const handleCopyLink = () => {
     if (inviteLink) {
-      try {
-        // 대체 복사 방법 (보다 안정적)
-        const textArea = document.createElement("textarea");
-        textArea.value = inviteLink;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-
-        // 상태 업데이트
-        setIsLinkCopied(true);
-        setTimeout(() => setIsLinkCopied(false), 2000); // Hide message after 2s
-      } catch (err) {
-        // 실패 시 원래 방식으로 시도
-        navigator.clipboard
-          .writeText(inviteLink)
-          .then(() => {
-            setIsLinkCopied(true);
-            setTimeout(() => setIsLinkCopied(false), 2000);
-          })
-          .catch((error) => {
-            setAlertMsg({
-              title: "링크 복사에 실패했습니다.",
-              description: error.message,
-            });
+      navigator.clipboard
+        .writeText(inviteLink)
+        .then(() => {
+          setIsLinkCopied(true);
+          setTimeout(() => setIsLinkCopied(false), 2000);
+        })
+        .catch((err) => {
+          setAlertMsg({
+            title: "링크 복사에 실패했습니다.",
+            description: err.message,
           });
       }
     }
   };
 
+  // Direct Invite by Email
   const handleDirectInvite = () => {
     if (!directInviteEmail.trim() || !/\S+@\S+\.\S+/.test(directInviteEmail)) {
       setAlertMsg({ title: "유효한 이메일 주소를 입력해주세요." });
@@ -212,15 +214,14 @@ const DiaryBookMemberPage = () => {
     directInviteMutation.mutate(directInviteEmail.trim());
   };
 
-  // --- Render Logic ---
+  // ─── Render ───────────────────────────────────────────────────────────────────
 
   if (isLoadingMembers) {
     return (
       <Page.Container>
         <DefaultHeader logoType={"back"} />
         <Page.Content className={"flex justify-center items-center h-full"}>
-          <p>멤버 정보를 불러오는 중...</p>{" "}
-          {/* Replace with Spinner if available */}
+          <p>멤버 정보를 불러오는 중...</p>
         </Page.Content>
       </Page.Container>
     );
@@ -240,43 +241,79 @@ const DiaryBookMemberPage = () => {
   return (
     <Page.Container>
       <DefaultHeader logoType={"back"} />
-      <Page.Content>
-        <p className={"text-lg font-medium py-5"}>일기장 멤버 관리</p>
+      <Page.Content className={"px-6 py-18"}>
+        <h1 className={"text-xl font-medium mb-6"}>
+          {diaryBook?.title} 일기장 멤버 관리
+        </h1>
 
-        {/* Member List Card */}
-        <div className={"mb-6 rounded-md shadow- bg-white p-4"}>
+        {/* ── Member List Card ───────────────────────────────────────────────── */}
+        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
           <div className={"flex justify-between items-center mb-4"}>
             <p>멤버 목록</p>
             {amIAdmin && (
-              <Button
-                variant={"text"}
-                onClick={() => setIsEditMode(!isEditMode)}
-                className={"text-black text-xs"}
-                disabled={
-                  updatePermissionMutation.isPending ||
-                  removeMemberMutation.isPending
-                } // Disable while mutating
-              >
-                {isEditMode ? "완료" : "관리자 변경"}
-              </Button>
+              <div className={"relative flex items-center gap-3"}>
+                {/* 관리자 변경 버튼 */}
+                <button
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  disabled={
+                    promoteAdminMutation.isPending ||
+                    demoteAdminMutation.isPending ||
+                    removeMemberMutation.isPending
+                  }
+                  className={
+                    "text-sm text-gray-600 underline underline-offset-4"
+                  }
+                >
+                  {isEditMode ? "완료" : "관리자 변경"}
+                </button>
+
+                {/* 물음표 버튼 */}
+                <button
+                  onClick={() => setShowAdminHelp(!showAdminHelp)}
+                  className={
+                    "w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs font-bold text-gray-600"
+                  }
+                >
+                  ?
+                </button>
+
+                {/* 도움말 툴팁 */}
+                {showAdminHelp && (
+                  <div
+                    className={
+                      "absolute top-[120%] right-0 z-10 w-[240px] bg-green-600 text-white text-sm p-3 rounded-md shadow-md"
+                    }
+                  >
+                    <div
+                      className={
+                        "absolute -top-2 right-3 w-0 h-0 border-l-8 border-r-8 border-b-[8px] border-l-transparent border-r-transparent border-b-green-600"
+                      }
+                    />
+                    일기장의 관리자만 멤버 삭제 및 추가가 가능합니다.
+                    <br />
+                    관리자 변경을 통해 관리자를 설정해보세요.
+                  </div>
+                )}
+              </div>
             )}
           </div>
+
           <div className={"flex flex-col gap-1"}>
             {memberData?.map((member) => (
               <div
                 key={member.id}
                 className={
-                  "flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+                  "flex items-center justify-between py-4 border-b border-gray-400 last:border-b-0"
                 }
               >
-                {/* Member Info */}
+                {/* ── 좌측: Avatar · Nickname · Email ── */}
                 <div className={"flex items-center gap-3"}>
                   <div
                     className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gray-200" // TODO: Add dynamic bg color based on user?
+                      "w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gray-200"
                     )}
                   >
-                    <span className={"text-gray-600 text-lg font-medium"}>
+                    <span className={"text-black-600 text-lg font-medium"}>
                       {member.user.nickName.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -292,24 +329,29 @@ const DiaryBookMemberPage = () => {
                         />
                       )}
                     </div>
-                    <span className={"text-xs text-gray-400 font-light"}>
+                    <span className={"text-xs text-gray-400 mt-[2px] block"}>
                       {member.user.email}
                     </span>
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className={"flex items-center"}>
+                {/* ── 우측: Edit 모드일 때만 보이는 버튼들 ── */}
+                <div className={"flex items-center gap-2"}>
                   {amIAdmin &&
-                  member.user.email !== authStore.context?.user?.email ? ( // Only show buttons for other members if admin
-                    isEditMode ? ( // Edit Mode: Toggle Admin
+                    member.user.email !== authStore.context?.user?.email &&
+                    isEditMode && (
                       <Button
                         variant={"text"}
                         size={"sm"}
                         onClick={() =>
-                          handleToggleAdmin(member.id, member.permission)
+                          member.permission === "ADMIN"
+                            ? handleDemoteAdmin(member)
+                            : handlePromoteAdmin(member)
                         }
-                        disabled={updatePermissionMutation.isPending} // Disable while mutating
+                        disabled={
+                          promoteAdminMutation.isPending ||
+                          demoteAdminMutation.isPending
+                        }
                         className={cn(
                           "text-sm",
                           member.permission === "ADMIN"
@@ -322,47 +364,53 @@ const DiaryBookMemberPage = () => {
                             : "관리자로 지정"
                         }
                       >
-                        {updatePermissionMutation.isPending &&
-                        updatePermissionMutation.variables?.memberId ===
-                          member.id
-                          ? "변경중..."
-                          : member.permission === "ADMIN"
-                            ? "관리자 해제"
+                        {member.permission === "ADMIN"
+                          ? demoteAdminMutation.isPending &&
+                            demoteAdminMutation.variables === member.id
+                            ? "해제중..."
+                            : "관리자 해제"
+                          : promoteAdminMutation.isPending &&
+                              promoteAdminMutation.variables === member.id
+                            ? "지정중..."
                             : "관리자 지정"}
                       </Button>
-                    ) : (
-                      // Normal Mode: Remove Member
+                    )}
+                  {/* Edit 모드가 아닐 때 보이는 “추방” 버튼(원하면) */}
+                  {!isEditMode &&
+                    amIAdmin &&
+                    member.user.email !== authStore.context?.user?.email && (
                       <Button
                         variant={"text"}
                         size={"sm"}
                         className={"text-gray-400 hover:text-red-500"}
                         onClick={() => handleRemoveMember(member)}
-                        disabled={removeMemberMutation.isPending} // Disable while mutating
+                        disabled={removeMemberMutation.isPending}
                         title={"멤버 내보내기"}
                       >
                         {removeMemberMutation.isPending &&
-                        removeMemberMutation.variables?.memberId ===
-                          member.id ? (
+                        removeMemberMutation.variables === member.id ? (
                           "삭제중..."
                         ) : (
                           <IoMdClose size={20} />
                         )}
                       </Button>
-                    )
-                  ) : member.user.email === authStore.context?.user?.email &&
-                    isEditMode ? ( // Show "(나)" for self in edit mode
-                    <span className={"text-xs text-gray-400 mr-2"}>(나)</span>
-                  ) : null}
+                    )}
+                  {/* 본인일 경우, Edit 모드에서 (나) 표시 */}
+                  {member.user.email === authStore.context?.user?.email &&
+                    isEditMode && (
+                      <span className={"text-xs text-gray-400 mr-2"}>(나)</span>
+                    )}
                 </div>
               </div>
             ))}
           </div>
         </div>
+        {/* ──────────────────────────────────────────────────────────────────────── */}
 
         {/* Invite via Link Card */}
-        <div className={"mb-6 rounded-md bg-white p-4"}>
-          <p className={"mb-4"}>멤버 초대 링크</p>
-          {isGeneratingInvite && inviteLink ? ( // Show link section if generated
+        <div className={"mb-6 rounded-md bg-white shadow-sm p-4"}>
+          <h2 className={"text-lg font-medium mb-4"}>멤버 초대 (링크)</h2>
+          {isGeneratingInvite && inviteLink ? (
             <div className={"flex flex-col gap-4"}>
               <div
                 className={"flex items-center gap-2 bg-gray-100 p-3 rounded-md"}
@@ -390,13 +438,12 @@ const DiaryBookMemberPage = () => {
                     setIsGeneratingInvite(false);
                     setInviteLink(null);
                   }}
-                  className={"text-xs rounded-md"}
                 >
                   닫기
                 </Button>
                 <Button
                   size={"sm"}
-                  onClick={handleGenerateInvite} // Generate a new link
+                  onClick={handleGenerateInvite}
                   disabled={generateInviteMutation.isPending}
                   className={"text-xs rounded-md"}
                 >
@@ -407,7 +454,6 @@ const DiaryBookMemberPage = () => {
               </div>
             </div>
           ) : (
-            // Show generate button initially
             <div>
               <p className={"text-sm text-gray-500 mb-4"}>
                 멤버를 초대하려면 초대 링크를 생성하여 공유하세요.
@@ -442,7 +488,7 @@ const DiaryBookMemberPage = () => {
             상대방에게 초대 알림이 전송됩니다.
           </p>
           <div className={"flex flex-col gap-3"}>
-            <div className={"flex flex-col  gap-4"}>
+            <div className={"flex flex-col gap-4"}>
               <Input
                 type={"email"}
                 placeholder={"초대할 멤버의 이메일 주소"}
@@ -458,7 +504,7 @@ const DiaryBookMemberPage = () => {
                 className={"text-base rounded-md"}
                 disabled={
                   !directInviteEmail.trim() || directInviteMutation.isPending
-                } // Disable if email is empty or mutation is pending
+                }
               >
                 {directInviteMutation.isPending ? "전송중..." : "초대 보내기"}
               </Button>
@@ -471,6 +517,8 @@ const DiaryBookMemberPage = () => {
           </div>
         </div>
       </Page.Content>
+
+      {/* Member Removal Confirmation Dialog */}
       <Dialog
         open={!!memberToRemove}
         title={`${memberToRemove?.user.nickName} 님을 일기장에서 삭제하시겠어요?`}
@@ -479,6 +527,8 @@ const DiaryBookMemberPage = () => {
         onConfirm={confirmRemove}
         onClose={() => setMemberToRemove(null)}
       />
+
+      {/* Alert Dialog */}
       <Dialog
         open={!!alertMsg}
         title={alertMsg?.title ?? ""}

@@ -125,6 +125,28 @@ export const updateDiaryMemberPermission = async ({
   return response.data;
 };
 
+export const addDiaryBookAdmin = async (
+  diaryBookId: number,
+  newAdminId: number
+) => {
+  const response = await server.post<DiaryBookMemer>(
+    `/api/diary-book/${diaryBookId}/members/add-admin`,
+    { newAdminId }
+  );
+  return response.data;
+};
+
+export const removeDiaryBookAdmin = async (
+  diaryBookId: number,
+  toRemoveId: number
+) => {
+  const response = await server.post<DiaryBookMemer>(
+    `/api/diary-book/${diaryBookId}/members/remove-admin`,
+    { toRemoveId }
+  );
+  return response.data;
+};
+
 export const fetchDiaryMembers = async (diaryBookId: number) => {
   const responcse = await server.get<DiaryBookMemer[]>(
     `/api/diary-book/${diaryBookId}/members`
