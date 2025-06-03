@@ -110,11 +110,11 @@ const ReactionHoverIcon = ({
       <div
         className={cn(
           "min-w-8 h-8 rounded-full flex items-center justify-center relative",
-          ReactionIconMap[reactionType].backgroundColor,
-          ReactionIconMap[reactionType].color,
+          ReactionIconMap[reactionType]?.backgroundColor,
+          ReactionIconMap[reactionType]?.color,
           isHovering ? "ring-2 ring-offset-1" : "",
           isSelected
-            ? `ring-2 ring-offset-2 ${ReactionIconMap[reactionType].color.replace("text-", "ring-")}`
+            ? `ring-2 ring-offset-2 ${ReactionIconMap[reactionType]?.color.replace("text-", "ring-")}`
             : ""
         )}
         style={{
@@ -127,7 +127,7 @@ const ReactionHoverIcon = ({
         {debug && (
           <div className={"absolute -top-12"}>{distance?.toFixed(1)}</div>
         )}
-        {ReactionIconMap[reactionType].icon}
+        {ReactionIconMap[reactionType]?.icon}
       </div>
     </div>
   );
@@ -144,16 +144,16 @@ const ReactionIcon = ({ reactionType, count, ...props }: ReactionIconProps) => {
       {...props}
       className={cn(
         "rounded-full flex items-center justify-center relative",
-        ReactionIconMap[reactionType].color,
+        ReactionIconMap[reactionType]?.color,
         props.className
       )}
     >
-      {ReactionIconMap[reactionType].icon}
+      {ReactionIconMap[reactionType]?.icon}
       {count > 0 && (
         <div
           className={cn(
             "text-xs absolute -bottom-2 -right-2 size-4 rounded-full flex items-center justify-center",
-            ReactionIconMap[reactionType].backgroundColor
+            ReactionIconMap[reactionType]?.backgroundColor
           )}
         >
           x{count}
