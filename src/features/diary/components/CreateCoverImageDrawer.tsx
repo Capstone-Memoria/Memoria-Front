@@ -9,12 +9,14 @@ interface CreateCoverImageDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  onImageCreate?: (imageBase64: string) => void;
 }
 
 export const CreateCoverImageDrawer = ({
   open,
   onOpenChange,
   children,
+  onImageCreate,
 }: CreateCoverImageDrawerProps) => {
   const [currentPanel, setCurrentPanel] = useState<"keyword" | "preview">(
     "keyword"
@@ -41,6 +43,12 @@ export const CreateCoverImageDrawer = ({
     },
   });
 
+  const handleConfirmImage = () => {
+    if (currentImageBase64 && onImageCreate) {
+      onImageCreate(currentImageBase64);
+    }
+  };
+
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
@@ -61,6 +69,7 @@ export const CreateCoverImageDrawer = ({
               onBack={() => setCurrentPanel("keyword")}
               imageBase64={currentImageBase64}
               isError={isError}
+              onConfirm={handleConfirmImage}
             />
           </div>
         </div>

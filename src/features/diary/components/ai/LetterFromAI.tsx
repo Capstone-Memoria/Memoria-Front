@@ -66,6 +66,7 @@ const LetterFromAI: React.FC<LetterFromAIProps> = ({ aiComment }) => {
             >
               <Image
                 className={"size-full"}
+                imageClassName={"size-full object-cover"}
                 imageId={aiComment?.createdBy.profileImage?.id}
               />
             </motion.div>
